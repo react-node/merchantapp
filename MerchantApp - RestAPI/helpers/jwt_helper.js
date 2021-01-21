@@ -35,7 +35,7 @@ module.exports = {
       }
       req.payload = payload
       client.get(payload.aud,(error,redisToken)=>{
-        console.log("redis token is checking in verify accesstoken function")
+        console.log("redis token is checking in verify accesstoken function, id is---", payload.aud)
         if(error || !redisToken)   return next(createError.Unauthorized('Unauthorized'))
         next()
       })
@@ -90,5 +90,5 @@ module.exports = {
         }
       )
     })
-  },
+  }
 }

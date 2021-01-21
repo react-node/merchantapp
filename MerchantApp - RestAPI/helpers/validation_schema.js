@@ -8,6 +8,36 @@ const authSchema = Joi.object({
   policy:Joi.boolean()
 })
 
+const StoreValidation = Joi.object({
+  name : Joi.string(),
+  address :Joi.string(),
+  isActive : Joi.boolean(),
+  owner : Joi.string(),
+  zipcode : Joi.number(),
+  storeType : Joi.array().items(Joi.object({
+    type: Joi.string(),
+    categories : Joi.array().required().messages({"any.required": "please add categories "})
+  }).required().messages({"any.required": "please add store type"})),
+  location : Joi.object({
+    type : Joi.string(),
+    coordinates : Joi.array().required().messages({"any.required": "coordinates are required"})
+  })
+}).unknown(true)
+
+const OffersModelValidation = Joi.object({
+  offerName : Joi.string(),
+  fromDate :Joi.date(),
+  isActive : Joi.boolean(),
+  storeID : Joi.string(),
+  expireDate : Joi.date(),
+  discountType : Joi.string(),
+  discount : Joi.string(),
+  
+ 
+}).unknown(true)
+
 module.exports = {
   authSchema,
+  StoreValidation,
+  OffersModelValidation
 }

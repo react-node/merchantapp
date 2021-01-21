@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import Axios from 'axios';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {
@@ -12,14 +13,13 @@ import {
   Typography,
   makeStyles
 } from '@material-ui/core';
-import FacebookIcon from 'src/icons/Facebook';
-import GoogleIcon from 'src/icons/Google';
 import Page from 'src/components/Page';
+import {API_URI} from '../../utils/config';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    backgroundColor: theme.palette.background.dark,
-    height: '100%',
+    backgroundColor: theme.palette.background.white,
+   
     paddingBottom: theme.spacing(3),
     paddingTop: theme.spacing(3)
   }
@@ -28,7 +28,25 @@ const useStyles = makeStyles((theme) => ({
 const LoginView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const login = async (userCredentials, setSubmitting )=>{
+    try{
+      const responseData  = await Axios.post(API_URI+'/auth/login',userCredentials);
+      console.log(responseData);
+      // .then((responseData)=>{
+      //   console.log(responseData);
+         navigate('/app/dashboard', { replace: true });
+      // }).catch((err)=>{
+      //   setSubmitting(false);
+      //   console.log(err);
+      // })
+      
+    }catch(error){
+      setSubmitting(false);
+      //   console.log(err);
+    }
 
+   
+  }
   return (
     <Page
       className={classes.root}
@@ -50,9 +68,7 @@ const LoginView = () => {
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
               password: Yup.string().max(255).required('Password is required')
             })}
-            onSubmit={() => {
-              navigate('/app/dashboard', { replace: true });
-            }}
+            onSubmit={(values, { setSubmitting }) => login(values,  setSubmitting )}
           >
             {({
               errors,
@@ -83,50 +99,8 @@ const LoginView = () => {
                   container
                   spacing={3}
                 >
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                  >
-                    <Button
-                      color="primary"
-                      fullWidth
-                      startIcon={<FacebookIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
-                    >
-                      Login with Facebook
-                    </Button>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={12}
-                    md={6}
-                  >
-                    <Button
-                      fullWidth
-                      startIcon={<GoogleIcon />}
-                      onClick={handleSubmit}
-                      size="large"
-                      variant="contained"
-                    >
-                      Login with Google
-                    </Button>
-                  </Grid>
-                </Grid>
-                <Box
-                  mt={3}
-                  mb={1}
-                >
-                  <Typography
-                    align="center"
-                    color="textSecondary"
-                    variant="body1"
-                  >
-                    or login with email address
-                  </Typography>
-                </Box>
+              </Grid>
+                <br/>
                 <TextField
                   error={Boolean(touched.email && errors.email)}
                   fullWidth

@@ -7,7 +7,6 @@ const {
   verifyRefreshToken,
 } = require('../helpers/jwt_helper')
 const client = require('../helpers/init_redis')
-const { ref } = require('@hapi/joi')
 
 module.exports = {
   register: async (req, res, next) => {

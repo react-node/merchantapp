@@ -1,34 +1,23 @@
 import React, { useEffect } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
-  Avatar,
+  
   Box,
-  Button,
   Divider,
   Drawer,
   Hidden,
   List,
-  Typography,
+ 
   makeStyles
 } from '@material-ui/core';
 import {
-  AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
-  Lock as LockIcon,
-  Settings as SettingsIcon,
   ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
-  UserPlus as UserPlusIcon,
-  Users as UsersIcon
 } from 'react-feather';
 import NavItem from './NavItem';
 
-const user = {
-  avatar: '/static/images/avatars/avatar_6.png',
-  jobTitle: 'Senior Developer',
-  name: 'Katarina Smith'
-};
 
 const items = [
   {
@@ -37,39 +26,14 @@ const items = [
     title: 'Dashboard'
   },
   {
-    href: '/app/customers',
-    icon: UsersIcon,
-    title: 'Customers'
-  },
-  {
-    href: '/app/products',
+    href: '/app/stores',
     icon: ShoppingBagIcon,
-    title: 'Products'
+    title: 'Stores'
   },
   {
-    href: '/app/account',
+    href: '/app/profile',
     icon: UserIcon,
-    title: 'Account'
-  },
-  {
-    href: '/app/settings',
-    icon: SettingsIcon,
-    title: 'Settings'
-  },
-  {
-    href: '/login',
-    icon: LockIcon,
-    title: 'Login'
-  },
-  {
-    href: '/register',
-    icon: UserPlusIcon,
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: AlertCircleIcon,
-    title: 'Error'
+    title: 'Profile'
   }
 ];
 
@@ -106,32 +70,7 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       display="flex"
       flexDirection="column"
     >
-      <Box
-        alignItems="center"
-        display="flex"
-        flexDirection="column"
-        p={2}
-      >
-        <Avatar
-          className={classes.avatar}
-          component={RouterLink}
-          src={user.avatar}
-          to="/app/account"
-        />
-        <Typography
-          className={classes.name}
-          color="textPrimary"
-          variant="h5"
-        >
-          {user.name}
-        </Typography>
-        <Typography
-          color="textSecondary"
-          variant="body2"
-        >
-          {user.jobTitle}
-        </Typography>
-      </Box>
+      
       <Divider />
       <Box p={2}>
         <List>
