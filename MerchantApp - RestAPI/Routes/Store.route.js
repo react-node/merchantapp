@@ -4,7 +4,10 @@ const router = express.Router()
 const StoreController = require('../Controllers/Store.Controller')
 
 router.post('/', StoreController.addStore)
+router.put('/', StoreController.updateStore)
 router.get('/', StoreController.getStores)
+router.delete('/:storeID', StoreController.deleteStore)
+router.get('/getAllStores', StoreController.getAllStores)
 
 
 module.exports = router

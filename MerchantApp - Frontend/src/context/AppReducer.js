@@ -17,6 +17,11 @@ export default (state, action) => {
           ...state,
           storeID : action.payload
         };
+      case "SET_STORE_DATA":
+        return {
+          ...state,
+          selectedStore : action.payload
+        };
       case "EDIT_EMPLOYEE":
         const updatedEmployee = action.payload;
   

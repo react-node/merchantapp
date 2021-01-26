@@ -37,7 +37,7 @@ import axios from "axios";
 import Autocomplete from 'react-google-autocomplete';
 import Map from "../../../components/Map"
 import { GlobalContext } from "../../../context/GlobalState";
-import {API_URI,ACCESS_TOKEN} from '../../../utils/config';
+import {API_URI,ACCESS_TOKEN, GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -103,7 +103,9 @@ const MenuProps = {
           : theme.typography.fontWeightMedium,
     };
   }
-const AddStore = ({ className, ...rest }) => {
+const AddStore = ({ className,type, ...rest }) => 
+{
+  const [isEdit,setisEdit]=useState(false)
   const classes = useStyles();
   const [profilePic, setProfilePic] = useState({});
   const [thumbnailImg, setThumbnailImg] = useState();
@@ -112,10 +114,13 @@ const AddStore = ({ className, ...rest }) => {
   const [names, setNames] = useState({storeTypes: []});
   const [open, setOpen] = React.useState(false);
   const [selectedSAC, setSelectedSAC] = React.useState([]);
+  const [initialValues, setInitialValues] = React.useState({});
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate();
-  const { storeID, assignStoreID} = useContext(GlobalContext);
+  const { storeID, assignStoreID,selectedStore,setSelectedStore} = useContext(GlobalContext);
+  
+
   //var selectedSAC = selectedSAC || [] 
   const handleOpen = () => {
     setOpen(true);
@@ -125,8 +130,8 @@ const AddStore = ({ className, ...rest }) => {
     var googleContainer = document.getElementsByClassName('pac-container');
     const containerLength = googleContainer.length;
     for (var i = 0; i < containerLength; i++) {
-      if(googleContainer[0].style.display !== "none"){
-        googleContainer[0].remove();
+      if(googleContainer[i].style.display !== "none"){
+        googleContainer[i].remove();
       }
     }
      
@@ -144,14 +149,86 @@ const AddStore = ({ className, ...rest }) => {
                 "Authorization" : ACCESS_TOKEN
             }
             const response = await axios.get(API_URI+'/rest/v1/utils/storetype',{"headers":options});
-            setNames({storeTypes: response.data});
-            console.log(names)
+            
+            //console.log(names)
+            response.data.map((item)=>{
+              item.checkedStatus = Array(item.categories.length).fill(false)
+            })
+            
+            if(Object.keys(selectedStore).length !== 0){
+              var categoriesData = [];
+            selectedStore.storeType.map(item=>{
+              var TypeName = response.data.filter((data=>{
+                if(item.type === data._id){
+                  categoriesData[data._id] = item.categories.map(String)
+                  item.categories.map((sc)=>{
+                    data.checkedStatus[sc] = true 
+                  })
+                  
+                  return data.type
+                }
+                
+              }))
+              setNames({storeTypes: response.data});
+              setSelectedStoreType([item.type]);
+              setSelectedSAC(categoriesData)            
+            })
+          }
         } catch (e) {
             console.log(e);
             setNames({storeTypes: names.storeTypes});
         }
     };
+ 
     fetchStoreTypes();
+
+}, []);
+  useEffect(() => {
+    const initialData = ()=>{
+      if(type==="edit"){
+        setisEdit(true)
+        console.log(selectedStore)
+        if(Object.keys(selectedStore).length == 0){
+          
+          navigate("/app/stores")
+          
+          return false
+        }
+        setInitialValues({
+          storeName : selectedStore.name,
+          email : selectedStore.email,
+          address: selectedStore.address,
+          phoneNumber: selectedStore.phoneNumber,
+          zipcode: selectedStore.zipcode,
+          identity_proof : selectedStore.identity_proof,
+          insideMall : selectedStore.insideMall ? "yes":"no",
+          mall_name: selectedStore.mall_name,
+          latitude : selectedStore.location.coordinates[1],
+          longitude : selectedStore.location.coordinates[0],
+          profilepic : selectedStore.profilepic,
+          _id : selectedStore._id
+        })
+        setThumbnailImg(GOOGLE_STORAGE_PUBLIC_URL+selectedStore.owner+"/"+selectedStore.profilepic)
+        console.log(initialValues)
+       
+
+        
+      }else{
+        setInitialValues({
+          storeName:'',
+          email: '',
+          address:'',
+          phoneNumber:'',
+          zipcode : '',
+          identity_proof : '',
+          insideMall : "no",
+          mall_name : ''
+        })
+        console.log(initialValues)
+      }
+    }
+    initialData();
+
 }, []);
   // const handleChange = (event) => {
   //   setValues({
@@ -169,19 +246,37 @@ const AddStore = ({ className, ...rest }) => {
   //     [event.target.name]: event.target.value
   //   }));
   // }
-  const storeTypeHandleChange = (event,storeType) => {
+  const storeTypeHandleChange = (event,storeType,checkedStatus) => {
+    console.log(names)
     if(!storeType ){
       setSelectedStoreType(event.target.value);
     }else{
-     
+     // checkedStatus[event.target.value] = !checkedStatus[event.target.value]
+      names.storeTypes.map((store)=>{
+        if(store._id === storeType){
+          store.checkedStatus[event.target.value] = !store.checkedStatus[event.target.value]
+        }
+      })
+      setNames(names)
+
       selectedSAC[storeType] = selectedSAC[storeType] || []
       if(event.target.checked){
         selectedSAC[storeType].push(event.target.value)
+        setSelectedSAC(selectedSAC)
       }else{
-        var removedData = []
+        var removedData = selectedSAC || []
         removedData[storeType]= selectedSAC[storeType].filter(function(entry) { return entry !== event.target.value ; });
         setSelectedSAC(removedData)
       }
+      //render checkbox again for update the checked status
+      // var q = selectedStoreType
+      // setSelectedStoreType([])
+      // setTimeout(() => {
+      //   setSelectedStoreType(q)
+      // }, 0);
+      
+
+
     }
     
     console.log(selectedStoreType)
@@ -192,7 +287,7 @@ const AddStore = ({ className, ...rest }) => {
        
         selected.categories.map((category,k)=>(
             <FormControlLabel key={category}
-        control={<Checkbox onChange={(event)=>storeTypeHandleChange(event,selected._id)} name={category} value={k} />}
+        control={<Checkbox onChange={(event)=>storeTypeHandleChange(event,selected._id,selected.checkedStatus)} name={category} value={k} defaultChecked= {selected.checkedStatus[k]} />}
         label={category}
       />
         ))
@@ -226,18 +321,30 @@ const AddStore = ({ className, ...rest }) => {
         "phoneNumber" : values.phoneNumber,
         "email" : values.email,
         "identity_proof" : values.identity_proof,
-        "profilepic" : profilePic[0].name
+        "profilepic" : profilePic[0] ? profilePic[0].name : values.profilePic 
       }
       if(storeID){
         requestPayload.hasMainBranch = true
         requestPayload.mainBranchID = storeID
       }
-      const responseData  = await axios.post(API_URI+'/rest/v1/imageupload/',data,{"headers":options});
-      console.log(responseData);
-     
-      const storeResponse  = await axios.post(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
-      console.log(storeResponse)
+      if( profilePic.length >0){
+        const responseData  = await axios.post(API_URI+'/rest/v1/imageupload/',data,{"headers":options});
+        console.log(responseData);
+      }
+      let storeResponse = {}
+      if(isEdit){
+        requestPayload._id = values._id
+         storeResponse  = await axios.put(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        console.log(storeResponse)
+      }else{
+         storeResponse  = await axios.post(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        console.log(storeResponse)
+      }
+      
       if(storeResponse.status ===200){
+        setSelectedStore({})
+        setSelectedSAC([])
+        setSelectedStoreType([])
         enqueueSnackbar('Store created successfully...!',  { variant: "success" ,"anchorOrigin" : alertPosition} );
         assignStoreID("")
         navigate("/app/stores")
@@ -245,6 +352,7 @@ const AddStore = ({ className, ...rest }) => {
 
 
     }catch(e){
+      console.log(e)
       setSubmitting(false)
       enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
     }
@@ -261,16 +369,8 @@ const handleCapture = ({ target }) => {
 
   return (
     <Formik
-            initialValues={{
-              storeName:'',
-              email: '',
-              address:'',
-              phoneNumber:'',
-              zipcode : '',
-              identity_proof : '',
-              insideMall : "no",
-              mall_name : ''
-            }}
+    enableReinitialize
+            initialValues={ { insideMall : "no",...initialValues}}
             validationSchema={Yup.object().shape({
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
               address: Yup.string().max(200).required('Address is required'),
@@ -299,8 +399,8 @@ const handleCapture = ({ target }) => {
     >
       <Card>
         <CardHeader
-          subheader="Create new store"
-          title="Add Store"
+          subheader={!isEdit? "Create new store" : "Update your store" }
+          title= {!isEdit? "Add Store": "Edit Store" }
         />
         <Divider />
         <CardContent>
@@ -330,6 +430,7 @@ const handleCapture = ({ target }) => {
                 label="Store Name"
                 name="storeName"
                 onChange={handleChange}
+                types={[]}
                 required
                 value={values.storeName || ''}
                 variant="outlined"
@@ -429,15 +530,20 @@ const handleCapture = ({ target }) => {
           input={<Input id="select-multiple-chip" />}
           renderValue={(selected) => (
             <div className={classes.chips}>
-              {selected.map((value) => (
-                <Chip key={value._id} label={value.type} className={classes.chip} />
-              ))}
+              {
+              selected.map((value) => {
+                var filterdArray = names.storeTypes.filter(store=> store._id===value)
+                  return (
+                    <Chip key={filterdArray[0]._id} label={filterdArray[0].type} className={classes.chip} />
+                  )
+                
+                })}
             </div>
           )}
           MenuProps={MenuProps}
         >
           {names.storeTypes.map((name) => (
-            <MenuItem key={name._id} value={name} style={getStyles(name, selectedStoreType, theme)}>
+            <MenuItem key={name._id} value={name._id}  style={getStyles(name, selectedStoreType, theme)}>
               {name.type}
             </MenuItem>
           ))}
@@ -494,21 +600,25 @@ const handleCapture = ({ target }) => {
             </Grid>
             )}
            
-            {selectedStoreType.map((selected)=> {
+            {
+              selectedStoreType.map((selected)=> {
+                var filterdArray = names.storeTypes.filter(store=> store._id===selected)
                 return (
                   <Grid
                   item
                   md={12}
                   xs={12}
-                  key={selected.type}
+                  key={selected}
                 >
                     
-                    <h3>{selected.type}</h3>
-                    {renderCategories(selected)}
+                    <h3>{filterdArray[0].type}</h3>
+                    {renderCategories(filterdArray[0])}
                     
                     </Grid>
                     )
-            })}
+              })
+            
+            }
    
     
       <input type="text" name="latitude" value={values.latitude || ''}  onChange={handleChange}/>

@@ -10,7 +10,8 @@ const initialState = {
       designation: "Frontend Developer"
     }
   ],
-  storeID : ""
+  storeID : "",
+  selectedStore : {}
 };
 
 export const GlobalContext = createContext(initialState);
@@ -43,6 +44,12 @@ export const GlobalProvider = ({ children }) => {
       payload: id
     });
   }
+  function setSelectedStore(storeData) {
+    dispatch({
+      type: "SET_STORE_DATA",
+      payload: storeData
+    });
+  }
 
   return (
     <GlobalContext.Provider
@@ -52,7 +59,9 @@ export const GlobalProvider = ({ children }) => {
         addEmployee,
         editEmployee,
         assignStoreID,
-        storeID : state.storeID
+        storeID : state.storeID,
+        setSelectedStore,
+        selectedStore : state.selectedStore
       }}
     >
       {children}

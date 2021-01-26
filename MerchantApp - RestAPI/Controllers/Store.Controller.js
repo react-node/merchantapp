@@ -1,7 +1,7 @@
 const Store = require('../Models/Store.model')
 const Branches = require('../Models/Branches.Model')
 const { StoreValidation } = require('../helpers/validation_schema')
-
+const createError = require('http-errors')
 const StoreContorller = {
     async addStore(req, res, next){
         try {
@@ -61,7 +61,51 @@ const StoreContorller = {
             if (error.isJoi === true) error.status = 422
             next(error)
           }
+    },
+    async getAllStores(req,res,next){
+      try {
+         
+          let query = {owner : req.payload.aud}
+         
+          const storesData = await Store.find(query).sort({ _id: -1 })
+          res.send(storesData)
+        } catch (error) {
+          if (error.isJoi === true) error.status = 422
+          next(error)
+        }
+  },
+  async updateStore(req,res,next){
+    try {
+      const requestPayload = req.body
+      requestPayload.owner = req.payload.aud
+      const result = await StoreValidation.validateAsync(requestPayload)
+      console.log(requestPayload._id)
+      var resultArray = await Store.findByIdAndUpdate(requestPayload._id,requestPayload)
+      if(!resultArray){
+        const message = "Store not found"
+        return next(createError[404](message))
+      }
+      var response = {message : "store updated",status:"ok"}
+
+
+      res.send(response)
+    } catch (error) {
+      if (error.isJoi === true) error.status = 422
+      next(error)
     }
+  },
+  async deleteStore(req,res,next){
+    try {
+      const storeID = req.params.storeID
+      const storeTypeData = await Store.findByIdAndDelete(storeID)
+      if(!storeTypeData){
+          return next(createError.NotFound)
+      }
+      res.send(storeTypeData)
+  } catch (error) {
+      next(error)
+  }
+  }
 }
 
 module.exports = StoreContorller

@@ -14,7 +14,6 @@ import {
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
 import NewStoreModal from './NewStoreModal'
-import Services from '../../../services/Services';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -44,10 +43,11 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
   };
   const searchHandler = (event)=>{
     const searchString = event.target.value
+    var filter = {}
     if(!isNaN(searchString)){
       console.log("search string contains number only")
       if(searchString.length ===6){
-        var filter = {
+        filter = {
           searchString : parseInt(searchString),
           type : "zipcode"
         }
@@ -60,7 +60,7 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
     }else{
       console.log("search string contains letter")
       if(searchString.length>3){
-        var filter = {
+         filter = {
           searchString : searchString,
           type : "name"
         }

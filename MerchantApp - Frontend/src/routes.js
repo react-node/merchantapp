@@ -8,6 +8,8 @@ import LoginView from 'src/views/auth/LoginView';
 import NotFoundView from 'src/views/errors/NotFoundView';
 import StoreListView from 'src/views/store/StoreListView';
 import AddStoreView from 'src/views/store/AddStoreView';
+import StoreDetailView from 'src/views/store/StoreDetailView';
+import StoreEditView from 'src/views/store/StoreEditView';
 import RegisterView from 'src/views/auth/RegisterView';
 
 const routes = [
@@ -20,6 +22,8 @@ const routes = [
       { path: 'dashboard', element: <DashboardView /> },
       { path: 'stores', element: <StoreListView /> },
       { path: 'stores/addstore', element: <AddStoreView /> },
+      { path: 'store/details', element: <StoreDetailView /> },
+      { path: 'store/edit', element: <StoreEditView /> },
      // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

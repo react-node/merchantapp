@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom'
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import {
@@ -9,12 +10,12 @@ import {
   Divider,
   Grid,
   Typography,
-  makeStyles
+  makeStyles,CardActionArea
 } from '@material-ui/core';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import {GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config'
-
+import { GlobalContext } from "../../../context/GlobalState";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -36,13 +37,21 @@ const useStyles = makeStyles((theme) => ({
 
 const ProductCard = ({ className, store, ...rest }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
+  const { setSelectedStore } = useContext(GlobalContext);
+  const gotoDetailedView=()=>{
+    console.log(store)
+    setSelectedStore(store)
+    navigate("/app/store/details")
 
+  }
   return (
     <Card
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <CardContent>
+      <CardActionArea onClick = {gotoDetailedView}>
+      <CardContent >
         <Box
           display="flex"
           justifyContent="center"
@@ -73,6 +82,7 @@ const ProductCard = ({ className, store, ...rest }) => {
           {store.address}
         </Typography>
       </CardContent>
+      </CardActionArea>
       <Box flexGrow={1} />
       <Divider />
       <Box p={2}>

@@ -55,7 +55,7 @@ const NewStoreModal =({openModalwindow,handleClose,goToAddStore})=>{
     const handleRender = async ()=>{
         console.log('render function')
         //console.log(openModalwindow)
-        const storesData = await Services.getStore()
+        const storesData = await Services.getAllStore()
         console.log(storesData)
         setStores(storesData.data)
     }

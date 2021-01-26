@@ -1,4 +1,5 @@
 const uploadImage = require('../helpers/gcs_helper')
+const StoreImagesModel = require('../Models/StoreImages.model')
 
 class ImageuploadController{
 
@@ -16,6 +17,36 @@ class ImageuploadController{
           } catch (error) {
             next(error)
           }
+    }
+    async saveStoreImage (req,res,next){
+      try{
+        const ownerID = req.payload.aud
+       // req.body.ownerID = userID
+        let requestBody = req.body
+        requestBody = requestBody.map(data=>({...data, ownerID}))
+        console.log(requestBody)
+        const storeImageData = await StoreImagesModel.insertMany(requestBody)
+        //const storeImageData = await storeImage.insertMany()
+        res.send(storeImageData)
+      }catch(error){
+        next(error)
+
+      }
+    }
+    async getStoreImage(req,res,next){
+      try{
+        const page = req.query.page || 1
+        const PAGE_SIZE = 6;                   // Similar to 'limit'
+        const skip = (page - 1) * PAGE_SIZE; 
+        const ownerID = req.payload.aud
+        const storeID = req.params.storeID
+        const storeImages = await StoreImagesModel.find({storeID: storeID,ownerID : ownerID}).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
+       
+        res.send(storeImages)
+      }catch(error){
+        next(error)
+
+      }
     }
 }
 module.exports = {

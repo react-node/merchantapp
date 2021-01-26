@@ -3,6 +3,7 @@ import { withGoogleMap, GoogleMap, withScriptjs, InfoWindow, Marker } from "reac
 import Geocode from "react-geocode";
 import Autocomplete from 'react-google-autocomplete';
 import { GOOGLE_MAP_API_KEY } from '../../src/utils/config';
+import '../views/store/AddStoreView/customStyle.css'
 Geocode.setApiKey( GOOGLE_MAP_API_KEY );
 Geocode.enableDebug();
 
@@ -227,6 +228,7 @@ console.log("info window closed")
 								
 							}}
 							onPlaceSelected={ this.onPlaceSelected }
+							types={[]}
 						/>
 						{/* InfoWindow on top of marker */}
 						<InfoWindow
@@ -254,7 +256,7 @@ console.log("info window closed")
 		if( this.props.center.lat !== undefined ) {
 			map = <div>
 				<AsyncMap
-					googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places`}
+					googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places&type=shopping_mall`}
 					
 					loadingElement={
 						<div style={{ height: `100%` }} />
