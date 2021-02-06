@@ -11,6 +11,10 @@ import AddStoreView from 'src/views/store/AddStoreView';
 import StoreDetailView from 'src/views/store/StoreDetailView';
 import StoreEditView from 'src/views/store/StoreEditView';
 import RegisterView from 'src/views/auth/RegisterView';
+import OffersListView from 'src/views/offer/OffersListView';
+import OfferDetailsView from 'src/views/offer/OfferDetailsView';
+import AddOffersView from 'src/views/offer/NewOffers';
+import EditOffersView from 'src/views/offer/EditOffers';
 
 const routes = [
   {
@@ -24,6 +28,10 @@ const routes = [
       { path: 'stores/addstore', element: <AddStoreView /> },
       { path: 'store/details', element: <StoreDetailView /> },
       { path: 'store/edit', element: <StoreEditView /> },
+      { path: 'offers', element: <OffersListView /> },
+      { path: 'offers/addoffer', element: <AddOffersView /> },
+      { path: 'offers/offerdetail', element: <OfferDetailsView /> },
+      { path: 'offer/editoffer', element: <EditOffersView /> },
      // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

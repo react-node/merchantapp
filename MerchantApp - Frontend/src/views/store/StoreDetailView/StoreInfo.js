@@ -1,18 +1,12 @@
 import React, { useContext } from 'react';
 import {
-
     Avatar,
-    Box,
-    Button,
     ButtonBase,
-    Card,
-    CardContent,
     colors,
     Grid,
     makeStyles,
     Paper,
     Typography
-
 } from '@material-ui/core';
 import VerifiedUserIcon from '@material-ui/icons/VerifiedUser';
 import EditIcon from '@material-ui/icons/Edit';
@@ -117,7 +111,7 @@ const StoreInfo =({store})=>{
                     <Typography variant="body2" style={{textAlign:"center" }}>
  
                         <ConfirmDialog 
-                        deleteStore={deleteStore} 
+                        deleteItem={deleteStore} 
                         buttonText="Delete Store" 
                         message="Are you sure, Do you want to delete the store?"
                         >

@@ -4,6 +4,7 @@ import Geocode from "react-geocode";
 import Autocomplete from 'react-google-autocomplete';
 import { GOOGLE_MAP_API_KEY } from '../../src/utils/config';
 import '../views/store/AddStoreView/customStyle.css'
+import MapServices from '../services/MapServices'
 Geocode.setApiKey( GOOGLE_MAP_API_KEY );
 Geocode.enableDebug();
 
@@ -17,40 +18,68 @@ class Map extends Component{
 			area: '',
 			state: '',
 			mapPosition: {
-				lat: this.props.center.lat,
-				lng: this.props.center.lng
+				lat: "",
+				lng: ""
 			},
 			markerPosition: {
-				lat: this.props.center.lat,
-				lng: this.props.center.lng
+				lat: "",
+				lng: ""
 			}
 		}
+		
 	}
+	showCurrentLocation = ()=>{
+		if (navigator.geolocation) {
+		  navigator.geolocation.getCurrentPosition(
+			position => {
+			  console.log(position.coords);
+			  this.setState({
+				  ...this.state,
+				mapPosition: {
+				
+				  lat: position.coords.latitude,
+				  lng: position.coords.longitude
+				},
+				markerPosition:{
+					lat: position.coords.latitude,
+				  	lng: position.coords.longitude
+				}
+				
+			  })
+			  Geocode.fromLatLng( position.coords.latitude , position.coords.longitude ).then(
+				response => {
+					const address = response.results[0].formatted_address,
+						  addressArray =  response.results[0].address_components,
+						  city = MapServices.getCity( addressArray ),
+						  area = MapServices.getArea( addressArray ),
+						  state = MapServices.getState( addressArray );
+	
+					console.log( 'city', city, area, state );
+	
+					this.setState( {
+						address: ( address ) ? address : '',
+						area: ( area ) ? area : '',
+						city: ( city ) ? city : '',
+						state: ( state ) ? state : '',
+					} )
+				},
+				error => {
+					console.error( error );
+				}
+			);
+			}
+		  )
+		} else {
+		  console.log("error")
+		}
+		
+	  };
+	 
 	/**
 	 * Get the current address from the default map position and set those values in the state
 	 */
 	componentDidMount() {
-		Geocode.fromLatLng( this.state.mapPosition.lat , this.state.mapPosition.lng ).then(
-			response => {
-				const address = response.results[0].formatted_address,
-				      addressArray =  response.results[0].address_components,
-				      city = this.getCity( addressArray ),
-				      area = this.getArea( addressArray ),
-				      state = this.getState( addressArray );
-
-				console.log( 'city', city, area, state );
-
-				this.setState( {
-					address: ( address ) ? address : '',
-					area: ( area ) ? area : '',
-					city: ( city ) ? city : '',
-					state: ( state ) ? state : '',
-				} )
-			},
-			error => {
-				console.error( error );
-			}
-		);
+		this.showCurrentLocation()
 	};
 	/**
 	 * Component should only update ( meaning re-render ), when the user selects the address, or drags the pin
@@ -72,57 +101,7 @@ class Map extends Component{
 			return false
 		}
 	}
-	/**
-	 * Get the city and set the city input value to the one selected
-	 *
-	 * @param addressArray
-	 * @return {string}
-	 */
-	getCity = ( addressArray ) => {
-		let city = '';
-		for( let i = 0; i < addressArray.length; i++ ) {
-			if ( addressArray[ i ].types[0] && 'administrative_area_level_2' === addressArray[ i ].types[0] ) {
-				city = addressArray[ i ].long_name;
-				return city;
-			}
-		}
-	};
-	/**
-	 * Get the area and set the area input value to the one selected
-	 *
-	 * @param addressArray
-	 * @return {string}
-	 */
-	getArea = ( addressArray ) => {
-		let area = '';
-		for( let i = 0; i < addressArray.length; i++ ) {
-			if ( addressArray[ i ].types[0]  ) {
-				for ( let j = 0; j < addressArray[ i ].types.length; j++ ) {
-					if ( 'sublocality_level_1' === addressArray[ i ].types[j] || 'locality' === addressArray[ i ].types[j] ) {
-						area = addressArray[ i ].long_name;
-						return area;
-					}
-				}
-			}
-		}
-	};
-	/**
-	 * Get the address and set the address input value to the one selected
-	 *
-	 * @param addressArray
-	 * @return {string}
-	 */
-	getState = ( addressArray ) => {
-		let state = '';
-		for( let i = 0; i < addressArray.length; i++ ) {
-			for( let i = 0; i < addressArray.length; i++ ) {
-				if ( addressArray[ i ].types[0] && 'administrative_area_level_1' === addressArray[ i ].types[0] ) {
-					state = addressArray[ i ].long_name;
-					return state;
-				}
-			}
-		}
-	};
+	
 	/**
 	 * And function for city,state and address input
 	 * @param event
@@ -149,14 +128,14 @@ console.log("info window closed")
 	onMarkerDragEnd = ( event ) => {
 		let newLat = event.latLng.lat(),
 		    newLng = event.latLng.lng();
-
+			this.props.updateGeoLocation(newLat,newLng)
 		Geocode.fromLatLng( newLat , newLng ).then(
 			response => {
 				const address = response.results[0].formatted_address,
 				      addressArray =  response.results[0].address_components,
-				      city = this.getCity( addressArray ),
-				      area = this.getArea( addressArray ),
-				      state = this.getState( addressArray );
+				      city = MapServices.getCity( addressArray ),
+				      area = MapServices.getArea( addressArray ),
+				      state = MapServices.getState( addressArray );
 				this.setState( {
 					address: ( address ) ? address : '',
 					area: ( area ) ? area : '',
@@ -186,9 +165,9 @@ console.log("info window closed")
 		console.log( 'plc', place );
 		const address = place.formatted_address,
 		      addressArray =  place.address_components,
-		      city = this.getCity( addressArray ),
-		      area = this.getArea( addressArray ),
-		      state = this.getState( addressArray ),
+		      city = MapServices.getCity( addressArray ),
+		      area = MapServices.getArea( addressArray ),
+		      state = MapServices.getState( addressArray ),
 		      latValue = place.geometry.location.lat(),
 		      lngValue = place.geometry.location.lng();
 		// Set these values in the state.
@@ -207,7 +186,7 @@ console.log("info window closed")
 			},
 		})
 	};
-
+	
 
 	render(){
 		const AsyncMap = withScriptjs(
@@ -256,7 +235,7 @@ console.log("info window closed")
 		if( this.props.center.lat !== undefined ) {
 			map = <div>
 				<AsyncMap
-					googleMapURL={`https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places&type=shopping_mall`}
+					googleMapURL={`http://maps.google.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places`}
 					
 					loadingElement={
 						<div style={{ height: `100%` }} />

@@ -15,6 +15,7 @@ import {
   BarChart as BarChartIcon,
   ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
+  Clipboard
 } from 'react-feather';
 import NavItem from './NavItem';
 
@@ -34,6 +35,11 @@ const items = [
     href: '/app/profile',
     icon: UserIcon,
     title: 'Profile'
+  },
+  {
+    href: '/app/offers',
+    icon: Clipboard,
+    title: 'Offers'
   }
 ];
 

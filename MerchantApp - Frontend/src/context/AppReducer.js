@@ -22,6 +22,21 @@ export default (state, action) => {
           ...state,
           selectedStore : action.payload
         };
+      case "SET_ADD_STORE_DATA":
+        return {
+          ...state,
+          addStoreData : action.payload
+        };
+      case "SET_OFFER_DATA":
+        return {
+          ...state,
+          selectedOffer : action.payload
+        };
+      case "LOADING":
+        return {
+          ...state,
+          isLoading : action.payload
+        };
       case "EDIT_EMPLOYEE":
         const updatedEmployee = action.payload;
   

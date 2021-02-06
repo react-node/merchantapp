@@ -7,7 +7,9 @@ class ImageuploadController{
         try {
             const myFile = req.file
             const userID = req.payload.aud
-            const imageUrl = await uploadImage(myFile,userID)
+            const imagePath = req.body.filePath || ""
+            //console.log(req)
+            const imageUrl = await uploadImage(myFile,userID,imagePath)
             res
               .status(200)
               .json({
@@ -15,6 +17,7 @@ class ImageuploadController{
                 data: imageUrl
               })
           } catch (error) {
+            console.log(error)
             next(error)
           }
     }
@@ -40,9 +43,12 @@ class ImageuploadController{
         const skip = (page - 1) * PAGE_SIZE; 
         const ownerID = req.payload.aud
         const storeID = req.params.storeID
+      //  setTimeout(async () => {
         const storeImages = await StoreImagesModel.find({storeID: storeID,ownerID : ownerID}).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
-       
         res.send(storeImages)
+          
+      //  }, 3000);
+       
       }catch(error){
         next(error)
 

@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useContext } from 'react';
 import {
   Box,
   Container,
@@ -8,8 +8,9 @@ import {
 import { Pagination } from '@material-ui/lab';
 import Page from 'src/components/Page';
 import Toolbar from './Toolbar';
-import ProductCard from './ProductCard';
+import OfferCard from './OffersCard';
 import Services from '../../../services/Services';
+import {GlobalContext} from "../../../context/GlobalState"
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,73 +19,75 @@ const useStyles = makeStyles((theme) => ({
     paddingBottom: theme.spacing(3),
     paddingTop: theme.spacing(3)
   },
-  productCard: {
+  OfferCard: {
     height: '100%'
   }
 }));
 const PAGE_LIMIT = 9
 
-const StoreList = () => {
+const OfferList = () => {
   const classes = useStyles();
-  const [stores, setStores] = useState([])
-  const [totalStores, setTotalStores] = useState(0)
+  const {setLoading} = useContext(GlobalContext);
+  
+  const [offers, setOffers] = useState([])
+  const [totalOffers, setTotalOffers] = useState(0)
   const [page, setPage] = React.useState(1);
-  const fetchStoresData = async (page=1,searchFilter={}) => {
+  const fetchOffersData = async (page=1,searchFilter={}) => {
     try {
-      setTotalStores(0)
-      const storesData = await Services.getStore(page,searchFilter)
-      setStores(storesData.data.storesData);
-      var count = storesData.data.count
+      setLoading(true)
+      setTotalOffers(0)
+      const responseData = await Services.getOffers(page,searchFilter)
+      setOffers(responseData.data.offersData);
+      var count = responseData.data.count
       count = Math.ceil(parseInt(count)/PAGE_LIMIT)
-      setTotalStores(count)
+      setTotalOffers(count)
+      setLoading(false)
     } catch (e) {
-        console.log(e.response);
-        if(e.response.status === 401){
-          //logout here
-        }
-        setStores([]);
+        console.log(e);
+        setOffers([]);
+        setLoading(false)
     }
 };
   useEffect(() => {
-    fetchStoresData();
+    fetchOffersData();
   }, []);
   
 const handleChange = (event, value) => {
   setPage(value);
-  fetchStoresData(value);
+  fetchOffersData(value);
 
 };
 const searchStore=(searchString)=>{
   console.log(searchString, "in index.js")
-  fetchStoresData(1,searchString)
+  fetchOffersData(1,searchString)
 }
   return (
     <Page
       className={classes.root}
-      title="Stores"
+      title="Offers"
     >
      
      
       <Container maxWidth={false}>
         <Toolbar searchStore={searchStore}/>
-        {stores.length >0 && (
+        {offers.length >0 && (
 
         <Box mt={3}>
           <Grid
             container
             spacing={3}
           >
-            {stores.map((store) => (
+            {offers.map((offer) => (
               <Grid
                 item
-                key={store._id}
+                key={offer._id}
                 lg={4}
                 md={6}
                 xs={12}
               >
-                <ProductCard
-                  className={classes.productCard}
-                  store={store}
+                <OfferCard
+                  className={classes.OfferCard}
+                  offer={offer}
                 />
               </Grid>
             ))}
@@ -98,7 +101,7 @@ const searchStore=(searchString)=>{
         >
           <Pagination
             color="primary"
-            count={totalStores}
+            count={totalOffers}
             size="small"
             onChange={handleChange}
             page={page}
@@ -110,4 +113,4 @@ const searchStore=(searchString)=>{
   );
 };
 
-export default StoreList;
+export default OfferList;

@@ -24,17 +24,17 @@ const StoreValidation = Joi.object({
   })
 }).unknown(true)
 
-const OffersModelValidation = Joi.object({
+const OffersModelValidation = Joi.array().items(Joi.object({
   offerName : Joi.string(),
   fromDate :Joi.date(),
   isActive : Joi.boolean(),
-  storeID : Joi.string(),
+  storeID : Joi.array(),
   expireDate : Joi.date(),
   discountType : Joi.string(),
-  discount : Joi.string(),
+  discount : Joi.number(),
   
  
-}).unknown(true)
+}).unknown(true))
 
 module.exports = {
   authSchema,

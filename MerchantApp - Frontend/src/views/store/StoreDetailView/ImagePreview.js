@@ -1,20 +1,13 @@
-import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom'
-import PropTypes from 'prop-types';
-import clsx from 'clsx';
+import React from 'react';
 import {
   Avatar,
   Box,
   Card,
   CardContent,
-  Divider,
   Grid,
-  Typography,
-  makeStyles,CardActionArea, CircularProgress, colors
+  makeStyles, CircularProgress, colors
 } from '@material-ui/core';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import DeleteIcon from '@material-ui/icons/Delete';
-import AutorenewIcon from '@material-ui/icons/Autorenew';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import './cardStyle.css'
@@ -77,15 +70,15 @@ const ImagePreview = ({ className, image, removeImagefromPreview,progressBarValu
             className={classes.statsItem}
             item
           >
+           
               {progressBarValue.percentage ===0 ? ( <DeleteIcon
               className={classes.statsIcon}
               color="action"
               onClick ={()=>deleteImage(rest.index)}
             />) : (progressBarValue.percentage ===100 ?
              <CheckCircleOutlineIcon className={classes.uploadDone}
-             color="action" /> : (progressBarValue.percentage===-1 ? 
-                <ErrorOutlineIcon className={classes.statsIcon}
-                color="action" /> : <CircularProgress />))}
+             color="action" /> :<ErrorOutlineIcon className={classes.statsIcon}
+             color="action" />)}
            
            
           </Grid>

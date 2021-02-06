@@ -10,7 +10,34 @@ const storeSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    building: {
+        type: String,
+        required: true,
+    },
+    area: {
+        type: String,
+        required: true,
+    },
+    landmark: {
+        type: String
+    },
+    city: {
+        type: String,
+        required: true,
+    },
+    state: {
+        type: String,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
     isActive:{
+        type : Boolean,
+        default : false
+    },
+    isDeleted:{
         type : Boolean,
         default : false
     },
@@ -45,7 +72,8 @@ const storeSchema = new mongoose.Schema({
     identity_proof:{type : String},
     profilepic : {type:String},
     hasMainBranch : {type : Boolean,default : false},
-    mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null}
+    mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null},
+    website: {type:String,default:null}
     }, {
         timestamps: true
     })

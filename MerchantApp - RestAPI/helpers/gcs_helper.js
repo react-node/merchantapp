@@ -11,10 +11,11 @@ const bucket = gc.bucket(process.env.GCS_BUCKET) // should be your bucket name
  *   "originalname" and "buffer" as keys
  */
 
-const uploadImage = (file,userID) => new Promise((resolve, reject) => {
+const uploadImage = (file,userID,imagePath="") => new Promise((resolve, reject) => {
   const { originalname, buffer } = file
-
-  const blob = bucket.file(`${userID}/`+originalname.replace(/ /g, "_"))
+  const offersPath = imagePath ? imagePath+"/":'/'
+  console.log(`${userID}${offersPath}`+originalname.replace(/ /g, "_"))
+  const blob = bucket.file(`${userID}${offersPath}`+originalname.replace(/ /g, "_"))
   const blobStream = blob.createWriteStream({
     resumable: false
   })
@@ -24,7 +25,8 @@ const uploadImage = (file,userID) => new Promise((resolve, reject) => {
     )
     resolve(publicUrl)
   })
-  .on('error', () => {
+  .on('error', (err) => {
+    console.log(err)
     reject(`Unable to upload image, something went wrong`)
   })
   .end(buffer)

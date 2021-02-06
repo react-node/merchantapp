@@ -44,6 +44,16 @@ const getstoreImages= async (storeID,page=1) =>{
     const responseData = await axios.get(config.API_URI+config.STORE_IMAGE_DB+"/"+storeID+"?page="+page,headers)
     return responseData
 }
+const saveOffer= async (RequestPayload) =>{
+    const headers =GenerateHeaders()
+    const responseData = await axios.post(config.API_URI+config.OFFERS,RequestPayload,headers)
+    return responseData
+}
+const updateOffer= async (RequestPayload) =>{
+    const headers =GenerateHeaders()
+    const responseData = await axios.put(config.API_URI+config.OFFERS,RequestPayload,headers)
+    return responseData
+}
 
 const GenerateHeaders =()=>{
     var headers = {
@@ -53,6 +63,28 @@ const GenerateHeaders =()=>{
     }
     return headers
 }
+const getOffers= async (page=1,searchFilter={},pageSize=9)=>{
+    const headers = GenerateHeaders()
+    let filter ='&pagesize='+pageSize 
+    if(searchFilter.type){
+        filter=`&searchstring=${searchFilter.searchString}&type=${searchFilter.type}`
+    }
+    if(searchFilter.storeID) 
+    filter += `&storeid=${searchFilter.storeID}`
+    const responseData = await axios.get(config.API_URI+config.OFFERS+"?page="+page+filter,headers)
+    return responseData
+}
+const deleteOffer= async (offerID)=>{
+    const headers = GenerateHeaders()
+    
+    const responseData = await axios.delete(`${config.API_URI}${config.OFFERS}/${offerID}`,headers)
+    return responseData
+}
+const getStoresByID= async (storeIDs)=>{
+    const headers = GenerateHeaders()
+    const responseData = await axios.post(`${config.API_URI}${config.GET_STORES_BY_ID}`,storeIDs,headers)
+    return responseData
+}
 
 export default {
     getStore,
@@ -60,5 +92,10 @@ export default {
     deleteStore,
     imageUpload,
     storeImages,
-    getstoreImages
+    getstoreImages,
+    saveOffer,
+    getOffers,
+    deleteOffer,
+    updateOffer,
+    getStoresByID
 }

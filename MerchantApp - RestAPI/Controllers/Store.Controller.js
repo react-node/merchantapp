@@ -43,7 +43,7 @@ const StoreContorller = {
             const PAGE_SIZE = 9;                   // Similar to 'limit'
             const skip = (page - 1) * PAGE_SIZE; 
            
-            let query = {owner : req.payload.aud}
+            let query = {owner : req.payload.aud, isDeleted:false}
             if(filterType === "zipcode"){
               query.zipcode = filter
             }else if(filterType === "name"){
@@ -65,10 +65,11 @@ const StoreContorller = {
     async getAllStores(req,res,next){
       try {
          
-          let query = {owner : req.payload.aud}
+          let query = {owner : req.payload.aud, isDeleted:false}
          
           const storesData = await Store.find(query).sort({ _id: -1 })
-          res.send(storesData)
+          const responseStore = storesData.map(({_id,name,address})=>{return {_id,name,address}})
+          res.send(responseStore)
         } catch (error) {
           if (error.isJoi === true) error.status = 422
           next(error)
@@ -97,7 +98,8 @@ const StoreContorller = {
   async deleteStore(req,res,next){
     try {
       const storeID = req.params.storeID
-      const storeTypeData = await Store.findByIdAndDelete(storeID)
+     // const storeTypeData = await Store.findByIdAndDelete(storeID)
+      const storeTypeData = await Store.findByIdAndUpdate(storeID,{isDeleted:true})
       if(!storeTypeData){
           return next(createError.NotFound)
       }

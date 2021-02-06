@@ -1,13 +1,13 @@
 
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 
-import { Avatar, Box, Button, colors, Grid,makeStyles } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+import { Box, Button, Grid,makeStyles } from '@material-ui/core';
 import ImagePreview from './ImagePreview'
 import PublishIcon from '@material-ui/icons/Publish';
 import Services from "../../../services/Services"
 import { GlobalContext } from "../../../context/GlobalState";
 import ImageListView from "./ImagesListView"
+import { map } from 'lodash';
 const useStyles = makeStyles((theme) => ({
     root: {},
     
@@ -18,14 +18,12 @@ const useStyles = makeStyles((theme) => ({
   }));
 const StoreImages = ()=>{
     const classes = useStyles();
-    const [isImageSelected,setIsImageSelected]=useState(false);
     const [selectedImages,setSelectedImages] = useState([])
     const [progressInfo,setProgressInfo] = useState([])
     const [storeImages,setStoreImages] = useState([])
     const [isLoading, setIsLoading]  = useState(false)
     const [isResponseEmpty, setisResponseEmpty]  = useState(true)
-    const {selectedStore} = useContext(GlobalContext);
-
+    const {selectedStore,setLoading} = useContext(GlobalContext);
     const handleCapture = ({ target }) => {
         let files = target.files
         let filesArray = [...files]
@@ -38,29 +36,38 @@ const StoreImages = ()=>{
         console.log(progressData)
         setProgressInfo(progressData)
         setSelectedImages(filesArray)
-        setIsImageSelected(true)
+       
         console.log(target.files)
         target.value=""
     }
     const getStoreImages =async (page=1)=>{
+      try{
         const storeID = selectedStore._id
         if(storeID && isResponseEmpty){
             setIsLoading(true)
             const resultObj = await Services.getstoreImages(storeID,page)
-            setStoreImages([...storeImages,...resultObj.data])
+           const responseData = resultObj.data.map((d)=>({...d,isSelected:(d.isSelected ? true :false)}))
+            console.log(responseData)
+            setStoreImages([...storeImages,...responseData])
             setIsLoading(false)
             if(resultObj.data.length ===0){
               setisResponseEmpty(false)
             }
         }
+      }catch(error){
+        setIsLoading(false)
+      }
+        
         
     }
 
     const uploadImages = async () => {
         try{
             if(Object.keys(selectedStore).length !== 0){
+              setLoading(true)
                 console.log(selectedImages)
-                let requestDataDB = []
+                let requestDataDB = [],promissArray=[];
+
                 selectedImages.map(async (image,k)=>{
                     console.log(selectedStore)
                     requestDataDB = [...requestDataDB,{image:image.name,storeID : selectedStore._id}]
@@ -76,10 +83,11 @@ const StoreImages = ()=>{
                     // if(responseData.status===200){
                       
                     // }
-                    Services.imageUpload(data).then((data)=>{
+                  promissArray[k] = Services.imageUpload(data).then((data)=>{
                         console.log(data)
                         pgd[k].percentage=100
                         setProgressInfo(pgd)
+                        
                     }).catch((error)=>{
                         pgd[k].percentage=-1
                         setProgressInfo(pgd)
@@ -88,6 +96,13 @@ const StoreImages = ()=>{
     
                   
     
+                })
+                Promise.all(promissArray).then(()=>{
+                  console.log("uploaded all Images")
+                  setLoading(false)
+                }).catch((error)=>{
+                  setLoading(false)
+                  console.log(`Error in promises ${error}`)
                 })
                 console.log(requestDataDB)
                 setSelectedImages(selectedImages)
@@ -103,7 +118,7 @@ const StoreImages = ()=>{
     const removeImagefromPreview =(index)=>{
         console.log("in delete image function")
         var filteredArray = selectedImages.filter((i,k)=>{
-             return k!=index
+             return k!== index
          })
         setSelectedImages(filteredArray)
         

@@ -4,32 +4,23 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { Box, IconButton } from '@material-ui/core';
-export default function AlertDialog({deleteItem,message,buttonText,children,buttonType}) {
+export default function ConfirmationDialogTwo({handleSubmit,open,message,handleCancel}) {
 
-  const [open, setOpen] = React.useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  //const [open, setOpen] = React.useState(open);
+//   const handleClickOpen = () => {
+//     setOpen(true);
+//   };
 
   const handleClose = () => {
-    setOpen(false);
+    handleCancel();
   };
-  const handleDeleteStore=()=>{
-      deleteItem()
-      setOpen(false);
-  }
+//   const handleDeleteStore=()=>{
+//     handleSubmit()
+//     //setOpen(false);
+//   }
 
   return (
     <Box component={'span'}  >
-      {buttonType === "iconButton" && (
-        <IconButton onClick={handleClickOpen} >
-          {children}
-        </IconButton>
-      ) || (
-        <Button  variant="outlined" color="primary" onClick={handleClickOpen}>
-          {children}  {buttonText}
-        </Button>
-      )}
       
       <Dialog
         open={open}
@@ -43,7 +34,7 @@ export default function AlertDialog({deleteItem,message,buttonText,children,butt
           <Button onClick={handleClose} color="primary">
             No
           </Button>
-          <Button onClick={handleDeleteStore} color="primary" autoFocus>
+          <Button onClick={handleSubmit} color="primary" autoFocus>
             Yes
           </Button>
         </DialogActions>

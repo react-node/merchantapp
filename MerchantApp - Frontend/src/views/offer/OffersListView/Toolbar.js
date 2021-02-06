@@ -13,7 +13,6 @@ import {
   makeStyles
 } from '@material-ui/core';
 import { Search as SearchIcon } from 'react-feather';
-import NewStoreModal from './NewStoreModal'
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -28,47 +27,27 @@ const useStyles = makeStyles((theme) => ({
 
 const Toolbar = ({ className,searchStore, ...rest }) => {
   const classes = useStyles();
-  const [openModalwindow, setopenModalwindow] = React.useState(false);
   
   const navigate = useNavigate();
-  const handleOpen = () => {
-    setopenModalwindow(true);
-    
-  };
-  const goToAddStore=()=>{
-    navigate("/app/stores/addstore")
-  }
-  const handleClose = () => {
-    setopenModalwindow(false);
-  };
+
+  
   const searchHandler = (event)=>{
     const searchString = event.target.value
     var filter = {}
-    if(!isNaN(searchString)){
-      console.log("search string contains number only")
-      if(searchString.length ===6){
-        filter = {
-          searchString : parseInt(searchString),
-          type : "zipcode"
-        }
-        searchStore(filter)
-        
-      }else if(searchString === undefined || searchString === "" ){
-        console.log(searchString)
-        searchStore()
-      }
-    }else{
+
       console.log("search string contains letter")
       if(searchString.length>3){
          filter = {
           searchString : searchString,
-          type : "name"
+          type : "offerName"
         }
         searchStore(filter)
 
+      }else if(searchString === undefined || searchString ===""){
+        searchStore()
       }
 
-    }
+    
    // console.log(searchString) 
   }
   return (
@@ -80,17 +59,13 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
         display="flex"
         justifyContent="flex-end"
       >
-        <Button className={classes.importButton}>
-          Import
-        </Button>
-       
         <Button
           color="primary"
           variant="contained"
-          onClick={()=>{navigate("/app/stores/addstore")}}
-         // onClick={()=>{handleOpen()}}
+          onClick={()=>{navigate("/app/offers/addoffer")}}
+         
         >
-          Add store
+          Add offer
         </Button>
       </Box>
       <Box mt={3}>
@@ -111,7 +86,7 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
                     </InputAdornment>
                   )
                 }}
-                placeholder="Enter zipcode / store name / area"
+                placeholder="Enter offers name"
                 variant="outlined"
                 onChange = {searchHandler}
               />
@@ -119,7 +94,6 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
           </CardContent>
         </Card>
       </Box>
-      <NewStoreModal openModalwindow={openModalwindow} handleClose={handleClose} goToAddStore={goToAddStore}></NewStoreModal>
     </div>
   );
 };

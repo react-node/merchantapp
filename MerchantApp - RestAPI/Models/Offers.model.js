@@ -6,6 +6,10 @@ const offersSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    offerDescription: {
+        type: String,
+        trim: true
+    },
     fromDate: {
         type: Date,
         required: true,
@@ -20,25 +24,53 @@ const offersSchema = new mongoose.Schema({
         
     },
     discount : {
-        type: String,
+        type: Number,
         required : "Discount is required",
         
     },
-    storeID: {
+    storeID: [{
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'Store'
+    }],
+    ownerID: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
+    groupOfStoresByUID:{
+        type:String,
+      
+        default: new Date().getTime()
     },
     likes : {
-        type: Number
+        type: Number,
+        default:0
+    },
+    views : {
+        type: Number,
+        default:0
     },
     shares : {
-        type: Number
+        type: Number,
+        default:0
     },
     isActive : {
-        type: Boolean
+        type: Boolean,
+        default:false
     },
-    images:  [String]
+    isDeleted : {
+        type: Boolean,
+        default:false
+    },
+    status:{
+        type:Number,
+        default : 1 //1=submitted,2-approved,3-rejected
+    },
+    images:  [{
+        imagePath : {type : String},
+        isDeleted : {type: Boolean,default:false}
+    }]
     
 }, {
     timestamps: true

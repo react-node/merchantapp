@@ -7,7 +7,7 @@ import { SnackbarProvider } from 'notistack';
 import 'src/mixins/chartjs';
 import theme from 'src/theme';
 import routes from 'src/routes';
-
+import Loading from "src/components/Loading"
 const App = () => {
   const routing = useRoutes(routes);
 
@@ -15,6 +15,7 @@ const App = () => {
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
       <GlobalStyles />
+      <Loading  />
       {routing}
       </SnackbarProvider>
     </ThemeProvider>

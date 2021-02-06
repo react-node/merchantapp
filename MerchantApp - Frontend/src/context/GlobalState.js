@@ -11,7 +11,10 @@ const initialState = {
     }
   ],
   storeID : "",
-  selectedStore : {}
+  selectedStore : {},
+  addStoreData : {},
+  isLoading : false,
+  selectedOffer : {}
 };
 
 export const GlobalContext = createContext(initialState);
@@ -50,6 +53,24 @@ export const GlobalProvider = ({ children }) => {
       payload: storeData
     });
   }
+  function setAddStoreData(data) {
+    dispatch({
+      type: "SET_ADD_STORE_DATA",
+      payload: data
+    });
+  }
+  function setSelectedOffer(data) {
+    dispatch({
+      type: "SET_OFFER_DATA",
+      payload: data
+    });
+  }
+  function setLoading(data) {
+    dispatch({
+      type: "LOADING",
+      payload: data
+    });
+  }
 
   return (
     <GlobalContext.Provider
@@ -61,7 +82,13 @@ export const GlobalProvider = ({ children }) => {
         assignStoreID,
         storeID : state.storeID,
         setSelectedStore,
-        selectedStore : state.selectedStore
+        selectedStore : state.selectedStore,
+        addStoreData : state.addStoreData,
+        setAddStoreData,
+        isLoading : state.isLoading,
+        setLoading,
+        selectedOffer : state.selectedOffer,
+        setSelectedOffer
       }}
     >
       {children}

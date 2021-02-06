@@ -101,7 +101,7 @@ const LatestOrders = ({ className, ...rest }) => {
       className={clsx(classes.root, className)}
       {...rest}
     >
-      <CardHeader title="Latest Orders" />
+      <CardHeader title="Latest Offers" />
       <Divider />
       <PerfectScrollbar>
         <Box minWidth={800}>

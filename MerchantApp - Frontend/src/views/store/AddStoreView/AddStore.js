@@ -1,4 +1,4 @@
-import React, { useEffect,useState,useContext } from 'react';
+import React, { useEffect,useState,useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -34,10 +34,10 @@ import {  useSnackbar } from 'notistack';
 import * as Yup from 'yup';
 import axios from "axios";
 
-import Autocomplete from 'react-google-autocomplete';
 import Map from "../../../components/Map"
 import { GlobalContext } from "../../../context/GlobalState";
 import {API_URI,ACCESS_TOKEN, GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
+import MapServices from "../../../services/MapServices"
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -109,17 +109,18 @@ const AddStore = ({ className,type, ...rest }) =>
   const classes = useStyles();
   const [profilePic, setProfilePic] = useState({});
   const [thumbnailImg, setThumbnailImg] = useState();
-  const [selectedStoreType, setSelectedStoreType] = React.useState([]);
+  const [selectedStoreType, setSelectedStoreType] = useState([]);
   const theme = useTheme();
   const [names, setNames] = useState({storeTypes: []});
-  const [open, setOpen] = React.useState(false);
-  const [selectedSAC, setSelectedSAC] = React.useState([]);
-  const [initialValues, setInitialValues] = React.useState({});
+  const [open, setOpen] = useState(false);
+  const [selectedSAC, setSelectedSAC] = useState([]);
+  const [initialValues, setInitialValues] = useState({});
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate();
-  const { storeID, assignStoreID,selectedStore,setSelectedStore} = useContext(GlobalContext);
-  
+  const { storeID, assignStoreID,selectedStore,setSelectedStore,addStoreData,setAddStoreData} = useContext(GlobalContext);
+  const [initialGeoLocation, setinitialGeoLocation] = useState({})
+  const [isSelectedFromsuggestions, setIsSelectedFromsuggestions] = useState(false)
 
   //var selectedSAC = selectedSAC || [] 
   const handleOpen = () => {
@@ -141,54 +142,68 @@ const AddStore = ({ className,type, ...rest }) =>
   //   var googleContainer = document.getElementsByClassName('pac-container');
   //   //googleContainer[1].style['z-index'] = 1301;
   // }
+  
   useEffect(() => {
     const fetchStoreTypes = async () => {
-        try {
-            setNames({storeTypes: names.storeTypes});
-            var options= {
-                "Authorization" : ACCESS_TOKEN
-            }
-            const response = await axios.get(API_URI+'/rest/v1/utils/storetype',{"headers":options});
-            
-            //console.log(names)
-            response.data.map((item)=>{
-              item.checkedStatus = Array(item.categories.length).fill(false)
-            })
-            
-            if(Object.keys(selectedStore).length !== 0){
-              var categoriesData = [];
-            selectedStore.storeType.map(item=>{
-              var TypeName = response.data.filter((data=>{
-                if(item.type === data._id){
-                  categoriesData[data._id] = item.categories.map(String)
-                  item.categories.map((sc)=>{
-                    data.checkedStatus[sc] = true 
-                  })
-                  
-                  return data.type
-                }
-                
-              }))
-              setNames({storeTypes: response.data});
-              setSelectedStoreType([item.type]);
-              setSelectedSAC(categoriesData)            
-            })
+      try {
+          setNames({storeTypes: names.storeTypes});
+          var options= {
+              "Authorization" : ACCESS_TOKEN
           }
-        } catch (e) {
-            console.log(e);
-            setNames({storeTypes: names.storeTypes});
+          const response = await axios.get(API_URI+'/rest/v1/utils/storetype',{"headers":options});
+          
+          //console.log(names)
+          response.data.map((item)=>{
+            item.checkedStatus = Array(item.categories.length).fill(false)
+            return item
+          })
+          
+          if(Object.keys(selectedStore).length !== 0){
+            var categoriesData = [];
+          selectedStore.storeType.map(item=>{
+            response.data.filter((data=>{
+              if(item.type === data._id){
+                categoriesData[data._id] = item.categories.map(String)
+                item.categories.map((sc)=>{
+                  data.checkedStatus[sc] = true 
+                  return null
+                })
+                
+                return data.type
+              }
+              return null
+            }))
+            setNames({storeTypes: response.data});
+            setSelectedStoreType([item.type]);
+            setSelectedSAC(categoriesData)   
+            return null      
+          })
+        }else{
+          setNames({storeTypes: response.data});
         }
-    };
- 
+      } catch (e) {
+          console.log(e);
+          setNames({storeTypes: names.storeTypes});
+      }
+  };
     fetchStoreTypes();
 
 }, []);
   useEffect(() => {
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          console.log(position.coords);
+          setinitialGeoLocation({lat : position.coords.latitude,long: position.coords.longitude})
+          
+          })
+    }
+    
     const initialData = ()=>{
       if(type==="edit"){
         setisEdit(true)
         console.log(selectedStore)
-        if(Object.keys(selectedStore).length == 0){
+        if(Object.keys(selectedStore).length === 0){
           
           navigate("/app/stores")
           
@@ -197,7 +212,7 @@ const AddStore = ({ className,type, ...rest }) =>
         setInitialValues({
           storeName : selectedStore.name,
           email : selectedStore.email,
-          address: selectedStore.address,
+          addressLine: selectedStore.address,
           phoneNumber: selectedStore.phoneNumber,
           zipcode: selectedStore.zipcode,
           identity_proof : selectedStore.identity_proof,
@@ -206,6 +221,13 @@ const AddStore = ({ className,type, ...rest }) =>
           latitude : selectedStore.location.coordinates[1],
           longitude : selectedStore.location.coordinates[0],
           profilepic : selectedStore.profilepic,
+          building : selectedStore.building,
+          landmark : selectedStore.landmark,
+          area:selectedStore.area,
+          city: selectedStore.city,
+          state:selectedStore.state,
+          country: selectedStore.country,
+          website: selectedStore.website,
           _id : selectedStore._id
         })
         setThumbnailImg(GOOGLE_STORAGE_PUBLIC_URL+selectedStore.owner+"/"+selectedStore.profilepic)
@@ -217,13 +239,22 @@ const AddStore = ({ className,type, ...rest }) =>
         setInitialValues({
           storeName:'',
           email: '',
-          address:'',
+          addressLine:'',
           phoneNumber:'',
           zipcode : '',
           identity_proof : '',
           insideMall : "no",
-          mall_name : ''
+          mall_name : '',
+          building : "",
+          landmark : "",
+          area:"",
+          city: "",
+          state:"",
+          country:"",
+          website: ""
         })
+        setSelectedStoreType([])
+        setSelectedSAC([])
         console.log(initialValues)
       }
     }
@@ -256,6 +287,7 @@ const AddStore = ({ className,type, ...rest }) =>
         if(store._id === storeType){
           store.checkedStatus[event.target.value] = !store.checkedStatus[event.target.value]
         }
+        return null
       })
       setNames(names)
 
@@ -296,7 +328,27 @@ const AddStore = ({ className,type, ...rest }) =>
   }
   const SaveStore= async (values,setSubmitting )=> {
     try{
-      
+      if(!values.latitude && !values.longitude){
+        enqueueSnackbar('Please select your store in map..!',   { variant: "error","anchorOrigin" : alertPosition } );
+       
+        setSubmitting(false)
+        return false
+      }
+      if(selectedStoreType.length===0){
+        enqueueSnackbar('Please select Store type..!',   { variant: "error","anchorOrigin" : alertPosition } );
+         
+        setSubmitting(false)
+        return false
+      }
+      if(!isEdit){
+        if(Object.keys(profilePic).length ===0){
+          enqueueSnackbar('Please upload the image which shows store name, probebly enterance of store...!',   { variant: "error","anchorOrigin" : alertPosition } );
+         
+          setSubmitting(false)
+          return false
+        }
+      }
+     
       console.log(values)
       console.log(selectedSAC)
       console.log(profilePic)
@@ -312,7 +364,13 @@ const AddStore = ({ className,type, ...rest }) =>
       console.log(storeTypeData)
       var requestPayload = {
         "name" : values.storeName,
-        "address" : values.address,
+        "address" : values.addressLine,
+        "area" : values.area,
+        "building" : values.building,
+        "landmark":values.landmark,
+        "city" : values.city,
+        "state" : values.state,
+        "country":values.country,
         "zipcode" : values.zipcode,
         "location" : { "type" : "Point", "coordinates":[parseFloat(values.longitude),parseFloat(values.latitude)]},
         "storeType" : storeTypeData,
@@ -321,7 +379,8 @@ const AddStore = ({ className,type, ...rest }) =>
         "phoneNumber" : values.phoneNumber,
         "email" : values.email,
         "identity_proof" : values.identity_proof,
-        "profilepic" : profilePic[0] ? profilePic[0].name : values.profilePic 
+        "profilepic" : profilePic[0] ? profilePic[0].name : values.profilePic ,
+        "website":values.website
       }
       if(storeID){
         requestPayload.hasMainBranch = true
@@ -331,21 +390,25 @@ const AddStore = ({ className,type, ...rest }) =>
         const responseData  = await axios.post(API_URI+'/rest/v1/imageupload/',data,{"headers":options});
         console.log(responseData);
       }
-      let storeResponse = {}
+      let storeResponse = {},message="";
       if(isEdit){
+        message = "Store updated successfully...!"
         requestPayload._id = values._id
          storeResponse  = await axios.put(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
         console.log(storeResponse)
       }else{
+        message = "Store created successfully...!"
          storeResponse  = await axios.post(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
         console.log(storeResponse)
       }
       
       if(storeResponse.status ===200){
-        setSelectedStore({})
+        await setSelectedStore({})
+        console.log(selectedStore)
         setSelectedSAC([])
         setSelectedStoreType([])
-        enqueueSnackbar('Store created successfully...!',  { variant: "success" ,"anchorOrigin" : alertPosition} );
+        
+        enqueueSnackbar(message,  { variant: "success" ,"anchorOrigin" : alertPosition} );
         assignStoreID("")
         navigate("/app/stores")
       }
@@ -367,17 +430,96 @@ const handleCapture = ({ target }) => {
   setThumbnailImg(URL.createObjectURL(target.files[0]))
 }
 
+  const placeInputRef = useRef(null);
+  useEffect(() => {
+    initPlaceAPI();
+  }, []);
+ 
+  // initialize the google place autocomplete
+  const initPlaceAPI = () => {
+    let autocomplete = new window.google.maps.places.Autocomplete( document.getElementById('place_changed'),);
+    new window.google.maps.event.addListener(autocomplete, "place_changed", function () {
+      let place = autocomplete.getPlace();
+    
+     // setValues({...values,latitude:place.geometry.location.lat()})
+      console.log(place)
+      //setStoreName(place.name)
+      const  addressArray =  place.address_components,
+       postalCode = MapServices.getPostalCode( addressArray ),
+       city = MapServices.getCity( addressArray ),
+       state = MapServices.getState( addressArray ),
+       country = MapServices.getCountry( addressArray ),
+       area = MapServices.getArea( addressArray ),
+       website = place.website || "",
+       addressLine = MapServices.getAddressLine(addressArray);
+
+       setIsSelectedFromsuggestions(true)
+      setInitialValues({...addStoreData,
+        latitude: place.geometry.location.lat(),
+        storeName : place.name,
+        addressLine,
+       // phoneNumber:place.formatted_phone_number,
+        longitude : place.geometry.location.lng(),
+        zipcode : postalCode,
+        city,
+        state,
+        country,
+        website,
+        area
+
+        })
+      
+    });
+  };
+const updateGeoLocation =(lat,long)=>{
+
+  console.log(addStoreData)
+  setInitialValues({...addStoreData, latitude:lat,longitude : long})
+}
+const resetForm=(e)=>{
+  if(isSelectedFromsuggestions){
+    setInitialValues({...addStoreData,
+      latitude: "",
+      storeName: e.target.value,
+      address : "",
+      longitude : "",
+      zipcode : ""
+      })
+      setIsSelectedFromsuggestions(false)
+  }
+ 
+}
+const updateStore=(e,val,setValues)=>{
+ // console.log(val)
+ var attrName = e.target.name,tempvalues={}
+
+  tempvalues[attrName] = e.target.value
+  
+    setAddStoreData({...val,[e.target.name]:e.target.value})
+ 
+  
+}
+
   return (
     <Formik
     enableReinitialize
             initialValues={ { insideMall : "no",...initialValues}}
             validationSchema={Yup.object().shape({
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-              address: Yup.string().max(200).required('Address is required'),
-              phoneNumber: Yup.string().min(10).max(10).required('Phone number is required'),
+              addressLine: Yup.string().max(200).required('Address is required'),
+              phoneNumber: Yup.string().required('Phone number is required'),
               zipcode: Yup.string().max(6).required('zipcode is required'),
-              identity_proof: Yup.string().required('identity proof is required'),
+              identity_proof: Yup.string().required('Identity proof is required'),
               storeName: Yup.string().required('Store name is required'),
+              insideMall: Yup.string().required('Please select is it inside mall or not'),
+              mall_name: Yup.string().when("insideMall",{is:(val)=>val ==="yes",then: Yup.string().required("Mall name is required"),
+              otherwise: Yup.string().notRequired()}),
+              building : Yup.string().max(200).required('Building details are required'),
+             
+              area:Yup.string().max(200).required('Area is required'),
+              city:Yup.string().max(200).required('City is required'),
+              state:Yup.string().max(200).required('State is required'),
+              country:Yup.string().max(200).required('Country is required'),
             })}
             onSubmit={(values, { setSubmitting }) => SaveStore(values,  setSubmitting )}
           >
@@ -388,7 +530,7 @@ const handleCapture = ({ target }) => {
               handleSubmit,
               isSubmitting,
               touched,
-              values
+              values,setValues
             }) => (
     <form
       autoComplete="off"
@@ -410,33 +552,26 @@ const handleCapture = ({ target }) => {
           >
             <Grid
               item
-              md={6}
+              md={12}
               xs={12}
             >
                 
-        <Autocomplete
-							style={{
-								width: '100%',
-								height: '100%',
-								paddingLeft: '16px',
-                marginTop: '2px',
-                borderRadius: '5px',
-                borderColor: 'lightgrey',
-                borderWidth: 'thin',
-                fontSize: '1rem'
-								
-							}}
-                
+                <TextField
+                fullWidth
+                error={Boolean(touched.storeName && errors.StoreName)}
+                helperText={touched.storeName && errors.storeName}
+                //helperText="Please specify the store name"
                 label="Store Name"
                 name="storeName"
-                onChange={handleChange}
-                types={[]}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues);resetForm(e)}}
                 required
                 value={values.storeName || ''}
                 variant="outlined"
-                placeholder ="Store name"
-						/>
-             
+                ref={placeInputRef}
+                id="place_changed"
+                placeholder=""
+              />
+              
               
             </Grid>
             <Grid
@@ -445,15 +580,15 @@ const handleCapture = ({ target }) => {
               xs={12}
             >
               <TextField
-                error={Boolean(touched.address && errors.address)}
-                helperText={touched.address && errors.address}
+                error={Boolean(touched.building && errors.building)}
+                helperText={touched.building && errors.building}
                 fullWidth
-                label="Address"
-                name="address"
+                label="Building no., Floor, Building name "
+                name="building"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
-                value={values.address|| ''}
+                value={values.building|| ''}
                 variant="outlined"
               />
             </Grid>
@@ -463,15 +598,15 @@ const handleCapture = ({ target }) => {
               xs={12}
             >
               <TextField
-                error={Boolean(touched.email && errors.email)}
-                helperText={touched.email && errors.email}
+                error={Boolean(touched.addressLine && errors.addressLine)}
+                helperText={touched.addressLine && errors.addressLine}
                 fullWidth
-                label="Email Address"
-                name="email"
+                label="Street, Layout, Sector, Colony"
+                name="addressLine"
                 onBlur={handleBlur}
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
-                value={values.email|| ''}
+                value={values.addressLine|| ''}
                 variant="outlined"
               />
             </Grid>
@@ -481,14 +616,86 @@ const handleCapture = ({ target }) => {
               xs={12}
             >
               <TextField
-                error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                helperText={touched.phoneNumber && errors.phoneNumber}
+                error={Boolean(touched.landmark && errors.landmark)}
+                helperText={touched.landmark && errors.landmark}
                 fullWidth
-                label="Phone Number"
-                name="phoneNumber"
-                onChange={handleChange}
-                type="number"
-                value={values.phoneNumber|| ''}
+                label="Landmark (Optional)"
+                name="landmark"
+                onBlur={handleBlur}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                value={values.landmark|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(touched.area && errors.area)}
+                helperText={touched.area && errors.area}
+                fullWidth
+                label="Area"
+                name="area"
+                onBlur={handleBlur}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                required
+                value={values.area|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(touched.city && errors.city)}
+                helperText={touched.city && errors.city}
+                fullWidth
+                label="City"
+                name="city"
+                onBlur={handleBlur}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                required
+                value={values.city|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(touched.state && errors.state)}
+                helperText={touched.state && errors.state}
+                fullWidth
+                label="State"
+                name="state"
+                onBlur={handleBlur}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                required
+                value={values.state|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(touched.country && errors.country)}
+                helperText={touched.country && errors.country}
+                fullWidth
+                label="Country"
+                name="country"
+                onBlur={handleBlur}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                required
+                value={values.country|| ''}
                 variant="outlined"
               />
             </Grid>
@@ -503,7 +710,7 @@ const handleCapture = ({ target }) => {
                 fullWidth
                 label="Zipcode"
                 name="zipcode"
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 type="number"
                 value={values.zipcode|| ''}
                 variant="outlined"
@@ -514,11 +721,47 @@ const handleCapture = ({ target }) => {
               md={6}
               xs={12}
             >
+              <TextField
+                error={Boolean(errors.email)}
+                helperText={ errors.email}
+                fullWidth
+                label="Email Address"
+                name="email"
+               
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                required
+                value={values.email|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(errors.phoneNumber)}
+                helperText={errors.phoneNumber}
+                fullWidth
+                label="Phone Number"
+                name="phoneNumber"
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                type="number"
+                value={values.phoneNumber|| ''}
+                variant="outlined"
+              />
+            </Grid>
+           
+            <Grid
+              item
+              md={6}
+              xs={12}
+              
+            >
               <FormControl className={classes.formControl}>
               <InputLabel id="demo-mutiple-chip-label">Store Type</InputLabel>
         <Select
           error={Boolean(touched.selectedStoreType && errors.selectedStoreType)}
-         
           labelId="demo-mutiple-chip-label"
           id="demo-mutiple-chip"
           multiple
@@ -552,16 +795,32 @@ const handleCapture = ({ target }) => {
             </Grid>
             <Grid
               item
+              md={6}
+              xs={12}
+            >
+              <TextField
+                error={Boolean(errors.website)}
+                helperText={errors.website}
+                fullWidth
+                label="Website (Optional)"
+                name="website"
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                value={values.website|| ''}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid
+              item
               md={12}
               xs={12}
             >  
              <TextField
-                error={Boolean(touched.identity_proof && errors.identity_proof)}
-                helperText={touched.identity_proof && errors.identity_proof}
+                error={Boolean( errors.identity_proof)}
+                helperText={ errors.identity_proof}
                 fullWidth
                 label="Enter PAN / Aadhar / GST Number"
                 name="identity_proof"
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                
                 value={values.identity_proof|| ''}
                 variant="outlined"
@@ -592,7 +851,7 @@ const handleCapture = ({ target }) => {
                 fullWidth
                 label="Enter mall name"
                 name="mall_name"
-                onChange={handleChange}
+                onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
                 value={values.mall_name|| ''}
                 variant="outlined"
@@ -619,8 +878,6 @@ const handleCapture = ({ target }) => {
               })
             
             }
-   
-    
       <input type="text" name="latitude" value={values.latitude || ''}  onChange={handleChange}/>
       <input type="text" name="longitude" value={values.longitude || ''}  onChange={handleChange}/>
       {!(values.latitude && values.longitude) && (
@@ -660,7 +917,6 @@ const handleCapture = ({ target }) => {
           
         </label> 
       </Box> 
-      
       <Avatar
             className={classes.avatar}
             src={thumbnailImg}
@@ -685,7 +941,6 @@ const handleCapture = ({ target }) => {
           </Button>
         </Box>
       </Card>
-      
       <Modal
         aria-labelledby="transition-modal-title"
         aria-describedby="transition-modal-description"
@@ -703,11 +958,11 @@ const handleCapture = ({ target }) => {
         <Fade in={open}>
           <div className={classes.paper}>
           <Map
-    
-     center={{lat: 18.5204, lng: 73.8567}}
-     height='300px'
-     zoom={15}
-    />
+            center={{lat: initialGeoLocation.lat, lng: initialGeoLocation.long}}
+            height='300px'
+            zoom={15}
+            updateGeoLocation = {updateGeoLocation}
+            />
           </div>
         </Fade>
       </Modal>
