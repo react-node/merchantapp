@@ -1,19 +1,36 @@
 import 'react-perfect-scrollbar/dist/css/styles.css';
-import React from 'react';
+import React, { useContext } from 'react';
 import { useRoutes } from 'react-router-dom';
-import { ThemeProvider } from '@material-ui/core';
+import { makeStyles, ThemeProvider } from '@material-ui/core';
 import GlobalStyles from 'src/components/GlobalStyles';
 import { SnackbarProvider } from 'notistack';
 import 'src/mixins/chartjs';
 import theme from 'src/theme';
 import routes from 'src/routes';
 import Loading from "src/components/Loading"
+import { GlobalContext } from "../src/context/GlobalState";
+
+const useStyles = makeStyles((theme) => ({
+  snack: {
+    top:65
+  }
+}));
 const App = () => {
-  const routing = useRoutes(routes);
+   const classes = useStyles();
+   const {getAccessToken} = useContext(GlobalContext);
+   const accessToken =  getAccessToken()
+console.log("accesstoken--------------------",accessToken)
+//const accessToken = window.sessionStorage.getItem('token')
+  const routing = useRoutes(routes(accessToken));
 
   return (
     <ThemeProvider theme={theme}>
-      <SnackbarProvider>
+      <SnackbarProvider 
+       maxSnack={3}
+        classes={{ 
+          root: classes.snack,
+        }}
+        >
       <GlobalStyles />
       <Loading  />
       {routing}

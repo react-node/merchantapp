@@ -5,7 +5,7 @@ import {
   Card,
   CardContent,
   Grid,
-  makeStyles, CircularProgress, colors
+  makeStyles, colors
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';

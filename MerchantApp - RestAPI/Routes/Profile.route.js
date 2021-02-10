@@ -5,6 +5,7 @@ const {profileController} = require('../Controllers/Profile.Controller')
 
 
 router.get('/me', profileController.getProfileDetails )
+router.get('/dashboard', profileController.dashboard )
 
 
 module.exports = router

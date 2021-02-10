@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -11,6 +11,7 @@ import LatestProducts from './LatestProducts';
 import TasksProgress from './TasksProgress';
 import TotalCustomers from './TotalCustomers';
 import TotalProfit from './TotalProfit';
+import Services from 'src/services/Services';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,6 +24,33 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = () => {
   const classes = useStyles();
+  const [totalStoresCount,setTotalStoresCount] = useState(0)
+  const [totalOffersCount,setTotalOffersCount] = useState(0)
+  const [totalActiveStoresCount,setTotalActiveStoresCount] = useState(0)
+  const [totalActiveOffersCount,setTotalActiveOffersCount] = useState(0)
+  const [storesData,setStoresData] = useState([])
+  const [offersData,setOffersData] = useState([])
+
+  const fetchDashboardData = async ()=>{
+    try{
+   
+      const responseData = await Services.dashboard()
+      setTotalStoresCount(responseData.data.TotalStores)
+      setTotalOffersCount(responseData.data.TotalOffers)
+      setTotalActiveStoresCount(responseData.data.TotalActiveStores)
+      setTotalActiveOffersCount(responseData.data.TotalActiveOffers)
+      setStoresData(responseData.data.TotalActiveStoresData)
+      setOffersData(responseData.data.TotalActiveOffersData)
+
+    }catch(err){
+      console.log(err)
+
+    }
+  }
+
+  useEffect(()=>{
+    fetchDashboardData()
+  },[])
 
   return (
     <Page
@@ -41,7 +69,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <Budget />
+            <Budget totalStoresCount= {totalStoresCount}/>
           </Grid>
           <Grid
             item
@@ -50,7 +78,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <TotalCustomers />
+            <TotalCustomers totalOffersCount={totalOffersCount}/>
           </Grid>
           <Grid
             item
@@ -59,7 +87,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <TasksProgress />
+            <TasksProgress totalActiveStoresCount={totalActiveStoresCount}/>
           </Grid>
           <Grid
             item
@@ -68,7 +96,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <TotalProfit />
+            <TotalProfit totalActiveOffersCount={totalActiveOffersCount}/>
           </Grid>
           
          
@@ -79,7 +107,7 @@ const Dashboard = () => {
             xl={3}
             xs={12}
           >
-            <LatestProducts />
+            <LatestProducts storesData={storesData}/>
           </Grid>
           <Grid
             item
@@ -88,7 +116,7 @@ const Dashboard = () => {
             xl={9}
             xs={12}
           >
-            <LatestOrders />
+            <LatestOrders offersData={offersData}/>
           </Grid>
         </Grid>
       </Container>

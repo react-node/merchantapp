@@ -187,7 +187,7 @@ const AddStore = ({ className,type, ...rest }) =>
       }
   };
     fetchStoreTypes();
-
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
   useEffect(() => {
     if(navigator.geolocation){
@@ -259,7 +259,7 @@ const AddStore = ({ className,type, ...rest }) =>
       }
     }
     initialData();
-
+// eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
   // const handleChange = (event) => {
   //   setValues({
@@ -433,10 +433,12 @@ const handleCapture = ({ target }) => {
   const placeInputRef = useRef(null);
   useEffect(() => {
     initPlaceAPI();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
  
   // initialize the google place autocomplete
   const initPlaceAPI = () => {
+    if(window.google){
     let autocomplete = new window.google.maps.places.Autocomplete( document.getElementById('place_changed'),);
     new window.google.maps.event.addListener(autocomplete, "place_changed", function () {
       let place = autocomplete.getPlace();
@@ -470,6 +472,7 @@ const handleCapture = ({ target }) => {
         })
       
     });
+  }
   };
 const updateGeoLocation =(lat,long)=>{
 

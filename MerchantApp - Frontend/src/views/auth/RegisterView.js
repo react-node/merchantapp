@@ -16,6 +16,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
+import {  useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -29,17 +30,26 @@ const useStyles = makeStyles((theme) => ({
 const RegisterView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const alertPosition = { horizontal: "right", vertical: "top" }
+
   const saveUser =(fromData) => {
  
     console.log(API_URI , fromData);
     Axios.post(API_URI+'/auth/register',fromData).then(response=>{
       console.log(response);
-      navigate('/app/dashboard', { replace: true });
+      enqueueSnackbar('Thank you for registering with us..!',   { variant: "success","anchorOrigin" : alertPosition } );
+      enqueueSnackbar('Email sent to your registered email. Please verify and activate.',   { variant: "success","anchorOrigin" : alertPosition } );
+
+      navigate('/', { replace: true });
     }).catch(error=>{
+      enqueueSnackbar('Something went wrong, Please try again later..!',   { variant: "error","anchorOrigin" : alertPosition } );
+
       console.log(error);
     });
   
 }
+
   return (
     <Page
       className={classes.root}
@@ -198,7 +208,7 @@ const RegisterView = () => {
                   {' '}
                   <Link
                     component={RouterLink}
-                    to="/login"
+                    to="/"
                     variant="h6"
                   >
                     Sign in

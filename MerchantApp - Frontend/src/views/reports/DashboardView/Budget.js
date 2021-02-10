@@ -11,7 +11,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import MoneyIcon from '@material-ui/icons/Money';
-
+import StorefrontIcon from '@material-ui/icons/Storefront';
 const useStyles = makeStyles((theme) => ({
   root: {
     height: '100%'
@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const Budget = ({ className, ...rest }) => {
+const Budget = ({ className,totalStoresCount, ...rest }) => {
   const classes = useStyles();
 
   return (
@@ -56,12 +56,12 @@ const Budget = ({ className, ...rest }) => {
               color="textPrimary"
               variant="h3"
             >
-              10
+              {totalStoresCount}
             </Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <MoneyIcon />
+              <StorefrontIcon />
             </Avatar>
           </Grid>
         </Grid>

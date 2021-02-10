@@ -21,11 +21,11 @@ export default function AlertDialog({deleteItem,message,buttonText,children,butt
 
   return (
     <Box component={'span'}  >
-      {buttonType === "iconButton" && (
+      {buttonType === "iconButton" ? (
         <IconButton onClick={handleClickOpen} >
           {children}
         </IconButton>
-      ) || (
+      ) : (
         <Button  variant="outlined" color="primary" onClick={handleClickOpen}>
           {children}  {buttonText}
         </Button>

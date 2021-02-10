@@ -6,8 +6,11 @@ const {
   signRefreshToken,
   verifyRefreshToken,
 } = require('../helpers/jwt_helper')
+const Cryptr = require('cryptr');
 const client = require('../helpers/init_redis')
-
+const sendEmail = require('../helpers/email_send');
+const { create } = require('../Models/User.model');
+const cryptr = new Cryptr(process.env.ENCRYPT_SECRET_KEY);
 module.exports = {
   register: async (req, res, next) => {
     try {
@@ -18,13 +21,22 @@ module.exports = {
       const doesExist = await User.findOne({ email: result.email })
       if (doesExist)
         throw createError.Conflict(`${result.email} is already been registered`)
-
+      const randomString = Math.random().toString(36).slice(2)
+      result.activationKey = randomString
       const user = new User(result)
       const savedUser = await user.save()
-      const accessToken = await signAccessToken(savedUser.id)
-      const refreshToken = await signRefreshToken(savedUser.id)
+      console.log(savedUser._id)
+      const encrypt_email =  cryptr.encrypt(savedUser._id);
+      const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
+      //console.log(emailSend)
+      // const accessToken = await signAccessToken(savedUser.id)
+      // const refreshToken = await signRefreshToken(savedUser.id)
+      const responseData = {
+        status:200,
+        message : "Registered successfully"
 
-      res.send({ accessToken, refreshToken })
+      }
+      res.send(responseData)
     } catch (error) {
       if (error.isJoi === true) error.status = 422
       next(error)
@@ -34,9 +46,9 @@ module.exports = {
   login: async (req, res, next) => {
     try {
       const result = await authSchema.validateAsync(req.body)
-      const user = await User.findOne({ email: result.email })
+      const user = await User.findOne({ email: result.email})
       if (!user) throw createError.NotFound('User not registered')
-
+      if(!user.isVerified) throw createError.NotAcceptable('Account not verified') 
       const isMatch = await user.isValidPassword(result.password)
       if (!isMatch)
         throw createError.Unauthorized('Username/password not valid')
@@ -84,4 +96,70 @@ module.exports = {
       next(error)
     }
   },
+  verifyUser:async (req,res,next)=>{
+    try{
+      const { token,id } = req.body
+      if (!token || !id ) throw createError.BadRequest()
+      const decrypt_id =  cryptr.decrypt(id);
+      console.log(decrypt_id)
+      const verification = await User.findOne({_id : decrypt_id}).or([{activationKey:token},{isVerified:true}])
+      console.log(verification)
+      if(!verification) throw createError.NotFound()
+      //const userModel = Object.assign(verification, {activationKey: "valid",isVerified:true});
+      // verification.activationKey= "valid"
+      // verification.isVerified= true
+      let response = {status:5001, message :"verified successfully"}
+      if(!verification.isVerified){
+        const updatedResponse = await User.updateOne({_id:decrypt_id},{activationKey: "valid",isVerified:true},{new:true})
+        console.log(updatedResponse)
+        
+      }else{
+        response.message="Already verified"
+        response.status = 5002
+      }
+     
+      
+      return res.send(response)
+
+    }catch(error){
+      next(error)
+    }
+  },
+  forgotpassword : async (req,res,next)=>{
+    try{
+  
+      const {email } = req.body
+      if (!email) throw createError.BadRequest()
+      const verification = await User.findOne({email })
+      console.log(verification)
+      if(!verification) throw createError.NotFound()
+      const randomString = Math.random().toString(36).slice(2)
+    
+      const encrypt_email =  cryptr.encrypt(email);
+      const emailSend = await sendEmail(randomString,encrypt_email,verification.firstName,email,"forgotPassword")
+      const updateToken = await User.updateOne({_id:verification._id},{forgotPasswordToken : randomString})
+      const responseData = {
+        status :200,
+        message: "Email sent to registerd email address."
+      }
+      res.send(responseData)
+    }catch(e){
+      next(e)
+    }
+  },
+  updatepassword : async(req,res,next)=>{
+    try{
+      const { token,email,password } = req.body
+      if (!token || !email ) throw createError.BadRequest()
+      const decrypt_email =  cryptr.decrypt(email);
+      console.log(decrypt_email)
+      const verification = await User.findOneAndUpdate({email : decrypt_email,forgotPasswordToken:token},{password,forgotPasswordToken:null},{new:true})
+      console.log(verification)
+      if(!verification) throw createError.NotFound()
+      res.send(verification) 
+    }catch(err){
+      next(err)
+    }
+
+  }
 }

@@ -18,27 +18,31 @@ import {
   Clipboard
 } from 'react-feather';
 import NavItem from './NavItem';
-
+import StorefrontIcon from '@material-ui/icons/Storefront';
+import LocalOfferIcon from '@material-ui/icons/LocalOffer';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import PersonIcon from '@material-ui/icons/Person';
 
 const items = [
   {
     href: '/app/dashboard',
-    icon: BarChartIcon,
+    icon: DashboardIcon,
     title: 'Dashboard'
   },
   {
     href: '/app/stores',
-    icon: ShoppingBagIcon,
+    icon: StorefrontIcon,
     title: 'Stores'
   },
   {
     href: '/app/profile',
-    icon: UserIcon,
+    icon: PersonIcon,
     title: 'Profile'
   },
   {
     href: '/app/offers',
-    icon: Clipboard,
+    icon: LocalOfferIcon,
     title: 'Offers'
   }
 ];

@@ -1,15 +1,11 @@
 import React from "react"
 import OffersForm from "../components/OffersForm"
 import {
-  
     Container,
     Grid,
     makeStyles
   } from '@material-ui/core';
-  import Page from 'src/components/Page';
-  import Loader from 'src/components/Loading'
-  
-
+import Page from 'src/components/Page';
 const useStyles = makeStyles((theme) => ({
     root: {
       backgroundColor: theme.palette.background.dark,
@@ -22,7 +18,6 @@ const useStyles = makeStyles((theme) => ({
   
 const AddOffers=()=>{
     const classes = useStyles();
-    
     return (
         <Page
       className={classes.root}
@@ -33,14 +28,10 @@ const AddOffers=()=>{
           container
           spacing={3}
         >
-          
-
           <OffersForm />
-         
         </Grid>
       </Container>
     </Page>
     )
 }
-
 export default AddOffers

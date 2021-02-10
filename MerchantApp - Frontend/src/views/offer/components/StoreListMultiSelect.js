@@ -35,20 +35,18 @@ const StoresList =({defaultVal,storeHandleChange,isError})=>{
       return () => { // ComponentWillUnmount in Class Component
         _isMounted.current = false;
     }
+
     },[])
     useEffect(()=>{
       if(defaultVal){
-        const defaultstoresdata = stores.filter(({_id,name})=>{
-          if(defaultVal.includes(_id))
-          return {_id,name}
-         
-         })
+        const defaultstoresdata = stores.filter(({_id,name})=> defaultVal.includes(_id))
          console.log(defaultstoresdata)
          setSelectedstore(defaultstoresdata)
        }
+       // eslint-disable-next-line react-hooks/exhaustive-deps
     },[stores])
     const renderOptions=(option,state)=>{
-      {
+      
         const selectFilmIndex = selectedStore.findIndex(
           store => store.name.toLowerCase() === "all"
         );
@@ -68,7 +66,7 @@ const StoresList =({defaultVal,storeHandleChange,isError})=>{
             <span name="sp">{option.name},{option.address}</span>
           </div>
         );
-      }
+      
     }
     return (
         // <FormControl fullWidth required >

@@ -14,7 +14,8 @@ const initialState = {
   selectedStore : {},
   addStoreData : {},
   isLoading : false,
-  selectedOffer : {}
+  selectedOffer : {},
+  accessToken:null
 };
 
 export const GlobalContext = createContext(initialState);
@@ -71,7 +72,16 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
-
+  function setAccessToken(data) {
+    dispatch({
+      type: "SET_TOKEN",
+      payload: data
+    });
+  }
+  function getAccessToken() {
+    const token = window.sessionStorage.getItem("token")
+    return token
+  }
   return (
     <GlobalContext.Provider
       value={{
@@ -88,7 +98,10 @@ export const GlobalProvider = ({ children }) => {
         isLoading : state.isLoading,
         setLoading,
         selectedOffer : state.selectedOffer,
-        setSelectedOffer
+        setSelectedOffer,
+        setAccessToken,
+        getAccessToken,
+        accessToken:state.accessToken
       }}
     >
       {children}

@@ -147,10 +147,38 @@ class OffersContorller {
     async deleteOffer(req, res, next){
         try {
             const offerID = req.params.offerID
-            const offerResult = await OffersModel.findByIdAndUpdate(offerID,{isDeleted:true})
+            const storeid = req.query.storeid || null
+            let offerResult = ""
+            let updateData = {isDeleted:true}
+            if(storeid){
+                const offerData = await OffersModel.findById(offerID).lean()
+                console.log("storeid====",storeid)
+                const {_id,...rest} = offerData
+                if(offerData.storeID.length >1){
+                    const requestBody = {...rest,isDeleted:true,deletedSourceStoreID: storeid}
+                    console.log(requestBody)
+                    const newRecord = new OffersModel(requestBody)
+                    await newRecord.save() //async operation
+                    const filteredStores = offerData.storeID.filter((i) => i != storeid)
+                   
+                    updateData = {storeID : filteredStores}
+                   // offerResult = await OffersModel.findByIdAndUpdate(offerID,{isDeleted:true,storeID:filteredStores})
+
+                }
+                // else{
+                //     offerResult = await OffersModel.findByIdAndUpdate(offerID,{isDeleted:true})
+
+                // }
+            }
+            // else{
+            //      offerResult = await OffersModel.findByIdAndUpdate(offerID,{isDeleted:true})
+            // }
+            offerResult = await OffersModel.findByIdAndUpdate(offerID,updateData)
             if(!offerResult){
                 return next(createError.NotFound)
             }
+
+            
             res.send(offerResult)
         } catch (error) {
             if (error.isJoi === true) error.status = 422

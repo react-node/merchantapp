@@ -13,6 +13,7 @@ import {
   colors
 } from '@material-ui/core';
 import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
+import StorefrontIcon from '@material-ui/icons/Storefront';
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -25,7 +26,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const TasksProgress = ({ className, ...rest }) => {
+const TasksProgress = ({ className,totalActiveStoresCount, ...rest }) => {
   const classes = useStyles();
 
   return (
@@ -45,27 +46,22 @@ const TasksProgress = ({ className, ...rest }) => {
               gutterBottom
               variant="h6"
             >
-              TASKS PROGRESS
+              ACTIVE STORES
             </Typography>
             <Typography
               color="textPrimary"
               variant="h3"
             >
-              75.5%
+             {totalActiveStoresCount}
             </Typography>
           </Grid>
           <Grid item>
             <Avatar className={classes.avatar}>
-              <InsertChartIcon />
+              <StorefrontIcon />
             </Avatar>
           </Grid>
         </Grid>
-        <Box mt={3}>
-          <LinearProgress
-            value={75.5}
-            variant="determinate"
-          />
-        </Box>
+        
       </CardContent>
     </Card>
   );

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom';
 import Axios from 'axios';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -17,6 +17,7 @@ import Page from 'src/components/Page';
 import {API_URI} from '../../utils/config';
 import { GlobalContext } from "../../context/GlobalState";
 import {  useSnackbar } from 'notistack';
+import Services from 'src/services/Services';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,40 +29,36 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const LoginView = () => {
+const UpdatePasswordView = () => {
   const classes = useStyles();
+  const { token,email } = useParams();
   const navigate = useNavigate();
   const {setLoading,setAccessToken} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
 
-  const login = async (userCredentials, setSubmitting )=>{
+  const updatePassword = async (formData, setSubmitting )=>{
     try{
       setLoading(true)
-      const responseData  = await Axios.post(API_URI+'/auth/login',userCredentials);
+      const requestData = {...formData,token,email}
+      const result = await Services.updatePassword(requestData)
+      //if(result.data.status ===200)
+      enqueueSnackbar('Updated successfully, Please login with your new credentials',   { variant: "success","anchorOrigin" : alertPosition } );
+      navigate('/')
 
-      console.log(responseData);
-      if(responseData.status===200){
-        setAccessToken(responseData.data.accessToken)
-      }
+        
       setLoading(false)
-      // .then((responseData)=>{
-      //   console.log(responseData);
-        navigate('/app/dashboard');
-      // }).catch((err)=>{
-      //   setSubmitting(false);
-      //   console.log(err);
-      // })
+     
       
     }catch(err){
       if (err.response) {
         // client received an error response (5xx, 4xx)
         if(err.response.status===406)
          enqueueSnackbar('Your account is not yet verified, please chek your email and verify',   { variant: "error","anchorOrigin" : alertPosition } );
-       if(err.response.status === 404)
-         enqueueSnackbar('Email address does not exist with us, Please try again with other email address.',   { variant: "error","anchorOrigin" : alertPosition } );
-         if(err.response.status === 401)
-         enqueueSnackbar('Username/password not valid',   { variant: "error","anchorOrigin" : alertPosition } );
+        if(err.response.status === 404)
+         enqueueSnackbar('Email address does not exist with us / Token expired.',   { variant: "error","anchorOrigin" : alertPosition } );
+        else
+        enqueueSnackbar('Something went wrong, Please try again later.',   { variant: "error","anchorOrigin" : alertPosition } );
 
        console.log("error in api call")
       } else if (err.request) {
@@ -79,10 +76,11 @@ const LoginView = () => {
 
    
   }
+ 
   return (
     <Page
       className={classes.root}
-      title="Login"
+      title="Reset Password"
     >
       <Box
         display="flex"
@@ -93,14 +91,22 @@ const LoginView = () => {
         <Container maxWidth="sm">
           <Formik
             initialValues={{
-              email: '',
-              password: ''
+             // email: '',
+             confirmPassword: '',
+             password: ''
             }}
             validationSchema={Yup.object().shape({
-              email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-              password: Yup.string().max(255).required('Password is required')
+              //confirmPassword: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
+              password: Yup.string().max(255).required('Password is required'),
+              confirmPassword: Yup.string().max(255).required('Confirm password is required')
+              .test("password-confirm-password-same",
+              "Password and confirm password should be same",
+              function(value){
+                return this.parent.password === value
+              }
+              )
             })}
-            onSubmit={(values, { setSubmitting }) => login(values,  setSubmitting )}
+            onSubmit={(values, { setSubmitting }) => updatePassword(values,  setSubmitting )}
           >
             {({
               errors,
@@ -117,14 +123,14 @@ const LoginView = () => {
                     color="textPrimary"
                     variant="h2"
                   >
-                    Sign in
+                    Reset Password
                   </Typography>
                   <Typography
                     color="textSecondary"
                     gutterBottom
                     variant="body2"
                   >
-                    Sign in on the internal platform
+                    Update your account password
                   </Typography>
                 </Box>
                 <Grid
@@ -133,19 +139,6 @@ const LoginView = () => {
                 >
               </Grid>
                 <br/>
-                <TextField
-                  error={Boolean(touched.email && errors.email)}
-                  fullWidth
-                  helperText={touched.email && errors.email}
-                  label="Email Address"
-                  margin="normal"
-                  name="email"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="email"
-                  value={values.email}
-                  variant="outlined"
-                />
                 <TextField
                   error={Boolean(touched.password && errors.password)}
                   fullWidth
@@ -159,6 +152,19 @@ const LoginView = () => {
                   value={values.password}
                   variant="outlined"
                 />
+                <TextField
+                  error={Boolean(touched.confirmPassword && errors.confirmPassword)}
+                  fullWidth
+                  helperText={touched.confirmPassword && errors.confirmPassword}
+                  label="Password"
+                  margin="normal"
+                  name="confirmPassword"
+                  onBlur={handleBlur}
+                  onChange={handleChange}
+                  type="password"
+                  value={values.confirmPassword}
+                  variant="outlined"
+                />
                 <Box my={2}>
                   <Button
                     color="primary"
@@ -168,7 +174,7 @@ const LoginView = () => {
                     type="submit"
                     variant="contained"
                   >
-                    Sign in now
+                    Update Password
                   </Button>
                 </Box>
                 <Grid container>
@@ -197,10 +203,10 @@ const LoginView = () => {
                 >
                   <Link
                     component={RouterLink}
-                    to="/forgotPassword"
+                    to="/"
                     variant="h6"
                   >
-                     Forgot password?
+                    Login
                   </Link>
                 </Typography>
                 </Grid>
@@ -214,4 +220,4 @@ const LoginView = () => {
   );
 };
 
-export default LoginView;
+export default UpdatePasswordView;

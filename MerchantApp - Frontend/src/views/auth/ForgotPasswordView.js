@@ -17,6 +17,7 @@ import Page from 'src/components/Page';
 import {API_URI} from '../../utils/config';
 import { GlobalContext } from "../../context/GlobalState";
 import {  useSnackbar } from 'notistack';
+import Services from 'src/services/Services';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,42 +29,32 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const LoginView = () => {
+const ForgotPasswordView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
   const {setLoading,setAccessToken} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
-  const alertPosition = { horizontal: "right", vertical: "top" }
+  const alertPosition = { horizontal: "right", vertical: "top",marginTop:"75px" }
 
-  const login = async (userCredentials, setSubmitting )=>{
+  const forgotPassword = async (userCredentials, setSubmitting )=>{
     try{
       setLoading(true)
-      const responseData  = await Axios.post(API_URI+'/auth/login',userCredentials);
+      const responseData  = await Services.forgotPassword(userCredentials);
 
       console.log(responseData);
       if(responseData.status===200){
-        setAccessToken(responseData.data.accessToken)
+       enqueueSnackbar('Sent email to your account. please check and update password',   { variant: "success","anchorOrigin" : alertPosition } );
+        
       }
       setLoading(false)
-      // .then((responseData)=>{
-      //   console.log(responseData);
-        navigate('/app/dashboard');
-      // }).catch((err)=>{
-      //   setSubmitting(false);
-      //   console.log(err);
-      // })
-      
+     
     }catch(err){
       if (err.response) {
         // client received an error response (5xx, 4xx)
-        if(err.response.status===406)
-         enqueueSnackbar('Your account is not yet verified, please chek your email and verify',   { variant: "error","anchorOrigin" : alertPosition } );
        if(err.response.status === 404)
-         enqueueSnackbar('Email address does not exist with us, Please try again with other email address.',   { variant: "error","anchorOrigin" : alertPosition } );
-         if(err.response.status === 401)
-         enqueueSnackbar('Username/password not valid',   { variant: "error","anchorOrigin" : alertPosition } );
+        enqueueSnackbar('Email address does not exist with us, Please try again with other email address.',   { variant: "error","anchorOrigin" : alertPosition } );
 
-       console.log("error in api call")
+        console.log("error in api call")
       } else if (err.request) {
         // client never received a response, or request never left
         console.log("request failed and no response ")
@@ -94,13 +85,13 @@ const LoginView = () => {
           <Formik
             initialValues={{
               email: '',
-              password: ''
+            //  password: ''
             }}
             validationSchema={Yup.object().shape({
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-              password: Yup.string().max(255).required('Password is required')
+            //  password: Yup.string().max(255).required('Password is required')
             })}
-            onSubmit={(values, { setSubmitting }) => login(values,  setSubmitting )}
+            onSubmit={(values, { setSubmitting }) => forgotPassword(values,  setSubmitting )}
           >
             {({
               errors,
@@ -117,14 +108,14 @@ const LoginView = () => {
                     color="textPrimary"
                     variant="h2"
                   >
-                    Sign in
+                    Forgot Password
                   </Typography>
                   <Typography
                     color="textSecondary"
                     gutterBottom
                     variant="body2"
                   >
-                    Sign in on the internal platform
+                    Enter your email address and we'll send you a link to reset your password
                   </Typography>
                 </Box>
                 <Grid
@@ -146,19 +137,7 @@ const LoginView = () => {
                   value={values.email}
                   variant="outlined"
                 />
-                <TextField
-                  error={Boolean(touched.password && errors.password)}
-                  fullWidth
-                  helperText={touched.password && errors.password}
-                  label="Password"
-                  margin="normal"
-                  name="password"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  type="password"
-                  value={values.password}
-                  variant="outlined"
-                />
+                
                 <Box my={2}>
                   <Button
                     color="primary"
@@ -168,7 +147,7 @@ const LoginView = () => {
                     type="submit"
                     variant="contained"
                   >
-                    Sign in now
+                    Submit
                   </Button>
                 </Box>
                 <Grid container>
@@ -197,10 +176,10 @@ const LoginView = () => {
                 >
                   <Link
                     component={RouterLink}
-                    to="/forgotPassword"
+                    to="/"
                     variant="h6"
                   >
-                     Forgot password?
+                     Login
                   </Link>
                 </Typography>
                 </Grid>
@@ -214,4 +193,4 @@ const LoginView = () => {
   );
 };
 
-export default LoginView;
+export default ForgotPasswordView;

@@ -1,5 +1,18 @@
 import * as config from '../../src/utils/config';
 import axios from "axios";
+import { GlobalContext } from "../context/GlobalState";
+import { useContext } from 'react';
+
+const userVerification =async (token,id)=>{
+    const RequestPayload = {token,id}
+    const verifyUserResponse = await axios.post(config.API_URI+config.USER_VERIFY,RequestPayload)
+    return verifyUserResponse
+}
+const forgotPassword =async (RequestPayload)=>{
+    //const RequestPayload = {token,id}
+    const verifyUserResponse = await axios.post(config.API_URI+config.FORGOT_PASSWORD,RequestPayload)
+    return verifyUserResponse
+}
 
 const getStore= async (page=1,searchFilter={})=>{
     const headers = GenerateHeaders()
@@ -56,9 +69,10 @@ const updateOffer= async (RequestPayload) =>{
 }
 
 const GenerateHeaders =()=>{
+    const token = window.sessionStorage.getItem('token')
     var headers = {
         "headers" : {
-            "Authorization" : config.ACCESS_TOKEN
+            "Authorization" : `Bearer ${token}`
         } 
     }
     return headers
@@ -74,15 +88,34 @@ const getOffers= async (page=1,searchFilter={},pageSize=9)=>{
     const responseData = await axios.get(config.API_URI+config.OFFERS+"?page="+page+filter,headers)
     return responseData
 }
-const deleteOffer= async (offerID)=>{
+const deleteOffer= async (offerID,storeID=null)=>{
     const headers = GenerateHeaders()
-    
-    const responseData = await axios.delete(`${config.API_URI}${config.OFFERS}/${offerID}`,headers)
+    let filter = ''
+    if(storeID){
+        filter = "?storeid="+storeID
+
+    }
+    const responseData = await axios.delete(`${config.API_URI}${config.OFFERS}/${offerID}${filter}`,headers)
     return responseData
 }
 const getStoresByID= async (storeIDs)=>{
     const headers = GenerateHeaders()
     const responseData = await axios.post(`${config.API_URI}${config.GET_STORES_BY_ID}`,storeIDs,headers)
+    return responseData
+}
+const updatePassword= async (requestData)=>{
+    const headers = GenerateHeaders()
+    const responseData = await axios.post(`${config.API_URI}${config.RESET_PASSWORD}`,requestData,headers)
+    return responseData
+}
+const dashboard = async ()=>{
+    const headers = GenerateHeaders()
+    const responseData = await axios.get(`${config.API_URI}${config.DASHBOARD}`,headers)
+    return responseData
+}
+const getProfileData = async ()=>{
+    const headers = GenerateHeaders()
+    const responseData = await axios.get(`${config.API_URI}${config.PROFILE}`,headers)
     return responseData
 }
 
@@ -97,5 +130,10 @@ export default {
     getOffers,
     deleteOffer,
     updateOffer,
-    getStoresByID
+    getStoresByID,
+    userVerification,
+    forgotPassword,
+    updatePassword,
+    dashboard,
+    getProfileData
 }

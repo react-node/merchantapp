@@ -25,7 +25,6 @@ import ConfirmDialog from '../../store/StoreDetailView/ConfirmDialog'
 import ConfirmationDialogTwo from '../components/ConfirmationDialogTwo'
 import DeleteIcon from '@material-ui/icons/Delete';
 import { withStyles } from '@material-ui/styles';
-
   const useStyles = makeStyles((theme) => ({
     root: {
       display: 'flex',
@@ -37,7 +36,6 @@ import { withStyles } from '@material-ui/styles';
     },
     paper: {
         padding: theme.spacing(2),
-        
         maxWidth: "100%",
       },
       image: {
@@ -72,7 +70,6 @@ import { withStyles } from '@material-ui/styles';
       expired:{
         color: "#f44336",
         backgroundColor: "rgba(244, 67, 54, 0.08)",
-       
       }
   }));
   const AntSwitch = withStyles((theme) => ({
@@ -124,6 +121,7 @@ const OfferInfo =({offerData})=>{
         }else{
            // setOfferStatus(offerData.isActive)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     const editOffer =()=>{
         console.log("edit offer")
@@ -263,13 +261,13 @@ const OfferInfo =({offerData})=>{
                         <Grid item    xs={12}   md={4}  lg={4}>
                             <Typography variant="body2" >
                                 Status : 
-                                {offerData.status !==1 && 
-                                    (editDisable(offerData.expireDate) && (<span className={`${classes.expired} ${classes.statusBadge}`}>Expired  </span>) 
-                                    ||                          
-                                    (offerData.isActive && (
+                                {offerData.status !==1 ?
+                                    (editDisable(offerData.expireDate) ? (<span className={`${classes.expired} ${classes.statusBadge}`}>Expired  </span>) 
+                                    :                         
+                                    (offerData.isActive ? (
                                         <span className={`${classes.active} ${classes.statusBadge}`}>Active  </span>
-                                    ) || (<span className={`${classes.expired} ${classes.statusBadge}`}>Inactive  </span>)
-                                    ))||(
+                                    ) : (<span className={`${classes.expired} ${classes.statusBadge}`}>Inactive  </span>)
+                                    )):(
                                         <span> Status will be updated after approved </span>
                                     )} 
                                
@@ -303,7 +301,6 @@ const OfferInfo =({offerData})=>{
                             Applied stores
                         </Link>
                     </Grid>
-
                     <Grid item container direction="row" spacing={2}>
                         {assignedStores.map((item)=>(
                              <Grid key={item._id} item  xs={12} md={3} lg={3} >
@@ -331,7 +328,6 @@ const OfferInfo =({offerData})=>{
                     </GridList>
                     <br/>
                     <Typography variant="body2" style={{textAlign:"center" }}>
- 
                         <ConfirmDialog 
                         deleteItem={deleteOffer} 
                         buttonText="Delete Offer" 
@@ -343,7 +339,6 @@ const OfferInfo =({offerData})=>{
                     </Grid>
                     </Grid>
                     <Grid container xs={1} md={1} item justify="flex-end">
-
                     <Typography variant="subtitle1"> 
                         <ButtonBase
                         onClick = {editOffer}
@@ -354,7 +349,6 @@ const OfferInfo =({offerData})=>{
                                 color="action"
                                 
                                 />
-                                
                         </ButtonBase>
                         <ButtonBase >
                             { offerData.status ===1 && 

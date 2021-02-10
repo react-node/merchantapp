@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
-import { Avatar, Box, CircularProgress, colors, GridListTileBar, IconButton, Typography } from '@material-ui/core';
+import { Avatar, Box, CircularProgress,  GridListTileBar, IconButton, Typography } from '@material-ui/core';
 import { GOOGLE_STORAGE_PUBLIC_URL } from 'src/utils/config';
-import PublishIcon from '@material-ui/icons/Publish';
 import ConfirmDialog from './ConfirmDialog'
 import DeleteIcon from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
@@ -48,23 +47,20 @@ const ImageGridList =({data,getMoreData,isLoading})=> {
        }
        imagesData.map((item=> item.isSelect= false))
        console.log(imagesData)
-
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
   useEffect(()=>{
-    
     setImagesdata(data)
-    
-  },[data])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[data])
   useEffect(() => {
     // here we simulate adding new posts to List
-
     if(page){
       getMoreData(page)
-     
       console.log("call function to get new records",page)
     }
-    
-}, [page])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page])
   const handleObserver = (entities) => {
     
     const target = entities[0];

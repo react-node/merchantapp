@@ -1,16 +1,13 @@
 
 import React, { useContext, useState } from 'react'
-
 import { Box, Button, Grid,makeStyles } from '@material-ui/core';
 import ImagePreview from './ImagePreview'
 import PublishIcon from '@material-ui/icons/Publish';
 import Services from "../../../services/Services"
 import { GlobalContext } from "../../../context/GlobalState";
 import ImageListView from "./ImagesListView"
-import { map } from 'lodash';
 const useStyles = makeStyles((theme) => ({
     root: {},
-    
     avatar: {
       height: 75,
       width: 75
@@ -57,10 +54,7 @@ const StoreImages = ()=>{
       }catch(error){
         setIsLoading(false)
       }
-        
-        
     }
-
     const uploadImages = async () => {
         try{
             if(Object.keys(selectedStore).length !== 0){
@@ -121,55 +115,44 @@ const StoreImages = ()=>{
              return k!== index
          })
         setSelectedImages(filteredArray)
-        
     }
     const getMoreData=(page)=>{
         getStoreImages(page)
-
         console.log( "getting info on page number",page)
     }
     return (
-       
         <Box  component={'div'}  >
             {Object.keys(selectedStore).length !== 0 && (
-                <Box
+          <Box
           display="flex"
           justifyContent="flex-end"
           p={1}
           component={'span'} 
-        >
-        <input
-          accept="image/*"
-          style={{ display: 'none' }}
-          id="raised-button-file"
-          type="file"
-          onChange={handleCapture}
+          >
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="raised-button-file"
+            type="file"
+            onChange={handleCapture}
 
-          multiple
-        />
-         <br />
+            multiple
+          />
+          <br />
         {selectedImages.length ===0 ? (
             <label htmlFor="raised-button-file">
             <Button  component="span" >
             Add images 
             </Button>
-            
             </label> 
         ):(
-            
             <Box  component={'span'}>
-               
             <Button variant="outlined" color="secondary" component="span" onClick={uploadImages}>
             <PublishIcon></PublishIcon>Upload
             </Button>
             </Box>
-            
         )}
-
-       
-      </Box>
-            )}
-        
+      </Box>)}
       <Grid
         component={'span'}
           container
@@ -196,8 +179,6 @@ const StoreImages = ()=>{
            </Grid> 
            <ImageListView data={storeImages} getMoreData={getMoreData} isLoading={isLoading} />
       </Box>
-      
     )
 }
-
 export default StoreImages

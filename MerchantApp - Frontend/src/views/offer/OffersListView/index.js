@@ -50,6 +50,7 @@ const OfferList = () => {
 };
   useEffect(() => {
     fetchOffersData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
 const handleChange = (event, value) => {

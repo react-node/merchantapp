@@ -37,6 +37,20 @@ export default (state, action) => {
           ...state,
           isLoading : action.payload
         };
+      case "SET_TOKEN":
+        window.sessionStorage.setItem("token",action.payload)
+        return {
+          ...state,
+          accessToken : action.payload
+          
+        };
+        case "GET_TOKEN":
+        const token = window.sessionStorage.getItem("token")
+        return {
+          ...state,
+         accessToken : token
+          
+        };
       case "EDIT_EMPLOYEE":
         const updatedEmployee = action.payload;
   

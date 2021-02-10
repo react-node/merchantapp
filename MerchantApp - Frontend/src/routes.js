@@ -11,15 +11,18 @@ import AddStoreView from 'src/views/store/AddStoreView';
 import StoreDetailView from 'src/views/store/StoreDetailView';
 import StoreEditView from 'src/views/store/StoreEditView';
 import RegisterView from 'src/views/auth/RegisterView';
+import VerificationView from 'src/views/auth/VerificationView';
+import ForgotPasswordView from 'src/views/auth/ForgotPasswordView';
+import UpdatePasswordView from 'src/views/auth/UpdatePasswordView';
 import OffersListView from 'src/views/offer/OffersListView';
 import OfferDetailsView from 'src/views/offer/OfferDetailsView';
 import AddOffersView from 'src/views/offer/NewOffers';
 import EditOffersView from 'src/views/offer/EditOffers';
 
-const routes = [
+const routes = (accessToken)=> [
   {
     path: 'app',
-    element: <DashboardLayout />,
+    element: !accessToken ? <Navigate to="/" /> : <DashboardLayout />,
     children: [
       { path: 'Profile', element: <AccountView /> },
      // { path: 'customers', element: <CustomerListView /> },
@@ -38,10 +41,13 @@ const routes = [
   },
   {
     path: '/',
-    element: <MainLayout />,
+    element: accessToken ? <Navigate to="/app/dashboard" /> :  <MainLayout />,
     children: [
       { path: '/', element: <LoginView /> },
       { path: 'register', element: <RegisterView /> },
+      { path: 'forgotPassword', element: <ForgotPasswordView /> },
+      { path: 'user/verify/:token/:userid', element: <VerificationView /> },
+      { path: 'user/updatepassword/:token/:email', element: <UpdatePasswordView /> },
       { path: '404', element: <NotFoundView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

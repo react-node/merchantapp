@@ -58,7 +58,7 @@ const UtilsContorller = {
         } catch (error) {
             next(error)
         }
-    }
+    },
 }
 
 module.exports = UtilsContorller

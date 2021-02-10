@@ -67,6 +67,11 @@ const offersSchema = new mongoose.Schema({
         type:Number,
         default : 1 //1=submitted,2-approved,3-rejected
     },
+    deletedSourceStoreID : {
+        type: String,
+        default: null
+        
+    },
     images:  [{
         imagePath : {type : String},
         isDeleted : {type: Boolean,default:false}

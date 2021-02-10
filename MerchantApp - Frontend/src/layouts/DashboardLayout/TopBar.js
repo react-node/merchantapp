@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link as RouterLink,useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -15,6 +15,7 @@ import MenuIcon from '@material-ui/icons/Menu';
 import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import Logo from 'src/components/Logo';
+import { GlobalContext } from "../../context/GlobalState";
 
 
 const useStyles = makeStyles(() => ({
@@ -33,7 +34,11 @@ const TopBar = ({
   const classes = useStyles();
   const navigate = useNavigate();
   const [notifications] = useState([]);
+  const {setLoading,setAccessToken} = useContext(GlobalContext);
+
   const LogOut=()=>{
+    
+    setAccessToken('')
     navigate('/', { replace: true });
   }
   return (

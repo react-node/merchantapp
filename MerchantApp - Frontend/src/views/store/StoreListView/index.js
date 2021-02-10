@@ -39,9 +39,7 @@ const StoreList = () => {
       setTotalStores(count)
     } catch (e) {
         console.log(e.response);
-        if(e.response.status === 401){
-          //logout here
-        }
+        
         setStores([]);
     }
 };

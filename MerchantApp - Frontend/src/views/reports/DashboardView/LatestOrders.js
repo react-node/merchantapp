@@ -22,79 +22,57 @@ import {
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 
-const data = [
-  {
-    id: uuid(),
-    ref: 'CDD1049',
-    amount: 30.5,
-    customer: {
-      name: 'Ekaterina Tankova'
-    },
-    createdAt: 1555016400000,
-    status: 'pending'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1048',
-    amount: 25.1,
-    customer: {
-      name: 'Cao Yu'
-    },
-    createdAt: 1555016400000,
-    status: 'delivered'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1047',
-    amount: 10.99,
-    customer: {
-      name: 'Alexa Richardson'
-    },
-    createdAt: 1554930000000,
-    status: 'refunded'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1046',
-    amount: 96.43,
-    customer: {
-      name: 'Anje Keizer'
-    },
-    createdAt: 1554757200000,
-    status: 'pending'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1045',
-    amount: 32.54,
-    customer: {
-      name: 'Clarke Gillebert'
-    },
-    createdAt: 1554670800000,
-    status: 'delivered'
-  },
-  {
-    id: uuid(),
-    ref: 'CDD1044',
-    amount: 16.76,
-    customer: {
-      name: 'Adam Denisov'
-    },
-    createdAt: 1554670800000,
-    status: 'delivered'
-  }
-];
 
 const useStyles = makeStyles(() => ({
   root: {},
   actions: {
     justifyContent: 'flex-end'
+  },
+  statusBadge:{
+    marginLeft: 10,
+    borderRadius: 10,
+    padding: 3,
+    paddingLeft:15,
+    paddingRight:15
+  },
+  active:{
+    color: "#4caf50",
+    backgroundColor: "rgba(76, 175, 80, 0.08)",
+   
+  },
+  expired:{
+    color: "#f44336",
+    backgroundColor: "rgba(244, 67, 54, 0.08)",
   }
 }));
 
-const LatestOrders = ({ className, ...rest }) => {
+const LatestOrders = ({ className, offersData,...rest }) => {
   const classes = useStyles();
-  const [orders] = useState(data);
+  const editDisable=(expiredate)=>{
+    const currentDate = new Date()
+    const currentDateWithouttime = currentDate.setHours(0,0,0,0)
+    console.log(currentDateWithouttime)
+    const expireDatewithoutTime  =  new Date(expiredate).setHours(0,0,0,0)
+    console.log(expireDatewithoutTime)
+    if(expireDatewithoutTime< currentDateWithouttime){
+        return true
+    }else{
+        return false
+    }
+  }
+  const getStatus=(status)=>{
+    let statusText = ""
+    if(status===1){
+      statusText = "Submitted"
+    }else if(status===2){
+      statusText = "Approved"
+
+    }else if(status===3){
+      statusText = "Rejected"
+
+    }
+    return statusText
+  }
 
   return (
     <Card
@@ -109,10 +87,10 @@ const LatestOrders = ({ className, ...rest }) => {
             <TableHead>
               <TableRow>
                 <TableCell>
-                  Order Ref
+                  Offer Name
                 </TableCell>
                 <TableCell>
-                  Customer
+                Active status
                 </TableCell>
                 <TableCell sortDirection="desc">
                   <Tooltip
@@ -123,34 +101,58 @@ const LatestOrders = ({ className, ...rest }) => {
                       active
                       direction="desc"
                     >
-                      Date
+                     From Date
+                    </TableSortLabel>
+                  </Tooltip>
+                </TableCell>
+                <TableCell sortDirection="desc">
+                  <Tooltip
+                    enterDelay={300}
+                    title="Sort"
+                  >
+                    <TableSortLabel
+                      active
+                      direction="desc"
+                    >
+                     Expire Date
                     </TableSortLabel>
                   </Tooltip>
                 </TableCell>
                 <TableCell>
-                  Status
+                  status
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.map((order) => (
+              {offersData.map((offer) => (
                 <TableRow
                   hover
-                  key={order.id}
+                  key={offer._id}
                 >
                   <TableCell>
-                    {order.ref}
+                    {offer.offerName}
                   </TableCell>
                   <TableCell>
-                    {order.customer.name}
+                  {offer.status !==1 ?
+                      (editDisable(offer.expireDate) ? (<span className={`${classes.expired} ${classes.statusBadge}`}>Expired  </span>) 
+                      :                         
+                      (offer.isActive ? (
+                          <span className={`${classes.active} ${classes.statusBadge}`}>Active  </span>
+                      ) : (<span className={`${classes.expired} ${classes.statusBadge}`}>Inactive  </span>)
+                      )):(
+                          <span> Status will be updated after approved </span>
+                  )} 
                   </TableCell>
                   <TableCell>
-                    {moment(order.createdAt).format('DD/MM/YYYY')}
+                    {moment(offer.fromDate).format('DD/MM/YYYY')}
+                  </TableCell>
+                  <TableCell>
+                    {moment(offer.expiredate).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>
                     <Chip
-                      color="primary"
-                      label={order.status}
+                      color={offer.status ===1 ? "default": (offer.status ===2? "secondary":"primary")}
+                      label={getStatus(offer.status)}
                       size="small"
                     />
                   </TableCell>

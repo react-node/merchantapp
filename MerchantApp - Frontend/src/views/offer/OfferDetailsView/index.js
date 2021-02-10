@@ -1,13 +1,9 @@
-import React, { useState,useEffect, useContext } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
-  Box,
   Container,
-  Grid,
   makeStyles
 } from '@material-ui/core';
-import { Pagination } from '@material-ui/lab';
 import Page from 'src/components/Page';
-import Services from '../../../services/Services';
 import {GlobalContext} from "../../../context/GlobalState"
 import OfferInfo from './OfferInfo'
 const useStyles = makeStyles((theme) => ({
@@ -21,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%'
   }
 }));
-const PAGE_LIMIT = 9
 
 const OfferDetails = () => {
   const classes = useStyles();
@@ -33,6 +28,7 @@ const OfferDetails = () => {
    setLoading(true)
    console.log(selectedOffer)
    setLoading(false)
+   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   return (
@@ -40,14 +36,10 @@ const OfferDetails = () => {
       className={classes.root}
       title="Offers"
     >
-     
-     
       <Container maxWidth={false}>
       <OfferInfo offerData = {selectedOffer} />
       </Container>
-    
     </Page>
   );
 };
-
 export default OfferDetails;

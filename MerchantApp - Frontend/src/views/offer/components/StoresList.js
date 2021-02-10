@@ -3,7 +3,7 @@ import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import Services from '../../../services/Services'
-import { Box, Grid } from "@material-ui/core";
+import {  Grid } from "@material-ui/core";
 
 const StoresList =({defaultVal,storeHandleChange})=>{
     const [stores, setStores] = useState([])
@@ -14,10 +14,13 @@ const StoresList =({defaultVal,storeHandleChange})=>{
             const storesData = await Services.getAllStore()
             console.log(storesData)
             setStores(storesData.data)
-            const SelectDropDownValue = storesData.data.filter(({_id,name})=>{if(_id===defaultVal) return setStoreVal({_id,name})})
+            const SelectDropDownValue = storesData.data.filter(({_id})=>_id===defaultVal  )            // setStoreVal({_id,name})
+
             setStoreVal(SelectDropDownValue)
+            return SelectDropDownValue
         }
         getStores();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
     const callParentcomponentfn=(newValue)=>{
         storeHandleChange((newValue))

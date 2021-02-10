@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import StoresList from '../components/StoresList'
+//import StoresList from '../components/StoresList'
 import StoresListMultiselect from './StoreListMultiSelect'
 import Services from "../../../services/Services"
 import {GlobalContext} from "../../../context/GlobalState"
@@ -31,14 +31,12 @@ import {
   GridListTile,
   IconButton,
   GridListTileBar,
-  Typography
 } from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import { string } from "prop-types";
 import { v1 } from "uuid";
 import { useSnackbar } from "notistack";
 const useStyles = makeStyles((theme) => ({
@@ -96,12 +94,12 @@ const OffersForm=({isEdit=false})=>{
   
     const classes = useStyles();
     const navigate = useNavigate();
-    const {setLoading,setSelectedOffer,selectedOffer} = useContext(GlobalContext);
+    const {setLoading,selectedOffer} = useContext(GlobalContext);
     const [selectedImages,setSelectedImages] = useState([])
     const [initialValues, setInitialValues] = useState({})
     const { enqueueSnackbar } = useSnackbar();
     const alertPosition = { horizontal: "right", vertical: "top" }
-
+    const currentDate = new Date()
     const handleCapture = ({ target },setFieldValue) => {
       let files = target.files
       
@@ -152,7 +150,9 @@ const OffersForm=({isEdit=false})=>{
     useEffect(()=>{
       const ac = new AbortController();
       initVal()
+
       return () => ac.abort(); // Abort both fetches on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
     const storeHandleChange = (newValues,setFieldValue)=>{
@@ -205,8 +205,9 @@ const OffersForm=({isEdit=false})=>{
         //   images : imagesWithpath
         // }))
         console.log(requestPayload)
+        let offerPostResponse=""
         if(!isEdit){
-          const offerPostResponse= await Services.saveOffer(requestPayload)
+           offerPostResponse= await Services.saveOffer(requestPayload)
         }else{
           requestPayload[0]._id= selectedOffer._id
           if(requestPayload[0].storeID.length !==1 && selectedOffer.editFromStoreID){
@@ -216,7 +217,7 @@ const OffersForm=({isEdit=false})=>{
               
           }
           
-          const offerPostResponse= await Services.updateOffer(requestPayload)
+           offerPostResponse= await Services.updateOffer(requestPayload)
 
           //if(!selectedOffer.isEditFromIndividualStore){
           //  requestPayload[0]._id= selectedOffer._id
@@ -224,8 +225,8 @@ const OffersForm=({isEdit=false})=>{
 
         }
         
-        //console.log(offerPostResponse)
-        let promissArray=[]
+        console.log(offerPostResponse)
+        //let promissArray=[]
         
         Promise.all(
           selectedImages.map(async (image,k)=>{
@@ -275,7 +276,6 @@ const OffersForm=({isEdit=false})=>{
       
 
     }
-    const FILE_SIZE = 160 * 1024;
     const SUPPORTED_FORMATS = [
       "image/jpg",
       "image/jpeg",
@@ -288,13 +288,14 @@ const OffersForm=({isEdit=false})=>{
         if (file.name && !SUPPORTED_FORMATS.includes(file.type)) {
           valid = false
         }
+        return valid
       })
     }
     return valid
   }
   const fileslimit= (files)=>{
     let valid = true
-    if (files.length>5) {
+    if (files && files.length>5) {
       valid=false
     }
     return valid
@@ -308,7 +309,7 @@ const OffersForm=({isEdit=false})=>{
       
     }else if(type==="existingImage"){
       const filteredArray = selectedImages.filter((img,key)=>{
-        if(key==index){
+        if(key===parseInt(index)){
           img.isDeleted = true
         }
         return img
@@ -320,7 +321,7 @@ const OffersForm=({isEdit=false})=>{
     
   }
   const getTheFormat=(str)=>{
-    return str. split('.').pop()
+    return str.split('.').pop()
   }
   
     return (
@@ -439,6 +440,7 @@ const OffersForm=({isEdit=false})=>{
           id="date-picker-fromDate"
           label="From Date"
           value={values.fromDate}
+          minDate={currentDate}
           onChange={( value) => setFieldValue('fromDate', value)}
           KeyboardButtonProps={{
             'aria-label': 'change date',
@@ -459,6 +461,7 @@ const OffersForm=({isEdit=false})=>{
           id="date-picker-toDate"
           label="To Date"
           value={values.toDate}
+          minDate={values.fromDate}
           onChange={( value) => setFieldValue('toDate', value)}
           KeyboardButtonProps={{
             'aria-label': 'change date',
@@ -492,7 +495,10 @@ const OffersForm=({isEdit=false})=>{
             <MenuItem value="UPTO">UP TO</MenuItem>
             <MenuItem value="BUY&GET">BUY & GET</MenuItem>
             </Select>
-            <FormHelperText className="MuiFormHelperText-root MuiFormHelperText-contained" className={errors.offerType ?  'Mui-error Mui-required': ''}>{touched.offerType && errors.offerType}</FormHelperText>
+            <FormHelperText 
+             className={`MuiFormHelperText-root MuiFormHelperText-contained ${errors.offerType} ?  Mui-error Mui-required: ''`}>
+               {touched.offerType && errors.offerType}
+               </FormHelperText>
         </FormControl>
     </Grid>
     <Grid
@@ -550,7 +556,10 @@ const OffersForm=({isEdit=false})=>{
                 variant="outlined"
               />
               </Grid>
-              <FormHelperText className="MuiFormHelperText-root MuiFormHelperText-contained" className={errors.buy ?  'Mui-error Mui-required': ''}>{errors.buy}</FormHelperText>
+              <FormHelperText
+               className={`MuiFormHelperText-root MuiFormHelperText-contained ${errors.buy} ?  Mui-error Mui-required: ''`}>
+                 {errors.buy}
+                 </FormHelperText>
             </Grid>))}
         </Grid>
         {/* <Grid

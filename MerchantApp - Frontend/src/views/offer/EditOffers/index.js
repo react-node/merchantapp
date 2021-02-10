@@ -1,17 +1,13 @@
 import React, { useContext, useEffect } from "react"
 import OffersForm from "../components/OffersForm"
 import {
-  
     Container,
     Grid,
     makeStyles
   } from '@material-ui/core';
-  import Page from 'src/components/Page';
-  import Loader from 'src/components/Loading'
+import Page from 'src/components/Page';
 import {GlobalContext} from "../../../context/GlobalState"
 import { useNavigate } from 'react-router-dom';
-  
-
 const useStyles = makeStyles((theme) => ({
     root: {
       backgroundColor: theme.palette.background.dark,
@@ -19,9 +15,7 @@ const useStyles = makeStyles((theme) => ({
       paddingBottom: theme.spacing(3),
       paddingTop: theme.spacing(3)
     }
-   
-  }));
-  
+}));
 const EditOffers=()=>{
     const classes = useStyles();
     const {selectedOffer} = useContext(GlobalContext);
@@ -52,5 +46,4 @@ const EditOffers=()=>{
     </Page>
     )
 }
-
 export default EditOffers

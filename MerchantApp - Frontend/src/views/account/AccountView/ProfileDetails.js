@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
@@ -12,6 +14,7 @@ import {
   TextField,
   makeStyles
 } from '@material-ui/core';
+import Services from 'src/services/Services';
 
 const useStyles = makeStyles(() => ({
   root: {}
@@ -19,13 +22,8 @@ const useStyles = makeStyles(() => ({
 
 const ProfileDetails = ({ className, ...rest }) => {
   const classes = useStyles();
-  const [values, setValues] = useState({
-    firstName: 'Dileep',
-    lastName: 'Kumar',
-    email: 'dileep@gmail.com',
-    phone: ''
-    
-  });
+  const [values, setValues] = useState({});
+  const navigate = useNavigate()
 
   const handleChange = (event) => {
     setValues({
@@ -33,10 +31,35 @@ const ProfileDetails = ({ className, ...rest }) => {
       [event.target.name]: event.target.value
     });
   };
+  const getProfiledata= async ()=>{
+    try{
+    const profileData = await Services.getProfileData()
+    if(profileData.status === 200){
+      var initialvalues = {
+        firstName : profileData.data.firstName,
+        lastName : profileData.data.lastName,
+        email: profileData.data.email,
+        phoneNumber : profileData.data.phoneNumber
 
+      }
+      setValues(initialvalues)
+    }
+  }catch(err){
+    console.log(err)
+    if(err.response.status ===401){
+      //setAccesstoken
+      navigate("/")
+
+    }
+  }
+  }
+  useEffect(()=>{
+    getProfiledata()
+  },[])
   return (
     <form
       autoComplete="off"
+      
       noValidate
       className={clsx(classes.root, className)}
       {...rest}
@@ -59,12 +82,12 @@ const ProfileDetails = ({ className, ...rest }) => {
             >
               <TextField
                 fullWidth
-                helperText="Please specify the first name"
+                //helperText="Please specify the first name"
                 label="First name"
                 name="firstName"
                 onChange={handleChange}
                 required
-                value={values.firstName}
+                value={values.firstName || ''}
                 variant="outlined"
               />
             </Grid>
@@ -79,7 +102,7 @@ const ProfileDetails = ({ className, ...rest }) => {
                 name="lastName"
                 onChange={handleChange}
                 required
-                value={values.lastName}
+                value={values.lastName  || ''}
                 variant="outlined"
               />
             </Grid>
@@ -92,9 +115,9 @@ const ProfileDetails = ({ className, ...rest }) => {
                 fullWidth
                 label="Email Address"
                 name="email"
-                onChange={handleChange}
+                disabled={true}
                 required
-                value={values.email}
+                value={values.email  || ''}
                 variant="outlined"
               />
             </Grid>
@@ -109,7 +132,7 @@ const ProfileDetails = ({ className, ...rest }) => {
                 name="phone"
                 onChange={handleChange}
                 type="number"
-                value={values.phone}
+                value={values.phone  || ''}
                 variant="outlined"
               />
             </Grid>

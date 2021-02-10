@@ -24,17 +24,35 @@ const UserSchema = new Schema({
   policy : {
     type : Boolean,
     required:true
+  },
+  activationKey :{
+    type:String,
+    default:null
+  },
+  forgotPasswordToken :{
+    type:String,
+    default:null
+  },
+  phoneNumber :{
+    type:Number,
+    default:null
+  },
+  isVerified:{
+    type:Boolean,
+    default: false
   }
+
 },{
   timestamps: true
 })
 
 UserSchema.pre('save', async function (next) {
   try {
+    console.log("pre save fucnction")
     /* 
     Here first checking if the document is new by using a helper of mongoose .isNew, therefore, this.isNew is true if document is new else false, and we only want to hash the password if its a new document, else  it will again hash the password if you save the document again by making some changes in other fields incase your document contains other fields.
     */
-    if (this.isNew) {
+    if (this.isNew || this.isModified("password")) {
       const salt = await bcrypt.genSalt(10)
       const hashedPassword = await bcrypt.hash(this.password, salt)
       this.password = hashedPassword
@@ -44,7 +62,22 @@ UserSchema.pre('save', async function (next) {
     next(error)
   }
 })
-
+UserSchema.pre('findOneAndUpdate', async function(next){
+  try{
+  console.log("pre update fucnction")
+  /* 
+  Here first checking if the document is new by using a helper of mongoose .isNew, therefore, this.isNew is true if document is new else false, and we only want to hash the password if its a new document, else  it will again hash the password if you save the document again by making some changes in other fields incase your document contains other fields.
+  */
+  if (this._update.password) {
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(this._update.password, salt)
+    this._update.password = hashedPassword
+  }
+  next()
+} catch (error) {
+  next(error)
+}
+})
 UserSchema.methods.isValidPassword = async function (password) {
   try {
     return await bcrypt.compare(password, this.password)

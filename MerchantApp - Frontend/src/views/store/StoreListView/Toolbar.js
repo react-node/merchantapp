@@ -31,10 +31,10 @@ const Toolbar = ({ className,searchStore, ...rest }) => {
   const [openModalwindow, setopenModalwindow] = React.useState(false);
   
   const navigate = useNavigate();
-  const handleOpen = () => {
-    setopenModalwindow(true);
+  // const handleOpen = () => {
+  //   setopenModalwindow(true);
     
-  };
+  // };
   const goToAddStore=()=>{
     navigate("/app/stores/addstore")
   }
