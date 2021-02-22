@@ -1,6 +1,7 @@
 const Store = require('../Models/Store.model')
 const Branches = require('../Models/Branches.Model')
 const { StoreValidation } = require('../helpers/validation_schema')
+const { validateStore } = require('../helpers/storeDuplicateCheck')
 const createError = require('http-errors')
 const StoreContorller = {
     async addStore(req, res, next){
@@ -8,26 +9,28 @@ const StoreContorller = {
             const requestPayload = req.body
             requestPayload.owner = req.payload.aud
             const result = await StoreValidation.validateAsync(requestPayload)
+            const isSotreExisted = await validateStore(requestPayload)
+            if(isSotreExisted) throw createError.Conflict()
             const store = new Store(result)
             const StoreInfo = await store.save()
             const storeID = StoreInfo._id
-            if(requestPayload.hasMainBranch){
-              const addBranchData = await Branches.findOne({"storeID" : requestPayload.mainBranchID })
-              console.log(addBranchData)
-              if(!addBranchData){
-                var newRecord = {
-                  storeID : requestPayload.mainBranchID,
-                  owner : requestPayload.owner,
-                  branches: [storeID]
-                }
-                const newBranchRecord = new Branches(newRecord)
-                 newBranchRecord.save()
-              }else{
-                addBranchData.branches.push(storeID)
-               await addBranchData.save() 
-              }
+            // if(requestPayload.hasMainBranch){
+            //   const addBranchData = await Branches.findOne({"storeID" : requestPayload.mainBranchID })
+            //   console.log(addBranchData)
+            //   if(!addBranchData){
+            //     var newRecord = {
+            //       storeID : requestPayload.mainBranchID,
+            //       owner : requestPayload.owner,
+            //       branches: [storeID]
+            //     }
+            //     const newBranchRecord = new Branches(newRecord)
+            //      newBranchRecord.save()
+            //   }else{
+            //     addBranchData.branches.push(storeID)
+            //    await addBranchData.save() 
+            //   }
 
-            }
+            // }
 
             res.send(StoreInfo)
           } catch (error) {
@@ -68,7 +71,7 @@ const StoreContorller = {
           let query = {owner : req.payload.aud, isDeleted:false}
          
           const storesData = await Store.find(query).sort({ _id: -1 })
-          const responseStore = storesData.map(({_id,name,address})=>{return {_id,name,address}})
+          const responseStore = storesData.map(({_id,name,address,zipcode})=>{return {_id,name,address,zipcode}})
           res.send(responseStore)
         } catch (error) {
           if (error.isJoi === true) error.status = 422
@@ -104,9 +107,9 @@ const StoreContorller = {
           return next(createError.NotFound)
       }
       res.send(storeTypeData)
-  } catch (error) {
-      next(error)
-  }
+    } catch (error) {
+        next(error)
+    }
   }
 }
 

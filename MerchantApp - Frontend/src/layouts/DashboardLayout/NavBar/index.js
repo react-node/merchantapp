@@ -9,20 +9,20 @@ import {
   Hidden,
   List,
  
-  makeStyles
+  makeStyles,
+  Typography
 } from '@material-ui/core';
-import {
-  BarChart as BarChartIcon,
-  ShoppingBag as ShoppingBagIcon,
-  User as UserIcon,
-  Clipboard
-} from 'react-feather';
+
 import NavItem from './NavItem';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
+import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import PersonIcon from '@material-ui/icons/Person';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
+import CollectionsBookmarkIcon from '@material-ui/icons/CollectionsBookmark';
+import ViewDayIcon from '@material-ui/icons/ViewDay';
+import PerfectScrollbar from 'react-perfect-scrollbar';
 
 const items = [
   {
@@ -44,7 +44,40 @@ const items = [
     href: '/app/offers',
     icon: LocalOfferIcon,
     title: 'Offers'
-  }
+  },
+  {
+    href: '/app/banner_images',
+    icon: ViewCarouselIcon,
+    title: 'Upload Banners'
+  },
+  {
+   
+    icon: LibraryBooksIcon,
+    title: 'Slots',
+    children : [{
+      href: '/app/banner_slot_booking',
+      icon: ViewDayIcon,
+      title: 'Banner Slots',
+    },{
+      href: '/app/offer_slot_booking',
+      icon: CollectionsBookmarkIcon,
+      title: 'Offer Slots',
+    }]
+  },
+  // {
+   
+  //   icon: LibraryBooksIcon,
+  //   title: 'Report',
+  //   children : [{
+  //     href: '/app/slot_booking',
+  //     icon: ViewCarouselIcon,
+  //     title: 'Banner Slots',
+  //   },{
+  //     href: '/app/offer_slot_booking',
+  //     icon: LibraryBooksIcon,
+  //     title: 'Offer Slots',
+  //   }]
+  // }
 ];
 
 const useStyles = makeStyles(() => ({
@@ -80,9 +113,9 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       display="flex"
       flexDirection="column"
     >
-      
-      <Divider />
+  
       <Box p={2}>
+      <PerfectScrollbar >
         <List>
           {items.map((item) => (
             <NavItem
@@ -90,18 +123,20 @@ const NavBar = ({ onMobileClose, openMobile }) => {
               key={item.title}
               title={item.title}
               icon={item.icon}
+              children = {item.children}
             />
           ))}
         </List>
+        </PerfectScrollbar>
       </Box>
       <Box flexGrow={1} />
       <Box
-        p={2}
-        m={2}
+        p={1}
+        m={1}
         bgcolor="background.dark"
+       
       >
-
-               
+       <Typography variant="subtitle1"> &copy; 2021 Infy Origin </Typography>
       </Box>
     </Box>
   );

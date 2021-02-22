@@ -11,7 +11,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 
 const StoresList =({defaultVal,storeHandleChange,isError})=>{
-    const _isMounted = useRef(true); // Initial value _isMounted = true
+    const _isMounted = useRef(true); // Initial value _isMounted = true //prevent memory leak 
     const [stores, setStores] = useState([])
     const [selectedStore, setSelectedstore] = useState([]);
     console.log(defaultVal)
@@ -31,7 +31,7 @@ const StoresList =({defaultVal,storeHandleChange,isError})=>{
       }
       }
     useEffect( ()=>{
-        getStores();
+      getStores();
       return () => { // ComponentWillUnmount in Class Component
         _isMounted.current = false;
     }
@@ -92,7 +92,6 @@ const StoresList =({defaultVal,storeHandleChange,isError})=>{
   
             <Autocomplete
               fullWidth
-              style={{padding:8}}
               multiple
               limitTags={4}
               id="checkboxes-tags"

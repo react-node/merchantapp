@@ -254,7 +254,7 @@ const OffersForm=({isEdit=false})=>{
           console.log(`error in promise----${err}`)
           setLoading(false)
           setSubmitting(false)
-        enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
+          enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
 
         })
         

@@ -14,10 +14,13 @@ const StoresList =({defaultVal,storeHandleChange})=>{
             const storesData = await Services.getAllStore()
             console.log(storesData)
             setStores(storesData.data)
-            const SelectDropDownValue = storesData.data.filter(({_id})=>_id===defaultVal  )            // setStoreVal({_id,name})
+            if(defaultVal){
+              const SelectDropDownValue = storesData.data.filter(({_id})=>_id===defaultVal  )            // setStoreVal({_id,name})
 
-            setStoreVal(SelectDropDownValue)
-            return SelectDropDownValue
+              setStoreVal(SelectDropDownValue)
+            }
+            
+           // return SelectDropDownValue
         }
         getStores();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -35,7 +38,7 @@ const StoresList =({defaultVal,storeHandleChange})=>{
             
             id="StoreList"
             options={stores}
-            getOptionLabel={(option) =>typeof option === 'string' ? option : option.name }
+            getOptionLabel={(option) =>typeof option === 'string' ? option : option.name+", "+option.address }
             fullWidth
             onChange={(event, newValue) => {
               console.log(newValue)

@@ -5,6 +5,7 @@ const StoreTypeController = require('../Controllers/Utils.Controller')
 
 router.post('/storetype', StoreTypeController.addStoreType)
 router.get('/storetype', StoreTypeController.getStoreTypes)
+router.get('/price/:type', StoreTypeController.getprice)
 router.put('/storetype/:storeID', StoreTypeController.updateStoreCategories)
 router.delete('/storetype/:storeID', StoreTypeController.deleteStoreCategories)
 

@@ -3,16 +3,13 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
   Avatar,
-  Box,
   Card,
   CardContent,
   Grid,
-  LinearProgress,
   Typography,
   makeStyles,
   colors
 } from '@material-ui/core';
-import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 
 const useStyles = makeStyles(() => ({

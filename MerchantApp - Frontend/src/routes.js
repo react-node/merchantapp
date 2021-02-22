@@ -15,6 +15,10 @@ import VerificationView from 'src/views/auth/VerificationView';
 import ForgotPasswordView from 'src/views/auth/ForgotPasswordView';
 import UpdatePasswordView from 'src/views/auth/UpdatePasswordView';
 import OffersListView from 'src/views/offer/OffersListView';
+import BannerImageView from 'src/views/bannerImages';
+import SlotBookingView from 'src/views/slotBooking';
+import OfferSlotBookingView from 'src/views/slotBooking/offerSlotBooking';
+import SlotBookingFinalView from 'src/views/slotBooking/slotBookingFinal';
 import OfferDetailsView from 'src/views/offer/OfferDetailsView';
 import AddOffersView from 'src/views/offer/NewOffers';
 import EditOffersView from 'src/views/offer/EditOffers';
@@ -35,7 +39,11 @@ const routes = (accessToken)=> [
       { path: 'offers/addoffer', element: <AddOffersView /> },
       { path: 'offers/offerdetail', element: <OfferDetailsView /> },
       { path: 'offer/editoffer', element: <EditOffersView /> },
-     // { path: 'settings', element: <SettingsView /> },
+      { path: 'banner_images', element: <BannerImageView /> },
+      { path: 'banner_slot_booking', element: <SlotBookingView /> },
+      { path: 'offer_slot_booking', element: <OfferSlotBookingView /> },
+      { path: 'slot_booking/next', element: <SlotBookingFinalView /> },
+      // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]
   },

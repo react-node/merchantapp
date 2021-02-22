@@ -4,7 +4,7 @@ import GridList from '@material-ui/core/GridList';
 import GridListTile from '@material-ui/core/GridListTile';
 import { Avatar, Box, CircularProgress,  GridListTileBar, IconButton, Typography } from '@material-ui/core';
 import { GOOGLE_STORAGE_PUBLIC_URL } from 'src/utils/config';
-import ConfirmDialog from './ConfirmDialog'
+import ConfirmDialog from '../store/StoreDetailView/ConfirmDialog'
 import DeleteIcon from '@material-ui/icons/Delete';
 import DoneIcon from '@material-ui/icons/Done';
 
@@ -21,10 +21,34 @@ const useStyles = makeStyles((theme) => ({
   },
   loading:{
     textAlign:'center'
+  },
+  statusBadge:{
+    marginLeft: 10,
+    borderRadius: 10,
+    padding: 3,
+    paddingLeft:15,
+    paddingRight:15
+  },
+  active:{
+    color: "#ffff",
+    backgroundColor: "rgb(68 163 72 / 89%)",
+   
+  },
+  expired:{
+    color: "#ffff",
+    backgroundColor: "rgb(244 67 54 / 92%)",
+  },
+  submitted:{
+    color: "#ffff",
+    backgroundColor: "rgb(49 161 214 / 89%)",
+  },
+  custPadding:{
+      paddingBottom:5,
+      paddingTop:5
   }
 }));
 
-const ImageGridList =({data,getMoreData,isLoading})=> {
+const ImageGridList =({data,getMoreData,isLoading,deleteImage})=> {
   const classes = useStyles();
   // tracking on which page we currently are
   const [page, setPage] = useState(0);
@@ -90,13 +114,15 @@ const ImageGridList =({data,getMoreData,isLoading})=> {
     })
     setImagesdata(modifiedArray)
   }
-  const deleteImages=()=>{
+  const deleteImages=async ()=>{
+
     console.log(imagesData)
 
     console.log(selectedImages)
     const afterdeleteArray= imagesData.filter(item => !selectedImages.includes(item._id))
+    //const deleteImg = await Services.deleteImages(selectedImages)
+    deleteImage(selectedImages)
     console.log(afterdeleteArray)
-    
     setImagesdata(afterdeleteArray)
     setSelectedImages([])
   }
@@ -106,7 +132,7 @@ const ImageGridList =({data,getMoreData,isLoading})=> {
         <Typography variant="body2" style={{textAlign:"center" }}>
           
           <ConfirmDialog 
-          deleteStore={deleteImages} 
+          deleteItem={deleteImages} 
           buttonText="Delete Image(s)" 
           message="Are you sure, Do you want to delete the images?"
           >
@@ -119,16 +145,28 @@ const ImageGridList =({data,getMoreData,isLoading})=> {
           <GridListTile key={item._id} cols={item.cols || 1} component={"span"} onClick={()=>selectImage(item._id)}>
             <Avatar
             component={"span"}
-            alt={item.image}
-            src={GOOGLE_STORAGE_PUBLIC_URL+item.ownerID+"/"+item.image}
+            alt={item.imagePath}
+            src={GOOGLE_STORAGE_PUBLIC_URL+item.ownerID+"/banners/"+item.imagePath}
             variant="square"
             className={classes.avatar}
           />
           <GridListTileBar
-              title={item.image}
-              subtitle={<span>Uploaded Date: {item.createdAt.slice(0, 10)}</span>}
+              classes={{subtitle:classes.custPadding}}
+              title={item.imagePath}
+              subtitle={<span>Uploaded Date: {item.createdAt.slice(0, 10)}
+              
+                  {item.isApproved ===1 ? <span className={`${classes.statusBadge} ${classes.submitted}`}>Submitted</span> : 
+
+                    (item.isApproved ===2 ? <span className={`${classes.statusBadge} ${classes.active}`}>Approved</span> : 
+                    
+                    <span className={`${classes.statusBadge} ${classes.expired}`}>Rejected</span>)
+
+                  }
+
+
+              </span>}
               actionIcon={
-                <IconButton aria-label={`info about ${item.image}`} className={classes.icon}>
+                <IconButton aria-label={`info about ${item.imagePath}`} className={classes.icon}>
                   {item.isSelect && <DoneIcon style={{color:'rgb(255,247,0)'}} fontSize='large' /> }
                 </IconButton>
               }

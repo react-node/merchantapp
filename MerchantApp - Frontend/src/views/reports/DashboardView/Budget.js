@@ -10,7 +10,6 @@ import {
   colors,
   makeStyles
 } from '@material-ui/core';
-import MoneyIcon from '@material-ui/icons/Money';
 import StorefrontIcon from '@material-ui/icons/Storefront';
 const useStyles = makeStyles((theme) => ({
   root: {

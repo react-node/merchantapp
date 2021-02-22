@@ -32,12 +32,12 @@ import Fade from '@material-ui/core/Fade';
 import { Formik } from 'formik';
 import {  useSnackbar } from 'notistack';
 import * as Yup from 'yup';
-import axios from "axios";
 
 import Map from "../../../components/Map"
 import { GlobalContext } from "../../../context/GlobalState";
-import {API_URI,ACCESS_TOKEN, GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
+import { GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
 import MapServices from "../../../services/MapServices"
+import Services from 'src/services/Services';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -118,10 +118,19 @@ const AddStore = ({ className,type, ...rest }) =>
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate();
-  const { storeID, assignStoreID,selectedStore,setSelectedStore,addStoreData,setAddStoreData} = useContext(GlobalContext);
+  const { assignStoreID,selectedStore,setSelectedStore,addStoreData,setAddStoreData} = useContext(GlobalContext);
   const [initialGeoLocation, setinitialGeoLocation] = useState({})
   const [isSelectedFromsuggestions, setIsSelectedFromsuggestions] = useState(false)
+  const [storeGoogleId,setStoreGoogleId] = useState(null)
+  const [disabledFields,setDisabledFields] = useState({})
+  const initialDisableState = {
+    area : false,
+    city : false,
+    state:false,
+    country:false,
+    zipcode:false
 
+  }
   //var selectedSAC = selectedSAC || [] 
   const handleOpen = () => {
     setOpen(true);
@@ -147,10 +156,8 @@ const AddStore = ({ className,type, ...rest }) =>
     const fetchStoreTypes = async () => {
       try {
           setNames({storeTypes: names.storeTypes});
-          var options= {
-              "Authorization" : ACCESS_TOKEN
-          }
-          const response = await axios.get(API_URI+'/rest/v1/utils/storetype',{"headers":options});
+         
+          const response = await Services.getStoreTypes()
           
           //console.log(names)
           response.data.map((item)=>{
@@ -259,6 +266,8 @@ const AddStore = ({ className,type, ...rest }) =>
       }
     }
     initialData();
+
+    setDisabledFields(initialDisableState)
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
   // const handleChange = (event) => {
@@ -354,9 +363,7 @@ const AddStore = ({ className,type, ...rest }) =>
       console.log(profilePic)
       const data = new FormData() 
       data.append('file', profilePic[0])
-      var options= {
-        "Authorization" : ACCESS_TOKEN
-      }
+     
       var storeTypeData=[]
       Object.keys(selectedSAC).map((k)=>
         storeTypeData.push({"type":k,"categories":selectedSAC[k]})
@@ -382,23 +389,26 @@ const AddStore = ({ className,type, ...rest }) =>
         "profilepic" : profilePic[0] ? profilePic[0].name : values.profilePic ,
         "website":values.website
       }
-      if(storeID){
-        requestPayload.hasMainBranch = true
-        requestPayload.mainBranchID = storeID
-      }
+      // if(storeID){
+      //   requestPayload.hasMainBranch = true
+      //   requestPayload.mainBranchID = storeID
+      // }
       if( profilePic.length >0){
-        const responseData  = await axios.post(API_URI+'/rest/v1/imageupload/',data,{"headers":options});
+        const responseData  = await Services.imageUpload(data);
         console.log(responseData);
       }
       let storeResponse = {},message="";
       if(isEdit){
         message = "Store updated successfully...!"
         requestPayload._id = values._id
-         storeResponse  = await axios.put(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        //storeResponse  = await axios.put(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        storeResponse  = await Services.updateStore(requestPayload);
         console.log(storeResponse)
       }else{
         message = "Store created successfully...!"
-         storeResponse  = await axios.post(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        requestPayload.store_google_id = storeGoogleId
+        //storeResponse  = await axios.post(API_URI+'/rest/v1/store',requestPayload,{"headers":options});
+        storeResponse  = await Services.saveStore(requestPayload);
         console.log(storeResponse)
       }
       
@@ -417,7 +427,13 @@ const AddStore = ({ className,type, ...rest }) =>
     }catch(e){
       console.log(e)
       setSubmitting(false)
-      enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
+      if(e.response.status === 409){
+        enqueueSnackbar('Store already registerd, Please contact our team if you need any help',   { variant: "error","anchorOrigin" : alertPosition } );
+
+      }else{
+        enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
+
+      }
     }
 
    // You should see email and password in console.
@@ -447,15 +463,15 @@ const handleCapture = ({ target }) => {
       console.log(place)
       //setStoreName(place.name)
       const  addressArray =  place.address_components,
-       postalCode = MapServices.getPostalCode( addressArray ),
-       city = MapServices.getCity( addressArray ),
-       state = MapServices.getState( addressArray ),
-       country = MapServices.getCountry( addressArray ),
-       area = MapServices.getArea( addressArray ),
-       website = place.website || "",
-       addressLine = MapServices.getAddressLine(addressArray);
-
-       setIsSelectedFromsuggestions(true)
+      postalCode = MapServices.getPostalCode( addressArray ),
+      city = MapServices.getCity( addressArray ),
+      state = MapServices.getState( addressArray ),
+      country = MapServices.getCountry( addressArray ),
+      area = MapServices.getArea( addressArray ),
+      website = place.website || "",
+      addressLine = MapServices.getAddressLine(addressArray);
+      setStoreGoogleId(place.place_id)
+      setIsSelectedFromsuggestions(true)
       setInitialValues({...addStoreData,
         latitude: place.geometry.location.lat(),
         storeName : place.name,
@@ -470,14 +486,29 @@ const handleCapture = ({ target }) => {
         area
 
         })
+
+        setDisabledFields({
+          area : area ? true :false,
+          city:city ? true :false,
+          state:state ? true :false,
+          country:country ? true :false,
+          zipcode:postalCode ? true :false,
+        })
       
     });
   }
   };
-const updateGeoLocation =(lat,long)=>{
+const updateGeoLocation =(lat,long,city,area,state,country,zipcode)=>{
 
   console.log(addStoreData)
-  setInitialValues({...addStoreData, latitude:lat,longitude : long})
+  setInitialValues({...addStoreData, latitude:lat,longitude : long,city,state,country,area,zipcode})
+  setDisabledFields({
+    area : area ? true :false,
+    city:city ? true :false,
+    state:state ? true :false,
+    country:country ? true :false,
+    zipcode:zipcode ? true :false,
+  })
 }
 const resetForm=(e)=>{
   if(isSelectedFromsuggestions){
@@ -489,6 +520,8 @@ const resetForm=(e)=>{
       zipcode : ""
       })
       setIsSelectedFromsuggestions(false)
+      setStoreGoogleId(null)
+      setDisabledFields(initialDisableState)
   }
  
 }
@@ -502,6 +535,19 @@ const updateStore=(e,val,setValues)=>{
  
   
 }
+const checkValidNumber = (val)=>{
+  console.log(val)
+  // Regex to check valid Aadhar number.
+  const aadharRegExp = new RegExp("^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$");
+  const GSTRegExp = new RegExp("^[0-9]{2}[A-Z]{5}[0-9]{4}"
+  + "[A-Z]{1}[1-9A-Z]{1}"
+  + "Z[0-9A-Z]{1}$")
+  const PANRegExp = new RegExp("[A-Z]{5}[0-9]{4}[A-Z]{1}");
+  if(!aadharRegExp.test(val) && !GSTRegExp.test(val) && !PANRegExp.test(val)){
+    return false
+  }
+  return true
+}
 
   return (
     <Formik
@@ -512,13 +558,16 @@ const updateStore=(e,val,setValues)=>{
               addressLine: Yup.string().max(200).required('Address is required'),
               phoneNumber: Yup.string().required('Phone number is required'),
               zipcode: Yup.string().max(6).required('zipcode is required'),
-              identity_proof: Yup.string().required('Identity proof is required'),
+              identity_proof: Yup.string().required('Identity proof is required')
+              .test("validate-id-proof",
+              "Please enter valid number",
+              checkValidNumber
+              ),
               storeName: Yup.string().required('Store name is required'),
               insideMall: Yup.string().required('Please select is it inside mall or not'),
               mall_name: Yup.string().when("insideMall",{is:(val)=>val ==="yes",then: Yup.string().required("Mall name is required"),
               otherwise: Yup.string().notRequired()}),
               building : Yup.string().max(200).required('Building details are required'),
-             
               area:Yup.string().max(200).required('Area is required'),
               city:Yup.string().max(200).required('City is required'),
               state:Yup.string().max(200).required('State is required'),
@@ -546,7 +595,28 @@ const updateStore=(e,val,setValues)=>{
         <CardHeader
           subheader={!isEdit? "Create new store" : "Update your store" }
           title= {!isEdit? "Add Store": "Edit Store" }
-        />
+          action={
+            !(values.latitude && values.longitude) && (
+              
+              <Box
+                display="flex"
+                justifyContent="flex-center"
+                p={1}
+              >
+                <Button
+                  color="primary"
+                  variant="contained"
+                  onClick={handleOpen}
+                >
+                  Select store in map
+                </Button>
+              </Box>
+              
+            )
+          }
+        >
+          
+          </CardHeader>
         <Divider />
         <CardContent>
           <Grid
@@ -577,6 +647,7 @@ const updateStore=(e,val,setValues)=>{
               
               
             </Grid>
+            
             <Grid
               item
               md={6}
@@ -643,6 +714,7 @@ const updateStore=(e,val,setValues)=>{
                 name="area"
                 onBlur={handleBlur}
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
+                disabled={disabledFields.area}
                 required
                 value={values.area|| ''}
                 variant="outlined"
@@ -662,6 +734,7 @@ const updateStore=(e,val,setValues)=>{
                 onBlur={handleBlur}
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
+                disabled={disabledFields.city}
                 value={values.city|| ''}
                 variant="outlined"
               />
@@ -680,6 +753,7 @@ const updateStore=(e,val,setValues)=>{
                 onBlur={handleBlur}
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
+                disabled={disabledFields.state}
                 value={values.state|| ''}
                 variant="outlined"
               />
@@ -698,6 +772,7 @@ const updateStore=(e,val,setValues)=>{
                 onBlur={handleBlur}
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 required
+                disabled={disabledFields.country}
                 value={values.country|| ''}
                 variant="outlined"
               />
@@ -715,6 +790,7 @@ const updateStore=(e,val,setValues)=>{
                 name="zipcode"
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
                 type="number"
+                disabled={disabledFields.zipcode}
                 value={values.zipcode|| ''}
                 variant="outlined"
               />
@@ -824,7 +900,7 @@ const updateStore=(e,val,setValues)=>{
                 label="Enter PAN / Aadhar / GST Number"
                 name="identity_proof"
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
-               
+               // onBlur={(e)=>{handleBlur(e);validateIDProof(e,values,setValues)}}
                 value={values.identity_proof|| ''}
                 variant="outlined"
               />
@@ -881,23 +957,9 @@ const updateStore=(e,val,setValues)=>{
               })
             
             }
-      <input type="text" name="latitude" value={values.latitude || ''}  onChange={handleChange}/>
-      <input type="text" name="longitude" value={values.longitude || ''}  onChange={handleChange}/>
-      {!(values.latitude && values.longitude) && (
-        <Box
-          display="flex"
-          justifyContent="flex-end"
-          p={4}
-        >
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={handleOpen}
-          >
-            Select store in map
-          </Button>
-        </Box>
-      )}
+      <input type="hidden" name="latitude" value={values.latitude || ''}  onChange={handleChange}/>
+      <input type="hidden" name="longitude" value={values.longitude || ''}  onChange={handleChange}/>
+      
         
         <Box
           display="flex"

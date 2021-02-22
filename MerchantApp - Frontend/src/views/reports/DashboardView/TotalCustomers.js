@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import {
   Avatar,
-  Box,
   Card,
   CardContent,
   Grid,
@@ -11,8 +10,6 @@ import {
   colors,
   makeStyles
 } from '@material-ui/core';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
 import LocalOfferIcon from '@material-ui/icons/LocalOffer';
 
 const useStyles = makeStyles((theme) => ({

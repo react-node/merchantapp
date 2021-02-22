@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import Axios from 'axios';
+import { Link as RouterLink } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {
@@ -14,7 +13,6 @@ import {
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
-import {API_URI} from '../../utils/config';
 import { GlobalContext } from "../../context/GlobalState";
 import {  useSnackbar } from 'notistack';
 import Services from 'src/services/Services';
@@ -31,8 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ForgotPasswordView = () => {
   const classes = useStyles();
-  const navigate = useNavigate();
-  const {setLoading,setAccessToken} = useContext(GlobalContext);
+  const {setLoading} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top",marginTop:"75px" }
 

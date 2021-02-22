@@ -34,7 +34,7 @@ const TopBar = ({
   const classes = useStyles();
   const navigate = useNavigate();
   const [notifications] = useState([]);
-  const {setLoading,setAccessToken} = useContext(GlobalContext);
+  const {setAccessToken} = useContext(GlobalContext);
 
   const LogOut=()=>{
     

@@ -13,6 +13,7 @@ const UtilsRoute = require('./Routes/Utils.route')
 const OffersRoute = require('./Routes/Offers.route')
 const ImageuploadRoute = require('./Routes/Imageupload.route')
 const ProfileRoute = require('./Routes/Profile.route')
+const SlotsRoute = require('./Routes/Slots.route')
 
 const app = express()
 const multerMid = multer({
@@ -38,6 +39,7 @@ app.use('/rest/v1/utils', verifyAccessToken, UtilsRoute)
 app.use('/rest/v1/offers', verifyAccessToken, OffersRoute)
 app.use('/rest/v1/imageupload', verifyAccessToken, ImageuploadRoute)
 app.use('/rest/v1/profile', verifyAccessToken, ProfileRoute)
+app.use('/rest/v1/slotbooking', verifyAccessToken, SlotsRoute)
 
 app.use(async (req, res, next) => {
   next(createError.NotFound())

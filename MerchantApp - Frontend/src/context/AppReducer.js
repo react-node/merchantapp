@@ -32,6 +32,21 @@ export default (state, action) => {
           ...state,
           selectedOffer : action.payload
         };
+      case "SET_BANNER_SEARCH_DATA":
+        return {
+          ...state,
+          bannerSearchData : action.payload
+        };
+      case "SET_SELECTED_SLOTS_DATA":
+        return {
+          ...state,
+          selectedSlotsData : action.payload
+        };
+      case "SET_SLOT_AVAILABILITY":
+        return {
+          ...state,
+          slotsAvailability : action.payload
+        };
       case "LOADING":
         return {
           ...state,

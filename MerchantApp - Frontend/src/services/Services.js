@@ -1,7 +1,5 @@
 import * as config from '../../src/utils/config';
 import axios from "axios";
-import { GlobalContext } from "../context/GlobalState";
-import { useContext } from 'react';
 
 const userVerification =async (token,id)=>{
     const RequestPayload = {token,id}
@@ -38,6 +36,13 @@ const deleteStore= async (storeID)=>{
     const responseData = await axios.delete(config.API_URI+config.STORES+`/${storeID}`,headers)
     return responseData
 }
+const deleteImages= async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    const requestdatawithHeader = {...headers,data:requestPayload,}
+    console.log(requestdatawithHeader)
+    const responseData = await axios.delete(config.API_URI+config.BANNER_API,{...headers,data:requestPayload,})
+    return responseData
+}
 const imageUpload = async (imageData)=>{
     const headers = GenerateHeaders()
     // headers.onUploadProgress = (progressEvent)=> {
@@ -55,6 +60,11 @@ const storeImages= async (requestBody) =>{
 const getstoreImages= async (storeID,page=1) =>{
     const headers =GenerateHeaders()
     const responseData = await axios.get(config.API_URI+config.STORE_IMAGE_DB+"/"+storeID+"?page="+page,headers)
+    return responseData
+}
+const getBannerImages= async (page=1) =>{
+    const headers =GenerateHeaders()
+    const responseData = await axios.get(config.API_URI+config.BANNER_API+"?page="+page,headers)
     return responseData
 }
 const saveOffer= async (RequestPayload) =>{
@@ -88,6 +98,12 @@ const getOffers= async (page=1,searchFilter={},pageSize=9)=>{
     const responseData = await axios.get(config.API_URI+config.OFFERS+"?page="+page+filter,headers)
     return responseData
 }
+const getAllOffers= async ()=>{
+    const headers = GenerateHeaders()
+
+    const responseData = await axios.get(config.API_URI+config.GET_ALL_OFFERS,headers)
+    return responseData
+}
 const deleteOffer= async (offerID,storeID=null)=>{
     const headers = GenerateHeaders()
     let filter = ''
@@ -118,6 +134,63 @@ const getProfileData = async ()=>{
     const responseData = await axios.get(`${config.API_URI}${config.PROFILE}`,headers)
     return responseData
 }
+const getStoreTypes = async ()=>{
+    const headers = GenerateHeaders()
+    const response = await axios.get(config.API_URI+'/rest/v1/utils/storetype',headers);
+    return response
+}
+const getPrice = async (type)=>{
+    const headers = GenerateHeaders()
+    const response = await axios.get(config.API_URI+'/rest/v1/utils/price/'+type,headers);
+    return response
+}
+const saveStore = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    const response = await axios.post(config.API_URI+config.STORES,requestPayload,headers);
+    return response
+}
+const updateStore = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    const response = await axios.put(config.API_URI+config.STORES,requestPayload,headers);
+    return response
+}
+const updateProfile = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    const response = await axios.put(config.API_URI+config.PROFILE,requestPayload,headers);
+    return response
+}
+const saveBannerData = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    console.log(requestPayload)
+    const response = await axios.post(config.API_URI+config.BANNER_API,requestPayload,headers);
+    return response
+}
+const saveBannerSlots = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    console.log(requestPayload)
+    const response = await axios.post(config.API_URI+config.BANNER_SLOT_API,requestPayload,headers);
+    return response
+}
+const saveOfferSlots = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    console.log(requestPayload)
+    const response = await axios.post(config.API_URI+config.OFFER_SLOT_API,requestPayload,headers);
+    return response
+}
+
+const searchSlots = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    console.log(requestPayload)
+    const response = await axios.post(config.API_URI+config.SEARCH_SLOT_API,requestPayload,headers);
+    return response
+}
+const searchOfferSlots = async (requestPayload)=>{
+    const headers = GenerateHeaders()
+    console.log(requestPayload)
+    const response = await axios.post(config.API_URI+config.SEARCH_OFFER_SLOT_API,requestPayload,headers);
+    return response
+}
+
 
 export default {
     getStore,
@@ -135,5 +208,18 @@ export default {
     forgotPassword,
     updatePassword,
     dashboard,
-    getProfileData
+    getProfileData,
+    getStoreTypes,
+    saveStore,
+    updateStore,
+    saveBannerData,
+    getBannerImages,
+    deleteImages,
+    updateProfile,
+    saveBannerSlots,
+    searchSlots,
+    getPrice,
+    getAllOffers,
+    searchOfferSlots,
+    saveOfferSlots
 }

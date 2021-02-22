@@ -15,7 +15,10 @@ const initialState = {
   addStoreData : {},
   isLoading : false,
   selectedOffer : {},
-  accessToken:null
+  accessToken:null,
+  bannerSearchData : {},
+  selectedSlotsData : [],
+  slotsAvailability:[]
 };
 
 export const GlobalContext = createContext(initialState);
@@ -66,6 +69,18 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
+  function setBannerSearchData(data) {
+    dispatch({
+      type: "SET_BANNER_SEARCH_DATA",
+      payload: data
+    });
+  }
+  function setSelectedSlotsData(data) {
+    dispatch({
+      type: "SET_SELECTED_SLOTS_DATA",
+      payload: data
+    });
+  }
   function setLoading(data) {
     dispatch({
       type: "LOADING",
@@ -75,6 +90,12 @@ export const GlobalProvider = ({ children }) => {
   function setAccessToken(data) {
     dispatch({
       type: "SET_TOKEN",
+      payload: data
+    });
+  }
+  function setSlotsAvailability(data) {
+    dispatch({
+      type: "SET_SLOT_AVAILABILITY",
       payload: data
     });
   }
@@ -101,7 +122,13 @@ export const GlobalProvider = ({ children }) => {
         setSelectedOffer,
         setAccessToken,
         getAccessToken,
-        accessToken:state.accessToken
+        accessToken:state.accessToken,
+        bannerSearchData:state.bannerSearchData,
+        setBannerSearchData,
+        setSelectedSlotsData,
+        selectedSlotsData : state.selectedSlotsData,
+        setSlotsAvailability,
+        slotsAvailability:state.slotsAvailability
       }}
     >
       {children}

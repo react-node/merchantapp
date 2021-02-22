@@ -128,14 +128,16 @@ console.log("info window closed")
 	onMarkerDragEnd = ( event ) => {
 		let newLat = event.latLng.lat(),
 		    newLng = event.latLng.lng();
-			this.props.updateGeoLocation(newLat,newLng)
 		Geocode.fromLatLng( newLat , newLng ).then(
 			response => {
 				const address = response.results[0].formatted_address,
 				      addressArray =  response.results[0].address_components,
 				      city = MapServices.getCity( addressArray ),
-				      area = MapServices.getArea( addressArray ),
-				      state = MapServices.getState( addressArray );
+				     
+				      state = MapServices.getState( addressArray ),
+				      country = MapServices.getCountry( addressArray ),
+				      zipcode = MapServices.getPostalCode( addressArray );
+				const  area = MapServices.getArea( addressArray )
 				this.setState( {
 					address: ( address ) ? address : '',
 					area: ( area ) ? area : '',
@@ -150,6 +152,8 @@ console.log("info window closed")
 						lng: newLng
 					},
 				} )
+			this.props.updateGeoLocation(newLat,newLng,city,area,state,country,zipcode)
+
 			},
 			error => {
 				console.error(error);

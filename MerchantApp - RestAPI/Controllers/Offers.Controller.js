@@ -189,11 +189,25 @@ class OffersContorller {
     async getstoresbyoffer(req, res, next){
         try {
             const storeids = req.body
-            const storeResult = await Store.find({'_id': {'$in' : storeids}}).select("_id name address")
+            const storeResult = await Store.find({'_id': {'$in' : storeids}}).select("_id name address zipcode")
             if(!storeResult){
                 return next(createError.NotFound)
             }
             res.send(storeResult)
+        } catch (error) {
+            if (error.isJoi === true) error.status = 422
+            next(error)
+        }
+
+    }
+    async getAllOffers(req, res, next){
+        try {
+            const ownerID = req.payload.aud
+            const offersResult = await OffersModel.find({ownerID,isDeleted:false}).select("_id offerName storeID isActive status createdAt")
+            if(!offersResult){
+                return next(createError.NotFound)
+            }
+            res.send(offersResult)
         } catch (error) {
             if (error.isJoi === true) error.status = 422
             next(error)

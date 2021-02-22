@@ -71,8 +71,9 @@ const storeSchema = new mongoose.Schema({
     email : {type:String},
     identity_proof:{type : String},
     profilepic : {type:String},
-    hasMainBranch : {type : Boolean,default : false},
-    mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null},
+    store_google_id : {type:String,default:null},
+   // hasMainBranch : {type : Boolean,default : false},
+    //mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null},
     website: {type:String,default:null}
     }, {
         timestamps: true

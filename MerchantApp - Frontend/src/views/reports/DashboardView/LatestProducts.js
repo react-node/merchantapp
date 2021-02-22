@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { v4 as uuid } from 'uuid';
 import moment from 'moment';
 import {
   Avatar,
@@ -20,6 +19,7 @@ import {
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import {GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config'
+import { useNavigate } from 'react-router-dom';
 
 
 const useStyles = makeStyles(({
@@ -34,6 +34,7 @@ const useStyles = makeStyles(({
 
 const LatestProducts = ({ className,storesData, ...rest }) => {
   const classes = useStyles();
+  const navigate =useNavigate()
 
   return (
     <Card
@@ -83,6 +84,8 @@ const LatestProducts = ({ className,storesData, ...rest }) => {
           endIcon={<ArrowRightIcon />}
           size="small"
           variant="text"
+          onClick={()=>navigate("/app/stores")}
+
         >
           View all
         </Button>

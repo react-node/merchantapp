@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import moment from 'moment';
-import { v4 as uuid } from 'uuid';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import PropTypes from 'prop-types';
 import {
@@ -21,6 +20,7 @@ import {
   makeStyles
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+import { useNavigate } from 'react-router-dom';
 
 
 const useStyles = makeStyles(() => ({
@@ -48,6 +48,7 @@ const useStyles = makeStyles(() => ({
 
 const LatestOrders = ({ className, offersData,...rest }) => {
   const classes = useStyles();
+  const navigate =useNavigate()
   const editDisable=(expiredate)=>{
     const currentDate = new Date()
     const currentDateWithouttime = currentDate.setHours(0,0,0,0)
@@ -147,7 +148,7 @@ const LatestOrders = ({ className, offersData,...rest }) => {
                     {moment(offer.fromDate).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>
-                    {moment(offer.expiredate).format('DD/MM/YYYY')}
+                    {moment(offer.expireDate).format('DD/MM/YYYY')}
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -172,6 +173,7 @@ const LatestOrders = ({ className, offersData,...rest }) => {
           endIcon={<ArrowRightIcon />}
           size="small"
           variant="text"
+          onClick={()=>navigate("/app/offers")}
         >
           View all
         </Button>

@@ -7,7 +7,7 @@
 	const getCity = ( addressArray ) => {
 		let city = '';
 		for( let i = 0; i < addressArray.length; i++ ) {
-			if ( addressArray[ i ].types[0] && 'administrative_area_level_2' === addressArray[ i ].types[0] ) {
+			if ( addressArray[ i ].types[0] && addressArray[ i ].types.includes('administrative_area_level_2') ) {
 				city = addressArray[ i ].long_name;
 				return city;
 			}
@@ -35,13 +35,14 @@
 	 * @return {string}
 	 */
 	const getArea = ( addressArray ) => {
-		const filteredStrings = ["sublocality_level_1","locality"]
+		//const filteredStrings = ["sublocality_level_1","locality"]
+		const filteredStrings = ["sublocality_level_1"]
 		let area = '';
 		for( let i = 0; i < filteredStrings.length; i++ ) {
 			
 				for ( let j = 0; j < addressArray.length; j++ ) {
 
-					if ( addressArray[ j ].types[0] && filteredStrings[i] === addressArray[ j ].types[0]  ) {
+					if ( addressArray[ j ].types[0] && addressArray[ j ].types.includes(filteredStrings[i])  ) {
 						area += ", "+addressArray[ j ].long_name;
 						
 					}
@@ -59,7 +60,7 @@
 	const getState = ( addressArray ) => {
 		let state = '';
 			for( let i = 0; i < addressArray.length; i++ ) {
-				if ( addressArray[ i ].types[0] && 'administrative_area_level_1' === addressArray[ i ].types[0] ) {
+				if ( addressArray[ i ].types[0] && addressArray[ i ].types.includes('administrative_area_level_1') ) {
 					state = addressArray[ i ].long_name;
 					return state;
 				}
@@ -76,7 +77,7 @@
 		let country = '';
 		for( let i = 0; i < addressArray.length; i++ ) {
 			for( let i = 0; i < addressArray.length; i++ ) {
-				if ( addressArray[ i ].types[0] && 'country' === addressArray[ i ].types[0] ) {
+				if ( addressArray[ i ].types[0] && addressArray[ i ].types.includes('country') ) {
 					country = addressArray[ i ].long_name;
 					return country;
 				}
@@ -91,15 +92,16 @@
 	 */
 	const getAddressLine = ( addressArray ) => {
 		let addressLine = '';
-		
+		const filteredStrings = ["street_number","route","sublocality_level_3","sublocality_level_2","premise"]
+
+		for( let x = 0; x < filteredStrings.length; x++ ) {
 			for( let i = 0; i < addressArray.length; i++ ) {
-				if ( addressArray[ i ].types[0] &&( 'street_number' === addressArray[ i ].types[0] || 
-				'route' === addressArray[ i ].types[0] || 'sublocality_level_3' === addressArray[ i ].types[0] ||
-				'sublocality_level_2' === addressArray[ i ].types[0] || 'premise' === addressArray[ i ].types[0] ) ) {
+				if ( addressArray[ i ].types[0] && addressArray[ i ].types.includes(filteredStrings[x])) {
 					addressLine += ", "+addressArray[ i ].long_name;
 					
 				}
 			}
+		}
 		
 		return addressLine.replace(/^,/, '');
     };

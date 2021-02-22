@@ -15,6 +15,16 @@ class ProfileContorller {
             next(error)
         }
     }
+    async updateProfileDetails(req, res, next){
+        try {
+            const requestPayload = req.body
+            const profileData = await ProfileModel.findByIdAndUpdate(req.payload.aud,requestPayload,{new:true})
+            res.send(profileData)
+        } catch (error) {
+            if (error.isJoi === true) error.status = 422
+            next(error)
+        }
+    }
     async dashboard(req, res, next){
         try {
             let query = {owner : req.payload.aud,isDeleted:false}

@@ -59,6 +59,22 @@ const UtilsContorller = {
             next(error)
         }
     },
+    async getprice(req,res,next){
+        try {
+            const type = req.params.type
+            let response = {}
+            if(type=== "offer"){
+                response = {price : 100,limit:10}
+            }else if(type === "banner"){
+                response = {price : 200,limit:5}
+            }
+            res.send(response)
+        } catch (error) {
+            next(error)
+        }
+
+    },
+
 }
 
 module.exports = UtilsContorller
