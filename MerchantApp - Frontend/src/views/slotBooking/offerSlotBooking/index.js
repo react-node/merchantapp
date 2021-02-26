@@ -6,6 +6,7 @@ import {
 import Page from 'src/components/Page';
 import Toolbar from './Toolbar';
 import SlotsForm from '../SlotsForm';
+import { useParams } from 'react-router-dom';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -19,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
 
 const SlotBookingView = () => {
   const classes = useStyles();
+  const {type} = useParams()
 
   return (
     <Page
@@ -29,7 +31,7 @@ const SlotBookingView = () => {
       <Toolbar />
     
       
-          <SlotsForm type="offer"/>
+          <SlotsForm type={type}/>
        
       </Container>
     </Page>

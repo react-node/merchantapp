@@ -40,8 +40,8 @@ const routes = (accessToken)=> [
       { path: 'offers/offerdetail', element: <OfferDetailsView /> },
       { path: 'offer/editoffer', element: <EditOffersView /> },
       { path: 'banner_images', element: <BannerImageView /> },
-      { path: 'banner_slot_booking', element: <SlotBookingView /> },
-      { path: 'offer_slot_booking', element: <OfferSlotBookingView /> },
+      { path: 'banner_slot_booking/:type', element: <SlotBookingView /> },
+      { path: 'offer_slot_booking/:type', element: <OfferSlotBookingView /> },
       { path: 'slot_booking/next', element: <SlotBookingFinalView /> },
       // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }

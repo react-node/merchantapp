@@ -4,11 +4,9 @@ import PropTypes from 'prop-types';
 import {
   
   Box,
-  Divider,
   Drawer,
   Hidden,
   List,
- 
   makeStyles,
   Typography
 } from '@material-ui/core';
@@ -55,11 +53,11 @@ const items = [
     icon: LibraryBooksIcon,
     title: 'Slots',
     children : [{
-      href: '/app/banner_slot_booking',
+      href: '/app/banner_slot_booking/banner',
       icon: ViewDayIcon,
       title: 'Banner Slots',
     },{
-      href: '/app/offer_slot_booking',
+      href: '/app/offer_slot_booking/offer',
       icon: CollectionsBookmarkIcon,
       title: 'Offer Slots',
     }]

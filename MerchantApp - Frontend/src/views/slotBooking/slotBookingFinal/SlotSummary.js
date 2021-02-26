@@ -39,7 +39,7 @@ const Toolbar = ({ className, ...rest }) => {
   const _isMounted = useRef(true); // Initial value _isMounted = true //prevent memory leak
   //const [Price,setPrice] = useState(200)
 
-  const {setLoading,bannerSearchData,selectedSlotsData} = useContext(GlobalContext);
+  const {setLoading,bannerSearchData} = useContext(GlobalContext);
   console.log(bannerSearchData)
   useEffect(()=>{
     if(Object.keys(bannerSearchData).length===0)
@@ -52,7 +52,7 @@ const Toolbar = ({ className, ...rest }) => {
     
     const priceInfo = await Services.getPrice(type)
     if (_isMounted.current) {
-    setPriceInfo(priceInfo.data)
+      setPriceInfo(priceInfo.data)
     }
   }
   useEffect(()=>{
@@ -83,13 +83,13 @@ const Toolbar = ({ className, ...rest }) => {
           id : bannerSearchData.banner._id,
           imagePath : bannerSearchData.banner.imagePath
         }
-        const saveData = await Services.saveBannerSlots(requestData)
+        await Services.saveBannerSlots(requestData)
       }else{
         requestData.offerDetails = {
           id : bannerSearchData.offer._id,
           name : bannerSearchData.offer.offerName
         }
-        const saveData = await Services.saveOfferSlots(requestData)
+        await Services.saveOfferSlots(requestData)
       }
      
       setLoading(false)
@@ -100,9 +100,6 @@ const Toolbar = ({ className, ...rest }) => {
 
     }
   }
-
-
-
   return (
     <div
       className={clsx(classes.root, className)}

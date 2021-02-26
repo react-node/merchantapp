@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const bcrypt = require('bcrypt')
+const { boolean } = require('@hapi/joi')
 
 const UserSchema = new Schema({
   firstName: {
@@ -40,6 +41,15 @@ const UserSchema = new Schema({
   isVerified:{
     type:Boolean,
     default: false
+  },
+  identityProofs : [{
+    id_type : String,
+    id_number : String,
+    upload_path : String
+  }],
+  isIDProofVerified : {
+    type:Boolean,
+    default : false
   }
 
 },{

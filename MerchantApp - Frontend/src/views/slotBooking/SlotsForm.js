@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   makeStyles,
-  Typography
 } from '@material-ui/core';
 import SlotBookingForm from './SlotBookingForm'
 import SlotsAvailability from './SlotsAvailability'

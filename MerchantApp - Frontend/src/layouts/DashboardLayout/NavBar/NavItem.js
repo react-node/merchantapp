@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { NavLink as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
-import PropTypes, { object } from 'prop-types';
+import PropTypes from 'prop-types';
 import {
   Button,
   Collapse,
   List,
   ListItem,
-  ListItemText,
   makeStyles
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';

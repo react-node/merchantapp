@@ -1,4 +1,5 @@
 const createError = require('http-errors')
+const { request } = require('../config')
 const Offers = require('../Models/Offers.model')
 const Store = require('../Models/Store.model')
 const ProfileModel = require('../Models/User.model')
@@ -8,7 +9,7 @@ class ProfileContorller {
     async getProfileDetails(req, res, next){
         try {
            
-            const profileData = await ProfileModel.findById(req.payload.aud)
+            const profileData = await ProfileModel.findById(req.payload.aud).select("_id firstName lastName email phoneNumber identityProofs isIDProofVerified")
             res.send(profileData)
         } catch (error) {
             if (error.isJoi === true) error.status = 422
@@ -18,8 +19,10 @@ class ProfileContorller {
     async updateProfileDetails(req, res, next){
         try {
             const requestPayload = req.body
-            const profileData = await ProfileModel.findByIdAndUpdate(req.payload.aud,requestPayload,{new:true})
-            res.send(profileData)
+            const isPhoneFound = await ProfileModel.findOne({phoneNumber: requestPayload.phoneNumber})
+            if(isPhoneFound && isPhoneFound.email !== requestPayload.email) throw createError.NotAcceptable("Phone number existed")
+            await ProfileModel.findByIdAndUpdate(req.payload.aud,requestPayload,{new:true})
+            res.send({"status": "ok","message" : "Updated successfully"})
         } catch (error) {
             if (error.isJoi === true) error.status = 422
             next(error)
@@ -51,6 +54,22 @@ class ProfileContorller {
             if (error.isJoi === true) error.status = 422
             next(error)
         }
+    }
+    async verifyIDProof (req, res, next){
+        try {
+            const idProofNumber = req.params.idProofNumber
+            const result = await ProfileModel.findOne({identityProofs: {$elemMatch:{id_number:idProofNumber}}})
+            console.log(result)
+            if(result) throw createError.NotAcceptable("PAN is existed")
+
+            res.send({})
+
+
+        } catch (error) {
+            next(error)
+            
+        }
+
     }
     
     

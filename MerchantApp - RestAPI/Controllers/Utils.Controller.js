@@ -1,5 +1,6 @@
 const createError = require('http-errors')
 const StoreType = require('../Models/StoreType.model')
+const MallModel = require('../Models/Malls.model')
 const { StoreTypeValidation } = require('../helpers/util_validation_schema')
 
 const UtilsContorller = {
@@ -14,11 +15,33 @@ const UtilsContorller = {
             next(error)
         }
     },
+    async addMalls(req, res, next){
+        try {
+            //const result = await MallModel.validateAsync(req.body)
+            const requestPayload = req.body.map(item=> ({...item , owner: req.payload.aud}))
+            const mallModelData = await MallModel.insertMany(requestPayload)
+           // const mallModelData =  mallModel()
+            res.send(mallModelData)
+        } catch (error) {
+            if (error.isJoi === true) error.status = 422
+            next(error)
+        }
+    },
     //get store type and categories.
     async getStoreTypes(req,res,next){
         try {
             const storeTypeData = await StoreType.find()
             res.send(storeTypeData)
+          } catch (error) {
+           
+            next(error)
+          }
+    },
+    async getMalls(req,res,next){
+        try {
+            const zipcode = req.params.zipcode
+            const mallsData = await MallModel.find({zipcode}).select("_id mallName")
+            res.send(mallsData)
           } catch (error) {
            
             next(error)

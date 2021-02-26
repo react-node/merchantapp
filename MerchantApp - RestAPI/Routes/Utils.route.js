@@ -1,12 +1,14 @@
 const express = require('express')
 
 const router = express.Router()
-const StoreTypeController = require('../Controllers/Utils.Controller')
+const UtilsController = require('../Controllers/Utils.Controller')
 
-router.post('/storetype', StoreTypeController.addStoreType)
-router.get('/storetype', StoreTypeController.getStoreTypes)
-router.get('/price/:type', StoreTypeController.getprice)
-router.put('/storetype/:storeID', StoreTypeController.updateStoreCategories)
-router.delete('/storetype/:storeID', StoreTypeController.deleteStoreCategories)
+router.post('/storetype', UtilsController.addStoreType)
+router.post('/malls', UtilsController.addMalls)
+router.get('/malls/:zipcode', UtilsController.getMalls)
+router.get('/storetype', UtilsController.getStoreTypes)
+router.get('/price/:type', UtilsController.getprice)
+router.put('/storetype/:storeID', UtilsController.updateStoreCategories)
+router.delete('/storetype/:storeID', UtilsController.deleteStoreCategories)
 
 module.exports = router

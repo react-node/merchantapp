@@ -190,6 +190,24 @@ const searchOfferSlots = async (requestPayload)=>{
     const response = await axios.post(config.API_URI+config.SEARCH_OFFER_SLOT_API,requestPayload,headers);
     return response
 }
+const getMallsData = async (zipcode)=>{
+    const headers = GenerateHeaders()
+    console.log(zipcode)
+    const response = await axios.get(config.API_URI+config.MALLS_DATA+"/"+zipcode,headers);
+    return response
+}
+const validatePAN = async (pan)=>{
+    const headers = GenerateHeaders()
+    console.log(pan)
+    const response = await axios.get(config.API_URI+config.VALIDATE_IDENTITY+"/"+pan,headers);
+    return response
+}
+const validateAadhaar = async (aadhaar)=>{
+    const headers = GenerateHeaders()
+    console.log(aadhaar)
+    const response = await axios.get(config.API_URI+config.VALIDATE_IDENTITY+"/"+aadhaar,headers);
+    return response
+}
 
 
 export default {
@@ -221,5 +239,8 @@ export default {
     getPrice,
     getAllOffers,
     searchOfferSlots,
-    saveOfferSlots
+    saveOfferSlots,
+    getMallsData,
+    validatePAN,
+    validateAadhaar
 }

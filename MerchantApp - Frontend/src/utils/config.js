@@ -4,6 +4,7 @@ export const GOOGLE_MAP_API_KEY = "AIzaSyAX1-u7kNBGOX1pAm79eDBXCb8KBU851TI"
 //export const GOOGLE_MAP_API_KEY =  "AIzaSyBfE9S6nfEMD8mX3D4IVfuynq9AYnBz9Eo"
 export const GOOGLE_STORAGE_PUBLIC_URL = "https://storage.googleapis.com/dileep06578/"
 export const OFFERS_PATH = "/offers/"
+export const IDENTITY_PROOF_PATH = "/idproof"
 export const BANNER_PATH = "/banners/"
 
 //END POINTS
@@ -25,3 +26,5 @@ export const BANNER_SLOT_API = `/rest/v1/slotbooking/banner`
 export const OFFER_SLOT_API = `/rest/v1/slotbooking/offer`
 export const SEARCH_SLOT_API = `/rest/v1/slotbooking/searchbanneravailability`
 export const SEARCH_OFFER_SLOT_API = `/rest/v1/slotbooking/searchofferavailability`
+export const MALLS_DATA = `/rest/v1/utils/malls`
+export const VALIDATE_IDENTITY = `/rest/v1/profile/me/validate_identity`

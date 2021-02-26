@@ -111,7 +111,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
 
       }
       let reservedSlotsArray =[]
-      const reservedSlots = searchSlotsAvailability.data.map(({selectStores})=>{
+      searchSlotsAvailability.data.forEach(({selectStores})=>{
           selectStores.map((item)=> reservedSlotsArray.push(item))
 
       })

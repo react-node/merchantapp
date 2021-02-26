@@ -17,7 +17,8 @@ import {
   Checkbox,
   FormLabel,
   RadioGroup,
-  Radio
+  Radio,
+  FormHelperText
 } from '@material-ui/core';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -38,6 +39,7 @@ import { GlobalContext } from "../../../context/GlobalState";
 import { GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
 import MapServices from "../../../services/MapServices"
 import Services from 'src/services/Services';
+import { Autocomplete } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -123,6 +125,7 @@ const AddStore = ({ className,type, ...rest }) =>
   const [isSelectedFromsuggestions, setIsSelectedFromsuggestions] = useState(false)
   const [storeGoogleId,setStoreGoogleId] = useState(null)
   const [disabledFields,setDisabledFields] = useState({})
+  const [mallsData,setMallsData] = useState([])
   const initialDisableState = {
     area : false,
     city : false,
@@ -216,6 +219,13 @@ const AddStore = ({ className,type, ...rest }) =>
           
           return false
         }
+        setDisabledFields({
+          area :true ,
+          city: true,
+          state:true,
+          country: true,
+          zipcode: true
+        })
         setInitialValues({
           storeName : selectedStore.name,
           email : selectedStore.email,
@@ -237,7 +247,9 @@ const AddStore = ({ className,type, ...rest }) =>
           website: selectedStore.website,
           _id : selectedStore._id
         })
+        
         setThumbnailImg(GOOGLE_STORAGE_PUBLIC_URL+selectedStore.owner+"/"+selectedStore.profilepic)
+        getMallsData(selectedStore.zipcode)
         console.log(initialValues)
        
 
@@ -263,13 +275,21 @@ const AddStore = ({ className,type, ...rest }) =>
         setSelectedStoreType([])
         setSelectedSAC([])
         console.log(initialValues)
+        setDisabledFields(initialDisableState)
       }
     }
     initialData();
 
-    setDisabledFields(initialDisableState)
+   
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
+useEffect(()=>{
+  if(isEdit){
+    const slecetedMallName = mallsData.filter((item)=>item._id === selectedStore.mall_name)
+    setInitialValues({...initialValues,mall_name: slecetedMallName[0]})
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+},[mallsData])
   // const handleChange = (event) => {
   //   setValues({
   //     ...values,
@@ -494,6 +514,7 @@ const handleCapture = ({ target }) => {
           country:country ? true :false,
           zipcode:postalCode ? true :false,
         })
+        getMallsData(postalCode)
       
     });
   }
@@ -509,6 +530,7 @@ const updateGeoLocation =(lat,long,city,area,state,country,zipcode)=>{
     country:country ? true :false,
     zipcode:zipcode ? true :false,
   })
+  getMallsData(zipcode)
 }
 const resetForm=(e)=>{
   if(isSelectedFromsuggestions){
@@ -526,13 +548,15 @@ const resetForm=(e)=>{
  
 }
 const updateStore=(e,val,setValues)=>{
- // console.log(val)
+
  var attrName = e.target.name,tempvalues={}
 
   tempvalues[attrName] = e.target.value
   
     setAddStoreData({...val,[e.target.name]:e.target.value})
- 
+ if(e.target.name === "zipcode" && e.target.value.length ===6){
+   getMallsData(e.target.value)
+ }
   
 }
 const checkValidNumber = (val)=>{
@@ -547,6 +571,16 @@ const checkValidNumber = (val)=>{
     return false
   }
   return true
+}
+const getMallsData = async (zipcode)=>{
+  try {
+    console.log("fetching malls data......")
+    const response = await Services.getMallsData(zipcode)
+    setMallsData(response.data)
+    
+  } catch (error) {
+    
+  }
 }
 
   return (
@@ -582,7 +616,8 @@ const checkValidNumber = (val)=>{
               handleSubmit,
               isSubmitting,
               touched,
-              values,setValues
+              values,setValues,
+              setFieldValue
             }) => (
     <form
       autoComplete="off"
@@ -924,7 +959,21 @@ const checkValidNumber = (val)=>{
               md={12}
               xs={12}
             >  
-             <TextField
+            <Autocomplete
+          
+           options={mallsData}
+           fullWidth
+            label="Enter mall name"
+            name="mall_name"
+            value={values.mall_name|| ''}
+            variant="outlined"
+           getOptionLabel={(option) =>typeof option === 'string' ? option : option.mallName}
+           onChange={( e,value) => setFieldValue('mall_name', value)}
+           renderInput={(params) => <TextField {...params} label="Select Mall" variant="outlined" />}
+           />
+          <FormHelperText  className={`${classes.mgLeft} ${errors.mall_name}?  Mui-error Mui-required: ''`}>{errors.mall_name}</FormHelperText>
+
+             {/* <TextField
                 error={Boolean(touched.mall_name && errors.mall_name)}
                 helperText={touched.mall_name && errors.mall_name}
                 fullWidth
@@ -934,7 +983,7 @@ const checkValidNumber = (val)=>{
                 required
                 value={values.mall_name|| ''}
                 variant="outlined"
-              />
+              /> */}
             </Grid>
             )}
            
