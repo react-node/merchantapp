@@ -16,6 +16,8 @@ import NotificationsIcon from '@material-ui/icons/NotificationsOutlined';
 import InputIcon from '@material-ui/icons/Input';
 import Logo from 'src/components/Logo';
 import { GlobalContext } from "../../context/GlobalState";
+import Services from 'src/services/Services';
+import { useSnackbar } from 'notistack';
 
 
 const useStyles = makeStyles(() => ({
@@ -34,12 +36,21 @@ const TopBar = ({
   const classes = useStyles();
   const navigate = useNavigate();
   const [notifications] = useState([]);
-  const {setAccessToken} = useContext(GlobalContext);
+  const {setAccessToken,getRefreshToken} = useContext(GlobalContext);
+  const { enqueueSnackbar } = useSnackbar();
+  const alertPosition = { horizontal: "right", vertical: "top" }
+  const LogOut=async ()=>{
+    try {
+      const refreshToken =getRefreshToken()
+      await Services.logout({refreshToken})
+      setAccessToken('')
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.log(error)
+      enqueueSnackbar('Sorry, Something went wrong. Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
 
-  const LogOut=()=>{
+    }
     
-    setAccessToken('')
-    navigate('/', { replace: true });
   }
   return (
     <AppBar
@@ -52,7 +63,7 @@ const TopBar = ({
           <Logo />
         </RouterLink>
         <Box flexGrow={1} />
-        <Hidden mdDown>
+        
           <IconButton color="inherit">
             <Badge
               badgeContent={notifications.length}
@@ -67,7 +78,7 @@ const TopBar = ({
             
             />
           </IconButton>
-        </Hidden>
+        
         <Hidden lgUp>
           <IconButton
             color="inherit"

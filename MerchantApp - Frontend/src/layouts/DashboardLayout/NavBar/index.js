@@ -21,6 +21,7 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CollectionsBookmarkIcon from '@material-ui/icons/CollectionsBookmark';
 import ViewDayIcon from '@material-ui/icons/ViewDay';
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import ReceiptIcon from '@material-ui/icons/Receipt';
 
 const items = [
   {
@@ -61,6 +62,11 @@ const items = [
       icon: CollectionsBookmarkIcon,
       title: 'Offer Slots',
     }]
+  },
+  {
+    href: '/app/slot_history',
+    icon: ReceiptIcon,
+    title: 'Slot History'
   },
   // {
    

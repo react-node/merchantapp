@@ -1,0 +1,33 @@
+# [START runtime]
+runtime: nodejs12
+# [END runtime]
+#env: flex
+service : api
+
+env_variables :
+  MONGODB_URI: "mongodb+srv://dileep:dileep@78@cluster0.dk8qw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+  DB_NAME: "clients"
+  ACCESS_TOKEN_SECRET: "f962f5a8b484e3cfa175227cd223fd5e0fc0d8c62f20aec87d918c808c5e833b"
+  REFRESH_TOKEN_SECRET: "029f1d279557b277c9beccb35dc0f9e22cefa462b2d3e2af42e386a3e4e68f94"
+  VERIFICATION_URI : "https://api-project-908088024896.uc.r.appspot.com/user/verify/"
+  RESTPASSWORD_URI : "https://api-project-908088024896.uc.r.appspot.com/user/updatepassword/"
+  EMAIL : "developer.dileep78@gmail.com"
+  EMAIL_PWD : ""
+  ENCRYPT_SECRET_KEY : "skajdfhkljdfhldafkjh12j4h23414"
+  EMAIL_CLIENT_ID : "908088024896-18d3ssda6bs5figdhedkgl0afk3hc83j.apps.googleusercontent.com"
+  EMAIL_CLIENT_SECRET : "DwbtFZbgHRNkehAkPhtopJhV"
+  EMAIL_CLIENT_ACCESSTOKEN : "ya29.A0AfH6SMBQWk6crIHEVjr4AZ5fCrbWjFqH5bLkRabhUoheWRGs1vL6eZ8-H93CKbc0eteAk-xS17AC95_7L9-EJfBYi-rxDwb4KZiwHTfUfjsb4MXoh3DaLvdiNTuPycHvmCyliJsu8Gx6H5QVy3BS6ZfDUmtV"
+  EMAIL_CLIENT_REFRESHTOKEN : "1//04LdaynLgv0ZFCgYIARAAGAQSNwF-L9IrWs2WsKV_dPmiZuzldXloOUIeXaBXi8GqAcX6kwlNXl-JI0H-GzRwNupxuZxXnW0Hels"
+
+manual_scaling:
+  instances: 1
+resources:
+  cpu: 1
+  memory_gb: 0.5
+  disk_size_gb: 10
+
+
+
+
+
+ 

@@ -118,12 +118,15 @@ const ControlledAccordions = () => {
     var selectedDates = selectedStoresDates 
     console.log(e.target.checked,storeID,selectedObj,storeIndex,slotsArrayIndex)
     const Sdata ={...searchData}
-    if(e.target.name === "checkAll")
-    Sdata.selectStore[storeIndex].checkAll =  e.target.checked
+    if(e.target.name === "checkAll"){
+      Sdata.selectStore[storeIndex].checkAll =  e.target.checked
+      
+    }
     Sdata.selectStore[storeIndex].slotsArray[slotsArrayIndex].checked = e.target.checked
     selectedDates[storeID] =selectedDates[storeID] || []
     if(e.target.checked){
-      selectedDates[storeID].push(selectedObj.date)
+      if(!selectedDates[storeID].includes(selectedObj.date))
+        selectedDates[storeID].push(selectedObj.date)
       if(selectedObj.count===(priceInfo.limit-1)){
         Sdata.selectStore.forEach((store)=>{
           if(store.zipcode===zipcode && storeID!==store.id) {

@@ -33,7 +33,7 @@ const RegisterView = () => {
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
 
-  const saveUser =(fromData) => {
+  const saveUser =(fromData,setSubmitting) => {
  
     console.log(API_URI , fromData);
     Axios.post(API_URI+'/auth/register',fromData).then(response=>{
@@ -43,8 +43,11 @@ const RegisterView = () => {
 
       navigate('/', { replace: true });
     }).catch(error=>{
+      if(error.response.status===409)
+      enqueueSnackbar(error.response.data.error.message,   { variant: "error","anchorOrigin" : alertPosition } );
+      else
       enqueueSnackbar('Something went wrong, Please try again later..!',   { variant: "error","anchorOrigin" : alertPosition } );
-
+      setSubmitting(false)
       console.log(error);
     });
   
@@ -79,7 +82,7 @@ const RegisterView = () => {
                 policy: Yup.boolean().oneOf([true], 'This field must be checked')
               })
             }
-            onSubmit={(values)=>saveUser(values)}
+            onSubmit={(values, { setSubmitting })=>saveUser(values,setSubmitting)}
           >
             {({
               errors,

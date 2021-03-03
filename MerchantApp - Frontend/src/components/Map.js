@@ -239,7 +239,7 @@ console.log("info window closed")
 		if( this.props.center.lat !== undefined ) {
 			map = <div>
 				<AsyncMap
-					googleMapURL={`http://maps.google.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places`}
+					googleMapURL={`https://maps.google.com/maps/api/js?key=${GOOGLE_MAP_API_KEY}&libraries=places`}
 					
 					loadingElement={
 						<div style={{ height: `100%` }} />

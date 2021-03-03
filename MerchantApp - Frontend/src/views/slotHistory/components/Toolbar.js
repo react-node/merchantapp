@@ -13,13 +13,12 @@ import {
   Grid,
   TextField,
   makeStyles,
-  FormHelperText,
-  Typography
+  FormHelperText
 } from '@material-ui/core';
 import Services from 'src/services/Services';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
-import {GlobalContext} from "../../context/GlobalState"
+import {GlobalContext} from "../../../context/GlobalState"
 import { useSnackbar } from 'notistack';
 import {
     MuiPickersUtilsProvider,
@@ -27,7 +26,6 @@ import {
   } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
 import { Autocomplete } from '@material-ui/lab';
-import Storeslist from '../offer/components/StoreListMultiSelect'
 import Moment from 'moment';
 
 const useStyles = makeStyles(() => ({
@@ -37,7 +35,7 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const SlotBookingForm = ({ className,type, ...rest }) => {
+const SlotHistoryForm = ({ className,type, ...rest }) => {
   const classes = useStyles();
   const [values, setValues] = useState({});
   const [bannersData,setBannersData]  = useState([])
@@ -46,7 +44,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate()
-  const {setLoading,setBannerSearchData,setSlotsAvailability} = useContext(GlobalContext)
+  const {setLoading,setHistoryData} = useContext(GlobalContext)
 
   const fetchBanners = async ()=>{
       try{
@@ -64,7 +62,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
       try{
         setLoading(true)
           const resultData = await Services.getAllOffers() //to get all the banners data
-          const offersArray = resultData.data.filter((offer)=> (offer.isActive && offer.status ===2 ))
+          const offersArray = resultData.data.filter((offer)=> ( offer.status ===2 ))
           setOffersData(offersArray)
           setLoading(false)
       }catch(e){
@@ -86,42 +84,28 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
         toDate:new Date(),
         slotType : type
     })
-    setBannerSearchData({})
     
     //getProfiledata()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-  const verifyWithOTP =()=>{
-    return true
-  }
-  const SearchAvailability=async (values,setSubmitting)=>{
+ 
+  const getHistory=async (values,setSubmitting)=>{
     try{
       setLoading(true)
-      console.log("save profile details")
       console.log(values)
       const requestData = {...values,
         fromDate : Moment(values.fromDate).format("YYYY-MM-DD"),
         toDate : Moment(values.toDate).format("YYYY-MM-DD"),
       }
-      let searchSlotsAvailability={data:[]}
+      let historyData={data:[]}
       if(type ==="banner"){
-         searchSlotsAvailability = await Services.searchSlots(requestData)
+        historyData = await Services.getBannerHistory(requestData)
 
       }else if(type==="offer"){
-       searchSlotsAvailability = await Services.searchOfferSlots(requestData)
-
+        historyData = await Services.getOfferHistory(requestData)
       }
-      let reservedSlotsArray =[]
-      searchSlotsAvailability.data.forEach(({selectStores})=>{
-          selectStores.map((item)=> reservedSlotsArray.push(item))
-
-      })
-      console.log("reservedSlots====",reservedSlotsArray)
-      setSlotsAvailability(reservedSlotsArray)
-      setBannerSearchData({...values,
-        fromDate : Moment(values.fromDate).format("YYYY-MM-DD"),
-        toDate : Moment(values.toDate).format("YYYY-MM-DD")
-      })
+      setHistoryData(historyData.data)
+     
       setSubmitting(false)
       setLoading(false)
     //  enqueueSnackbar('Data updated successfully...!',  { variant: "success" ,"anchorOrigin" : alertPosition} );
@@ -135,33 +119,12 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
     }
 
   }
-  const getStores = async (value,setFieldValue)=>{
-    try{
-      console.log(value)
-      if(value){
-        const stores = await Services.getStoresByID(value.storeID)
-        console.log(stores.data)
-        const selectedStores = stores.data.map((store)=>{
-          return {id:store._id,name:store.name,address : store.address,zipcode: store.zipcode}
-        })
-        setFieldValue("selectStore",selectedStores)
-      }
-    }catch(e){
-
-    } 
-  }
-  const storeHandleChange = (newValues,setFieldValue)=>{
-     console.log(newValues,setFieldValue)
-    const selectedStoreIds = newValues.map(({_id,zipcode,name})=> ({id:_id,zipcode,name}))
-     setFieldValue('selectStore',selectedStoreIds)
-   }
    const optionName =(name,createdDate,type)=>{
     
       if(type==="banner"){
       name  = name.split('/')[1]
       }
-      const dateTimeFormat = Moment(createdDate).format("YYYY-MM-DD h:mm a")
-      return name+", "+dateTimeFormat
+      return name
 
    }
   return (
@@ -171,14 +134,11 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
             validationSchema={Yup.object().shape({
                 fromDate : Yup.date().required("From date is required"),
                 toDate : Yup.date().required("To date is required"),
-                selectStore : Yup.string().required("Store is required"),
                 slotType : Yup.string(),
-                banner : Yup.string().when('slotType' ,{is:(val)=>(val ==="banner") ,then: Yup.string().required("banner is required"),
-                otherwise: Yup.string().notRequired()}),
-                offer:Yup.string().when('slotType' ,{is:(val)=>(val ==="offer") ,then: Yup.string().required("offer is required"),
-                otherwise: Yup.string().notRequired()})
+                banner : Yup.string().nullable(),
+                offer:Yup.string().nullable()
             })}
-            onSubmit={(values, { setSubmitting }) => SearchAvailability(values,  setSubmitting )}
+            onSubmit={(values, { setSubmitting }) => getHistory(values,  setSubmitting )}
           >
             {({
               errors,
@@ -200,11 +160,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
       {...rest}
     >
       <Card>
-        <CardHeader
-          subheader=""
-          title="Banner Slot Booking"
-        />
-        <Divider />
+       
         <CardContent>
           <Grid
             container
@@ -213,7 +169,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
             <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <Grid
               item
-              md={6}
+              md={3}
               xs={12}
             >
         <KeyboardDatePicker
@@ -226,7 +182,6 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
           id="date-picker-fromDate"
           label="From Date"
           value={values.fromDate}
-          minDate={values.fromDate}
           onChange={( value) => setFieldValue('fromDate', value)}
           KeyboardButtonProps={{
             'aria-label': 'change date',
@@ -234,7 +189,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
         /></Grid>
          <Grid
               item
-              md={6}
+              md={3}
               xs={12}
             >
         <KeyboardDatePicker
@@ -247,7 +202,6 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
           id="date-picker-toDate"
           label="To Date"
           value={values.toDate}
-          minDate={values.fromDate}
           onChange={( value) => setFieldValue('toDate', value)}
           KeyboardButtonProps={{
             'aria-label': 'change date',
@@ -257,13 +211,12 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
         </MuiPickersUtilsProvider>
         <input type="hidden" name="slotType" value={values.slotType || ''} />
          {type==="banner" && 
-         <>
        
-        {bannersData.length >0 ? (
+        (bannersData.length >0 && (
             <>
-             <Grid
+            <Grid
             item
-            md={6}
+            md={3}
             xs={12}
         >
         <Autocomplete
@@ -278,64 +231,38 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
             />
           <FormHelperText  className={`${classes.mgLeft} ${errors.banner}?  Mui-error Mui-required: ''`}>{errors.banner}</FormHelperText>
           </Grid>
-          <Grid
-            item
-            md={6}
-            xs={12}
-        >
-           <Storeslist 
-           storeHandleChange={(newvalue)=>{storeHandleChange(newvalue,setFieldValue)}}/>
-          <FormHelperText  className={`${classes.mgLeft} ${errors.selectStore}?  Mui-error Mui-required: ''`}>{errors.selectStore}</FormHelperText>
-
-        </Grid>
           </>
-          ) :  (    
-            <FormHelperText  className={`${classes.mgLeft} ${errors.selectStore}?  Mui-error Mui-required: ''`}>
-              You dont have any approved banners so you can't able to book any slots 
-            </FormHelperText>
-          )}
-            
-        </>
-            }  
+          )
+        )}  
          {type==="offer" && 
-         <>
-        
-        {offersData.length >0 ? (
+         (offersData.length >0 && (
             <>
             <Grid
             item
-            md={6}
+            md={3}
             xs={12}
         >
         <Autocomplete
            
-            id="Banners"
+            id="offers"
             options={offersData}
             value={values.offer || ''}
             name="offer"
             getOptionLabel={(option) =>typeof option === 'string' ? option : optionName(option.offerName,option.createdAt,"offer")}
-            onChange={( e,value) => {setFieldValue('offer', value);getStores(value,setFieldValue)}}
+            onChange={( e,value) => {setFieldValue('offer', value)}}
             renderInput={(params) => <TextField {...params} label="Select offer" variant="outlined" />}
             />
           <FormHelperText  className={`${classes.mgLeft} ${errors.offer}?  Mui-error Mui-required: ''`}>{errors.offer}</FormHelperText>
           </Grid>
           </>
-          ):(<FormHelperText  className={`${classes.mgLeft} ${errors.selectStore}?  Mui-error Mui-required: ''`}>
-              You dont have any approved offers so you can't able to book any slots 
-            </FormHelperText>
-            )}
-            
-        </>
-            } 
-                
-          </Grid>
-        </CardContent>
-        <Divider />
+          ))
+       
+        } 
         <Box
-          display="flex"
-          justifyContent="flex-end"
-          p={2}
-        >
+         
+            alignSelf="center"
+            p={2}
+            >
           <Button
             color="primary"
             variant="contained"
@@ -344,15 +271,18 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
           >
             Search
           </Button>
-        </Box>
+        </Box> 
+          </Grid>
+        </CardContent>
+        
       </Card>
     </form> )}
   </Formik>
   );
 };
 
-SlotBookingForm.propTypes = {
+SlotHistoryForm.propTypes = {
   className: PropTypes.string
 };
 
-export default SlotBookingForm;
+export default SlotHistoryForm;

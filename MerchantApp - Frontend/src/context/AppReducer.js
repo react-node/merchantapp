@@ -47,6 +47,11 @@ export default (state, action) => {
           ...state,
           slotsAvailability : action.payload
         };
+      case "SET_HISTORY_DATA":
+        return {
+          ...state,
+          historyData : action.payload
+        };
       case "LOADING":
         return {
           ...state,
@@ -59,11 +64,25 @@ export default (state, action) => {
           accessToken : action.payload
           
         };
-        case "GET_TOKEN":
+      case "SET_REFRESH_TOKEN":
+        window.sessionStorage.setItem("refreshToken",action.payload)
+        return {
+          ...state,
+          refreshToken : action.payload
+          
+        };
+      case "GET_TOKEN":
         const token = window.sessionStorage.getItem("token")
         return {
           ...state,
          accessToken : token
+          
+        };
+      case "GET_REFRESH_TOKEN":
+        const refreshToken = window.sessionStorage.getItem("refreshToken")
+        return {
+          ...state,
+         refreshToken : refreshToken
           
         };
       case "EDIT_EMPLOYEE":

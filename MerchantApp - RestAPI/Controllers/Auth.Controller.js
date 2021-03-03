@@ -9,7 +9,6 @@ const {
 const Cryptr = require('cryptr');
 const client = require('../helpers/init_redis')
 const sendEmail = require('../helpers/email_send');
-const { create } = require('../Models/User.model');
 const cryptr = new Cryptr(process.env.ENCRYPT_SECRET_KEY);
 module.exports = {
   register: async (req, res, next) => {
@@ -24,21 +23,24 @@ module.exports = {
       const randomString = Math.random().toString(36).slice(2)
       result.activationKey = randomString
       const user = new User(result)
-      const savedUser = await user.save()
+      var savedUser = await user.save()
       console.log(savedUser._id)
       const encrypt_email =  cryptr.encrypt(savedUser._id);
       const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
-      //console.log(emailSend)
+      console.log(emailSend)
+
+      if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
       // const accessToken = await signAccessToken(savedUser.id)
       // const refreshToken = await signRefreshToken(savedUser.id)
       const responseData = {
         status:200,
         message : "Registered successfully"
-
       }
       res.send(responseData)
     } catch (error) {
       if (error.isJoi === true) error.status = 422
+      if(error.status === 500)
+      var deleteUser = await User.findByIdAndDelete(savedUser._id)
       next(error)
     }
   },

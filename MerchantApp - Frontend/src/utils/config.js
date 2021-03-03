@@ -1,3 +1,4 @@
+//export const API_URI = "https://api-dot-api-project-908088024896.uc.r.appspot.com";
 export const API_URI = "http://localhost:3001";
 export const ACCESS_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2MTI4OTY5MDYsImV4cCI6MTYxMjkwNzcwNiwiYXVkIjoiNjAyMjUwZjlmOGFmNWUyNWEwMDNlZTM3IiwiaXNzIjoidGVjaGJpOCJ9.kM0fMieB0h0R9jb8P7H8s30xHf7GOD8A0R5KluiqSto"
 export const GOOGLE_MAP_API_KEY = "AIzaSyAX1-u7kNBGOX1pAm79eDBXCb8KBU851TI"
@@ -28,3 +29,5 @@ export const SEARCH_SLOT_API = `/rest/v1/slotbooking/searchbanneravailability`
 export const SEARCH_OFFER_SLOT_API = `/rest/v1/slotbooking/searchofferavailability`
 export const MALLS_DATA = `/rest/v1/utils/malls`
 export const VALIDATE_IDENTITY = `/rest/v1/profile/me/validate_identity`
+export const OFFER_HISTORY = `/rest/v1/slotbooking/offerHistory`
+export const BANNER_HISTORY = `/rest/v1/slotbooking/bannerHistory`

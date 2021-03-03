@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 const LoginView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const {setLoading,setAccessToken} = useContext(GlobalContext);
+  const {setLoading,setAccessToken,setRefreshToken} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
 
@@ -43,6 +43,7 @@ const LoginView = () => {
       console.log(responseData);
       if(responseData.status===200){
         setAccessToken(responseData.data.accessToken)
+        setRefreshToken(responseData.data.refreshToken)
       }
       setLoading(false)
       // .then((responseData)=>{

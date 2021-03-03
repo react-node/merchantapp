@@ -17,6 +17,7 @@ import UpdatePasswordView from 'src/views/auth/UpdatePasswordView';
 import OffersListView from 'src/views/offer/OffersListView';
 import BannerImageView from 'src/views/bannerImages';
 import SlotBookingView from 'src/views/slotBooking';
+import SlotHistoryView from 'src/views/slotHistory';
 import OfferSlotBookingView from 'src/views/slotBooking/offerSlotBooking';
 import SlotBookingFinalView from 'src/views/slotBooking/slotBookingFinal';
 import OfferDetailsView from 'src/views/offer/OfferDetailsView';
@@ -43,6 +44,7 @@ const routes = (accessToken)=> [
       { path: 'banner_slot_booking/:type', element: <SlotBookingView /> },
       { path: 'offer_slot_booking/:type', element: <OfferSlotBookingView /> },
       { path: 'slot_booking/next', element: <SlotBookingFinalView /> },
+      { path: 'slot_history', element: <SlotHistoryView /> },
       // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

@@ -208,6 +208,24 @@ const validateAadhaar = async (aadhaar)=>{
     const response = await axios.get(config.API_URI+config.VALIDATE_IDENTITY+"/"+aadhaar,headers);
     return response
 }
+const getOfferHistory = async (requestBody)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.post(config.API_URI+config.OFFER_HISTORY,requestBody,headers);
+    return response
+}
+const getBannerHistory = async (requestBody)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.post(config.API_URI+config.BANNER_HISTORY,requestBody,headers);
+    return response
+}
+const logout = async (requestBody)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.delete(config.API_URI+"/auth/logout",{...headers,data:requestBody});
+    return response
+}
 
 
 export default {
@@ -242,5 +260,8 @@ export default {
     saveOfferSlots,
     getMallsData,
     validatePAN,
-    validateAadhaar
+    validateAadhaar,
+    getOfferHistory,
+    getBannerHistory,
+    logout
 }

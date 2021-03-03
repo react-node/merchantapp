@@ -4,7 +4,8 @@
   "licence": "InfyOrigin",
   "version": "1.0.0",
   "scripts": {
-    "start": "react-scripts start  --no-cache"
+    "start": "react-scripts start  --no-cache",
+    "build": "react-scripts build"
   },
   "eslintConfig": {
     "extends": "react-app"

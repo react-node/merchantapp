@@ -18,7 +18,9 @@ const initialState = {
   accessToken:null,
   bannerSearchData : {},
   selectedSlotsData : [],
-  slotsAvailability:[]
+  slotsAvailability:[],
+  historyData :[],
+  refreshToken : null
 };
 
 export const GlobalContext = createContext(initialState);
@@ -75,6 +77,12 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
+  function setHistoryData(data) {
+    dispatch({
+      type: "SET_HISTORY_DATA",
+      payload: data
+    });
+  }
   function setSelectedSlotsData(data) {
     dispatch({
       type: "SET_SELECTED_SLOTS_DATA",
@@ -93,6 +101,12 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
+  function setRefreshToken(data) {
+    dispatch({
+      type: "SET_REFRESH_TOKEN",
+      payload: data
+    });
+  }
   function setSlotsAvailability(data) {
     dispatch({
       type: "SET_SLOT_AVAILABILITY",
@@ -102,6 +116,10 @@ export const GlobalProvider = ({ children }) => {
   function getAccessToken() {
     const token = window.sessionStorage.getItem("token")
     return token
+  }
+  function getRefreshToken() {
+    const refreshToken = window.sessionStorage.getItem("refreshToken")
+    return refreshToken
   }
   return (
     <GlobalContext.Provider
@@ -128,7 +146,12 @@ export const GlobalProvider = ({ children }) => {
         setSelectedSlotsData,
         selectedSlotsData : state.selectedSlotsData,
         setSlotsAvailability,
-        slotsAvailability:state.slotsAvailability
+        slotsAvailability:state.slotsAvailability,
+        historyData : state.historyData,
+        setHistoryData,
+        setRefreshToken,
+        getRefreshToken,
+        refreshToken : state.refreshToken
       }}
     >
       {children}

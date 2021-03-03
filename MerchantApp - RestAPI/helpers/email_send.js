@@ -1,14 +1,28 @@
 const nodemailer = require('nodemailer');
 var pug = require('pug');
 
-const sendEmail = (token,encrypt_email,firstName,sendEmail,type="register")=>{
+const sendEmail = async (token,encrypt_email,firstName,sendEmail,type="register")=>{
+    // var transporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     host: 'smtp.gmail.com',
+    //     port: 465,
+    //     auth: {
+    //       user: process.env.EMAIL,
+    //       pass: process.env.EMAIL_PWD
+    //     }
+    //   });
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
         port: 465,
         auth: {
+          type: 'OAuth2',
           user: process.env.EMAIL,
-          pass: process.env.PASSWORD
+          clientId : process.env.EMAIL_CLIENT_ID ,
+          clientSecret : process.env.EMAIL_CLIENT_SECRET ,
+          refreshToken : process.env.EMAIL_CLIENT_REFRESHTOKEN ,
+          accessToken : process.env.EMAIL_CLIENT_ACCESSTOKEN ,
+
         }
       });
       // compile
@@ -33,14 +47,12 @@ const sendEmail = (token,encrypt_email,firstName,sendEmail,type="register")=>{
         subject: subject,
         html: html
       };
-      
-      transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      try{
+        const sendResponse = await transporter.sendMail(mailOptions);
+        return sendResponse
+      }catch(err){
+        return err
+      }
 }  
   
 module.exports = sendEmail
