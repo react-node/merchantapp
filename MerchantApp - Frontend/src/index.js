@@ -13,4 +13,4 @@ ReactDOM.render((
   </GlobalProvider>
 ), document.getElementById('root'));
 
-serviceWorker.unregister();
+serviceWorker.register();

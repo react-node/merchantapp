@@ -14,7 +14,6 @@ import {
   TextField,
   makeStyles,
   FormHelperText,
-  Typography
 } from '@material-ui/core';
 import Services from 'src/services/Services';
 import * as Yup from 'yup';
@@ -91,9 +90,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
     //getProfiledata()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-  const verifyWithOTP =()=>{
-    return true
-  }
+
   const SearchAvailability=async (values,setSubmitting)=>{
     try{
       setLoading(true)

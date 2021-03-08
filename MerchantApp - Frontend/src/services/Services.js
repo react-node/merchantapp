@@ -226,6 +226,18 @@ const logout = async (requestBody)=>{
     const response = await axios.delete(config.API_URI+"/auth/logout",{...headers,data:requestBody});
     return response
 }
+const getPaymentInit = async (requestBody)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.post(config.API_URI+config.INIT_PAYMENT,requestBody,headers);
+    return response
+}
+const getOrderDetails = async (type,orderID)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.get(config.API_URI+config.GET_ORDER_DETAILS+`/${type}/${orderID}`,headers);
+    return response
+}
 
 
 export default {
@@ -263,5 +275,7 @@ export default {
     validateAadhaar,
     getOfferHistory,
     getBannerHistory,
-    logout
+    logout,
+    getPaymentInit,
+    getOrderDetails
 }

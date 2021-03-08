@@ -16,20 +16,13 @@ import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
 import Paper from "@material-ui/core/Paper";
-import Checkbox from "@material-ui/core/Checkbox";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
 import DeleteIcon from "@material-ui/icons/Delete";
 import FilterListIcon from "@material-ui/icons/FilterList";
 import {GlobalContext} from "../../../context/GlobalState"
 import Services from "src/services/Services";
 import { Link } from "@material-ui/core";
-
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -46,7 +39,6 @@ function getComparator(order, orderBy) {
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
-
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -56,11 +48,7 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
-
-
-
 function EnhancedTableHead(props) {
-
     var headCells = [
         {
             id: "name",
@@ -74,16 +62,15 @@ function EnhancedTableHead(props) {
         { id: "endDate", numeric: false, disablePadding: false, label: "End Date",type : "offer" },
         { id: "slotDetails", numeric: false, disablePadding: false, label: "Slot Details",type : "both" },
         { id: "amount", numeric: true, disablePadding: false, label: "Amount",type : "both" },
+        { id: "transactionStatus", numeric: false, disablePadding: false, label: "Transaction Status",type : "both" },
         { id: "transactionID", numeric: false, disablePadding: false, label: "Transaction ID",type : "both" },
         ];
   const {
     classes,
-    onSelectAllClick,
     order,
     orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,type
+    onRequestSort,
+    type
   } = props;
   const createSortHandler = (property) => (event) => {
     console.log(order,orderBy)
@@ -93,7 +80,6 @@ function EnhancedTableHead(props) {
     headCells = headCells.filter(item => item.type !== "offer") 
     console.log(headCells)
   }
-  
   return (
     <TableHead>
       <TableRow>
@@ -122,7 +108,6 @@ function EnhancedTableHead(props) {
     </TableHead>
   );
 }
-
 EnhancedTableHead.propTypes = {
   classes: PropTypes.object.isRequired,
   numSelected: PropTypes.number.isRequired,
@@ -242,9 +227,9 @@ export default function EnhancedTable({type}) {
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  //const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [rows, setRows] = React.useState([])
+  //const [rows, setRows] = React.useState([])
   const { historyData,setLoading,setHistoryData} = useContext(GlobalContext)
   const [open, setOpen] = React.useState(false);
   const [storeAndDates, setStoreAndDates] = React.useState([]);
@@ -252,10 +237,9 @@ export default function EnhancedTable({type}) {
   
   useEffect(()=>{
     setHistoryData([])
-    setRows([])
+   // setRows([])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-
-
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -270,48 +254,39 @@ export default function EnhancedTable({type}) {
     }
     setSelected([]);
   };
+  // const handleClick = (event, name) => {
+  //   const selectedIndex = selected.indexOf(name);
+  //   let newSelected = [];
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
+  //   if (selectedIndex === -1) {
+  //     newSelected = newSelected.concat(selected, name);
+  //   } else if (selectedIndex === 0) {
+  //     newSelected = newSelected.concat(selected.slice(1));
+  //   } else if (selectedIndex === selected.length - 1) {
+  //     newSelected = newSelected.concat(selected.slice(0, -1));
+  //   } else if (selectedIndex > 0) {
+  //     newSelected = newSelected.concat(
+  //       selected.slice(0, selectedIndex),
+  //       selected.slice(selectedIndex + 1)
+  //     );
+  //   }
 
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelected(newSelected);
-  };
-
+  //   setSelected(newSelected);
+  // };
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
   const optionName =(name,type)=>{
-    
     if(type==="banner"){
     name  = name.split('/')[1]
     }
     return name
-
   }
-  const isSelected = (name) => selected.indexOf(name) !== -1;
+  //const isSelected = (name) => selected.indexOf(name) !== -1;
   const getStoreDetails =async (selectStores)=>{
     try{
       setLoading(true)
@@ -350,7 +325,7 @@ export default function EnhancedTable({type}) {
           <Table
             className={classes.table}
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
+            size= "medium"
             aria-label="enhanced table"
           >
             <EnhancedTableHead
@@ -368,7 +343,7 @@ export default function EnhancedTable({type}) {
                && stableSort(historyData, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  //const isItemSelected = isSelected(row.name);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
                   return (
@@ -405,12 +380,13 @@ export default function EnhancedTable({type}) {
                         >Click Here</Link>
                         </TableCell>
                       <TableCell align="right">{row.totalPaid}</TableCell>
+                      <TableCell align="left">{row.txn_response_code === "01" ? "Success" : "Fail"}</TableCell>
                       <TableCell align="left">{row.transactionID}</TableCell>
                     </TableRow>
                   );
                 })}
               {emptyRows > 0 && (
-                <TableRow style={{ height: (dense ? 33 : 53) * emptyRows }}>
+                <TableRow style={{ height: 53 * emptyRows }}>
                   <TableCell colSpan={6} />
                 </TableRow>
               )}

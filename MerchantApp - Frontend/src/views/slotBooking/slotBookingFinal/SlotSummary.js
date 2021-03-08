@@ -14,6 +14,8 @@ import {
 import {GlobalContext} from "../../../context/GlobalState"
 import { useNavigate } from 'react-router-dom';
 import Services from 'src/services/Services';
+import { useSnackbar } from 'notistack';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -38,7 +40,8 @@ const Toolbar = ({ className, ...rest }) => {
   const [priceInfo,setPriceInfo] = useState({})
   const _isMounted = useRef(true); // Initial value _isMounted = true //prevent memory leak
   //const [Price,setPrice] = useState(200)
-
+  const { enqueueSnackbar } = useSnackbar();
+  const alertPosition = { horizontal: "right", vertical: "top" }
   const {setLoading,bannerSearchData} = useContext(GlobalContext);
   console.log(bannerSearchData)
   useEffect(()=>{
@@ -66,39 +69,111 @@ const Toolbar = ({ className, ...rest }) => {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
-  const proceedToPay = async ()=>{
-    try{
-      setLoading(true)
-      console.log(bannerSearchData,total)
-      const selectStores =bannerSearchData.selectStore.map(({id,zipcode,selectedDates})=> ({id,zipcode,selectedDates}))
+  // const proceedToPay = async ()=>{
+  //   try{
+  //     setLoading(true)
+  //     console.log(bannerSearchData,total)
+  //     const selectStores =bannerSearchData.selectStore.map(({id,zipcode,selectedDates})=> ({id,zipcode,selectedDates}))
       
-      let requestData = {
-        
-        selectStores : selectStores,
-        transactionID : 'test',
-        totalPaid : total
-      }
-      if(bannerSearchData.banner){
-        requestData.bannerDetails = {
-          id : bannerSearchData.banner._id,
-          imagePath : bannerSearchData.banner.imagePath
-        }
-        await Services.saveBannerSlots(requestData)
-      }else{
-        requestData.offerDetails = {
-          id : bannerSearchData.offer._id,
-          name : bannerSearchData.offer.offerName
-        }
-        await Services.saveOfferSlots(requestData)
-      }
+  //     let requestData = {
+       
+  //       selectStores : selectStores,
+  //       totalPaid : total
+  //     }
+  //     if(bannerSearchData.banner){
+  //       requestData.bannerDetails = {
+  //         id : bannerSearchData.banner._id,
+  //         imagePath : bannerSearchData.banner.imagePath
+  //       }
+  //       await Services.saveBannerSlots(requestData)
+  //     }else{
+  //       requestData.offerDetails = {
+  //         id : bannerSearchData.offer._id,
+  //         name : bannerSearchData.offer.offerName
+  //       }
+  //       await Services.saveOfferSlots(requestData)
+  //     }
+  //     makePayment(requestData)
      
-      setLoading(false)
-      navigate("/app/slot_booking/confirmation")
+  //     setLoading(false)
+  //     navigate("/app/slot_booking/confirmation")
 
-    }catch(e){
-      setLoading(false)
+  //   }catch(e){
+  //     setLoading(false)
 
+  //   }
+  // }
+  function isDate(val) {
+    // Cross realm comptatible
+    return Object.prototype.toString.call(val) === '[object Date]'
+  }
+  
+  function isObj(val) {
+    return typeof val === 'object'
+  }
+  
+   function stringifyValue(val) {
+    if (isObj(val) && !isDate(val)) {
+      return JSON.stringify(val)
+    } else {
+      return val
     }
+  }
+  
+  function buildForm({ action, params }) {
+    const form = document.createElement('form')
+    form.setAttribute('method', 'post')
+    form.setAttribute('action', action)
+  
+    Object.keys(params).forEach(key => {
+      const input = document.createElement('input')
+      input.setAttribute('type', 'hidden')
+      input.setAttribute('name', key)
+      input.setAttribute('value', stringifyValue(params[key]))
+      form.appendChild(input)
+    })
+  
+    return form
+  }
+  
+  function post(details) {
+    //setLoading(true)
+    const form = buildForm(details)
+    document.body.appendChild(form)
+    form.submit()
+    form.remove()
+    //setLoading(false)
+  }
+
+  // const getData=(data)=>
+  // {
+
+  // return fetch(`http://localhost:3001/rest/v1/payment`,{
+  //     method:"POST",
+  //     headers:{
+  //         Accept:"application/json",
+  //         "Content-Type":"application/json"
+  //     },
+  //     body:JSON.stringify(data)
+  // }).then(response=>response.json()).catch(err=>console.log(err))
+  // }
+  const makePayment=async ()=>
+  {
+    try {
+      setLoading(true)
+      const paymentInit = await Services.getPaymentInit({amount:total,bannerSearchData})
+      var information={
+        action:"https://securegw-stage.paytm.in/order/process",
+        params:paymentInit.data
+      }
+      post(information)
+     // setLoading(false)
+    } catch (error) {
+      setLoading(false)
+      enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
+      console.log(error)
+    }
+
   }
   return (
     <div
@@ -146,7 +221,7 @@ const Toolbar = ({ className, ...rest }) => {
           <Button
             color="primary"
             variant="contained"
-            onClick={proceedToPay}
+            onClick={makePayment}
           >
             Proceed To Pay
           </Button>

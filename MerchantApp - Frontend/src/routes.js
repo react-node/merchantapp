@@ -23,6 +23,7 @@ import SlotBookingFinalView from 'src/views/slotBooking/slotBookingFinal';
 import OfferDetailsView from 'src/views/offer/OfferDetailsView';
 import AddOffersView from 'src/views/offer/NewOffers';
 import EditOffersView from 'src/views/offer/EditOffers';
+import SlotBookingStatusView from 'src/views/slotBooking/slotStatus';
 
 const routes = (accessToken)=> [
   {
@@ -45,6 +46,7 @@ const routes = (accessToken)=> [
       { path: 'offer_slot_booking/:type', element: <OfferSlotBookingView /> },
       { path: 'slot_booking/next', element: <SlotBookingFinalView /> },
       { path: 'slot_history', element: <SlotHistoryView /> },
+      { path: 'slot-booking-status/:type/:orderID', element: <SlotBookingStatusView /> },
       // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

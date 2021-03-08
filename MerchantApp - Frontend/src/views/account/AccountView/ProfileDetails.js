@@ -20,7 +20,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import {GlobalContext} from "../../../context/GlobalState"
 import { useSnackbar } from 'notistack';
-import { GOOGLE_STORAGE_PUBLIC_URL, IDENTITY_PROOF_PATH} from 'src/utils/config';
+import { IDENTITY_PROOF_PATH} from 'src/utils/config';
 
 
 const useStyles = makeStyles(() => ({

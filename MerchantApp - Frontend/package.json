@@ -54,6 +54,11 @@
     "react-scripts": "^3.4.1",
     "react-swipeable-views": "^0.13.9",
     "uuid": "^8.3.0",
+    "workbox-core": "^6.1.1",
+    "workbox-expiration": "^6.1.1",
+    "workbox-precaching": "^6.1.1",
+    "workbox-routing": "^6.1.1",
+    "workbox-strategies": "^6.1.1",
     "yup": "^0.29.3"
   },
   "devDependencies": {

@@ -31,3 +31,5 @@ export const MALLS_DATA = `/rest/v1/utils/malls`
 export const VALIDATE_IDENTITY = `/rest/v1/profile/me/validate_identity`
 export const OFFER_HISTORY = `/rest/v1/slotbooking/offerHistory`
 export const BANNER_HISTORY = `/rest/v1/slotbooking/bannerHistory`
+export const INIT_PAYMENT = `/rest/v1/payment`
+export const GET_ORDER_DETAILS = `/rest/v1/payment/orderDetails`
