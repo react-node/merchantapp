@@ -6,19 +6,19 @@ const { SlotBookingValidation ,OfferSlotBookingValidation} = require('../helpers
 
 
 class SlotBookingController {
-    async saveBookingInfo(req, res, next){
+    async saveBookingInfo(req){
         try {
-          const ownerID = req.payload.aud
-          const requestData = {...req.body,ownerID}
-          const validationResult = await SlotBookingValidation.validateAsync(requestData)
+        //   const ownerID = req.payload.aud
+        //   const requestData = {...req.body,ownerID}
+          const validationResult = await SlotBookingValidation.validateAsync(req)
 
           const saveData = new BannerBooking(validationResult)
           const result =await saveData.save()
-          res.send(result)
+          return result
 
         } catch (error) {
             if (error.isJoi === true) error.status = 422
-            next(error)
+            throw error
         }
     }
     async searchBannerSlots (req,res,next){
@@ -28,7 +28,7 @@ class SlotBookingController {
             const toDate = req.body.toDate
             const zipcodes = req.body.selectStore.map(({zipcode})=> zipcode)
             console.log(zipcodes)
-            const SlotsAvailability = await BannerBooking.find({selectStores:{$elemMatch:{selectedDates : {$gte : fromDate, $lte: toDate},zipcode:{$in:zipcodes}}}}).select("selectStores")
+            const SlotsAvailability = await BannerBooking.find({selectStores:{$elemMatch:{selectedDates : {$gte : fromDate, $lte: toDate},zipcode:{$in:zipcodes}}},txn_response_code:"01"}).select("selectStores")
             res.send(SlotsAvailability)
 
             
@@ -43,7 +43,7 @@ class SlotBookingController {
             const toDate = req.body.toDate
             const zipcodes = req.body.selectStore.map(({zipcode})=> zipcode)
             console.log(zipcodes)
-            const SlotsAvailability = await OfferBooking.find({selectStores:{$elemMatch:{selectedDates : {$gte : fromDate, $lte: toDate},zipcode:{$in:zipcodes}}}}).select("selectStores")
+            const SlotsAvailability = await OfferBooking.find({selectStores:{$elemMatch:{selectedDates : {$gte : fromDate, $lte: toDate},zipcode:{$in:zipcodes}}},txn_response_code:"01"}).select("selectStores")
             res.send(SlotsAvailability)
 
             
@@ -97,19 +97,57 @@ class SlotBookingController {
             next(error)
         }
     }
-    async saveOfferBookingInfo(req, res, next){
+    async saveOfferBookingInfo(req){
         try {
-          const ownerID = req.payload.aud
-          const requestData = {...req.body,ownerID}
-          const validationResult = await OfferSlotBookingValidation.validateAsync(requestData)
+        //   const ownerID = req.payload.aud
+        //   const requestData = {...req.body,ownerID}
+          const validationResult = await OfferSlotBookingValidation.validateAsync(req)
 
           const saveData = new OfferBooking(validationResult)
           const result =await saveData.save()
-          res.send(result)
+          //res.send(result)
+          return result
 
         } catch (error) {
             if (error.isJoi === true) error.status = 422
-            next(error)
+            //next(error)
+            throw error
+        }
+    }
+    async updateBookingTXNID(req,slotType){
+        try {
+            const {orderID,...rest} = req
+            let update_txn_data = []
+            if(slotType === "banner"){
+                 update_txn_data = await BannerBooking.findOneAndUpdate({orderID },rest)
+            }else{
+                 update_txn_data = await OfferBooking.findOneAndUpdate({orderID },rest)
+
+            }
+            return update_txn_data
+
+        } catch (error) {
+            if (error.isJoi === true) error.status = 422
+            //next(error)
+            return error
+        }
+    }
+    async getOrderDetails(orderID,type){
+        try {
+            let orderData =[] 
+            if(type === "banner"){
+                orderData = await BannerBooking.findOne({orderID })
+            }else{
+                orderData = await OfferBooking.findOne({orderID })
+
+            }
+            console.log(type, orderData)
+            return orderData
+
+        } catch (error) {
+            if (error.isJoi === true) error.status = 422
+            //next(error)
+            return error
         }
     }
 

@@ -1,5 +1,4 @@
 const createError = require('http-errors')
-const { request } = require('../config')
 const Offers = require('../Models/Offers.model')
 const Store = require('../Models/Store.model')
 const ProfileModel = require('../Models/User.model')

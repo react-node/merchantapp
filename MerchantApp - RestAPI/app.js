@@ -14,6 +14,7 @@ const OffersRoute = require('./Routes/Offers.route')
 const ImageuploadRoute = require('./Routes/Imageupload.route')
 const ProfileRoute = require('./Routes/Profile.route')
 const SlotsRoute = require('./Routes/Slots.route')
+const PaymentRoute = require('./Routes/Payment.route')
 
 const app = express()
 const multerMid = multer({
@@ -25,12 +26,12 @@ const multerMid = multer({
 app.use(cors())
 app.use(morgan('dev'))
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+//app.use(express.urlencoded({ extended: true })) //commented on 07-03-2020 due to payment callback formidable not accepting this header
 app.use(multerMid.single('file'))
 
-app.get('/', verifyAccessToken, async (req, res, next) => {
+app.get('/',  async (req, res, next) => {
   console.log(req.body)
-  res.send('Hello from express.')
+  res.redirect("http://localhost:3000/app/dashboard")
 })
 
 app.use('/auth', AuthRoute)
@@ -40,6 +41,7 @@ app.use('/rest/v1/offers', verifyAccessToken, OffersRoute)
 app.use('/rest/v1/imageupload', verifyAccessToken, ImageuploadRoute)
 app.use('/rest/v1/profile', verifyAccessToken, ProfileRoute)
 app.use('/rest/v1/slotbooking', verifyAccessToken, SlotsRoute)
+app.use('/rest/v1/payment',PaymentRoute)
 
 app.use(async (req, res, next) => {
   next(createError.NotFound())

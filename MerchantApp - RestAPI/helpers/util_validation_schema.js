@@ -18,7 +18,8 @@ const SlotBookingValidation = Joi.object({
     imagePath : Joi.string().required().messages({"any.required": "Missing image path"}),
     id : Joi.string()
   }),
-  transactionID : Joi.string().required().messages({"any.required": "Missing transaction id "}),
+  orderID : Joi.string().required().messages({"any.required": "Missing order id "}),
+  transactionID : Joi.string(),
   totalPaid : Joi.number().required().messages({"any.required": "Missing total amount "})
 }).unknown(true)
 
@@ -35,7 +36,8 @@ const OfferSlotBookingValidation = Joi.object({
     name : Joi.string().required().messages({"any.required": "Missing image path"}),
     id : Joi.string()
   }),
-  transactionID : Joi.string().required().messages({"any.required": "Missing transaction id "}),
+  orderID : Joi.string().required().messages({"any.required": "Missing order id "}),
+  transactionID : Joi.string(),
   totalPaid : Joi.number().required().messages({"any.required": "Missing total amount "})
 }).unknown(true)
 

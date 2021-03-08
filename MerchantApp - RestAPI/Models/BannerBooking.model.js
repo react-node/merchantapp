@@ -20,6 +20,10 @@ const bannerSlotSchema = new mongoose.Schema({
     },
     transactionID : {
         type:String,
+        default:null
+    },
+    orderID : {
+        type:String,
         required: true
     },
     totalPaid:{
@@ -40,7 +44,47 @@ const bannerSlotSchema = new mongoose.Schema({
             type: Date,
             required:true
         }]
-    }]
+    }],
+    txn_status : {
+        type : String,
+        default:null
+    },
+    txn_type : {
+        type : String,
+        default:null
+    },
+    txn_gateway : {
+        type : String,
+        default:null
+    },
+    txn_response_code : {
+        type : String,
+        default:null
+    },
+    txn_res_msg : {
+        type : String,
+        default:null
+    },
+    txn_bank_name : {
+        type : String,
+        default:null
+    },
+    txn_payment_mode : {
+        type : String,
+        default:null
+    },
+    txn_refunt_amount : {
+        type : String,
+        default:null
+    },
+    txn_date : {
+        type : String,
+        default:null
+    },
+    txn_bank_id : {
+        type : String,
+        default:null
+    },
     
 }, {
     timestamps: true
