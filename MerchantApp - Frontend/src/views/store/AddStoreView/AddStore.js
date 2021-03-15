@@ -18,7 +18,8 @@ import {
   FormLabel,
   RadioGroup,
   Radio,
-  FormHelperText
+  FormHelperText,
+  Typography
 } from '@material-ui/core';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -36,7 +37,7 @@ import * as Yup from 'yup';
 
 import Map from "../../../components/Map"
 import { GlobalContext } from "../../../context/GlobalState";
-import { GOOGLE_STORAGE_PUBLIC_URL} from '../../../utils/config';
+import { GOOGLE_STORAGE_PUBLIC_URL,IDENTITY_PROOF_PATH} from '../../../utils/config';
 import MapServices from "../../../services/MapServices"
 import Services from 'src/services/Services';
 import { Autocomplete } from '@material-ui/lab';
@@ -73,6 +74,13 @@ const useStyles = makeStyles((theme) => ({
   avatar: {
     height: 100,
     width: 100
+  },
+  GSTDocStyle:{
+    alignSelf:"center",
+    marginLeft : 20
+  },
+  mt : {
+    marginTop : "22px !important"
   }
 }));
 const ITEM_HEIGHT = 48;
@@ -126,6 +134,9 @@ const AddStore = ({ className,type, ...rest }) =>
   const [storeGoogleId,setStoreGoogleId] = useState(null)
   const [disabledFields,setDisabledFields] = useState({})
   const [mallsData,setMallsData] = useState([])
+  const [identityTypeData,setIdentityTypeData] = useState([])
+  const [useridentityData,setUseridentityData] = useState([])
+  const [isGSTExisted,setIsGSTExisted] = useState(true)
   const initialDisableState = {
     area : false,
     city : false,
@@ -154,7 +165,15 @@ const AddStore = ({ className,type, ...rest }) =>
   //   var googleContainer = document.getElementsByClassName('pac-container');
   //   //googleContainer[1].style['z-index'] = 1301;
   // }
-  
+  const fetchUserIdentitydata = async ()=>{
+    try {
+      const identityData = await Services.getProfileData()
+      setUseridentityData(identityData.data.identityProofs)
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
   useEffect(() => {
     const fetchStoreTypes = async () => {
       try {
@@ -197,6 +216,15 @@ const AddStore = ({ className,type, ...rest }) =>
       }
   };
     fetchStoreTypes();
+    fetchUserIdentitydata()
+    var idData= [{
+      name : "PAN"
+    },{
+      name : "AADHAAR"
+    },{
+      name : "GST"
+    }]
+    setIdentityTypeData(idData)
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
   useEffect(() => {
@@ -224,7 +252,8 @@ const AddStore = ({ className,type, ...rest }) =>
           city: true,
           state:true,
           country: true,
-          zipcode: true
+          zipcode: true,
+          identity_proof: true
         })
         setInitialValues({
           storeName : selectedStore.name,
@@ -245,7 +274,9 @@ const AddStore = ({ className,type, ...rest }) =>
           state:selectedStore.state,
           country: selectedStore.country,
           website: selectedStore.website,
-          _id : selectedStore._id
+          _id : selectedStore._id,
+          identityType : selectedStore.identity_type,
+          GSTDoc : []
         })
         
         setThumbnailImg(GOOGLE_STORAGE_PUBLIC_URL+selectedStore.owner+"/"+selectedStore.profilepic)
@@ -270,7 +301,9 @@ const AddStore = ({ className,type, ...rest }) =>
           city: "",
           state:"",
           country:"",
-          website: ""
+          website: "",
+          identityType : "",
+          GSTDoc : []
         })
         setSelectedStoreType([])
         setSelectedSAC([])
@@ -407,7 +440,8 @@ useEffect(()=>{
         "email" : values.email,
         "identity_proof" : values.identity_proof,
         "profilepic" : profilePic[0] ? profilePic[0].name : values.profilePic ,
-        "website":values.website
+        "website":values.website,
+        "identity_type" : values.identityType.name
       }
       // if(storeID){
       //   requestPayload.hasMainBranch = true
@@ -416,6 +450,13 @@ useEffect(()=>{
       if( profilePic.length >0){
         const responseData  = await Services.imageUpload(data);
         console.log(responseData);
+      }
+      if(values.identityType.name === "GST" && !isGSTExisted && values.GSTDoc.length>0){
+       
+        const GSTFromData = new FormData()
+        GSTFromData.append("file", values.GSTDoc[0])
+        GSTFromData.append("filePath", IDENTITY_PROOF_PATH)
+        await Services.imageUpload(GSTFromData)
       }
       let storeResponse = {},message="";
       if(isEdit){
@@ -464,6 +505,11 @@ const handleCapture = ({ target }) => {
   console.log(target.files)
   setProfilePic(target.files)
   setThumbnailImg(URL.createObjectURL(target.files[0]))
+}
+const handleGSTCapture = ({ target },setFieldValue) => {
+  console.log(target.files)
+  const file = [target.files[0]]
+  setFieldValue("GSTDoc",file)
 }
 
   const placeInputRef = useRef(null);
@@ -553,10 +599,10 @@ const updateStore=(e,val,setValues)=>{
 
   tempvalues[attrName] = e.target.value
   
-    setAddStoreData({...val,[e.target.name]:e.target.value})
- if(e.target.name === "zipcode" && e.target.value.length ===6){
-   getMallsData(e.target.value)
- }
+  setAddStoreData({...val,[e.target.name]:e.target.value})
+  if(e.target.name === "zipcode" && e.target.value.length ===6){
+    getMallsData(e.target.value)
+  }
   
 }
 const checkValidNumber = (val)=>{
@@ -582,10 +628,49 @@ const getMallsData = async (zipcode)=>{
     
   }
 }
+const setIdentityValue=(value, setFieldValue)=>{
+  console.log(value)
+  //if(value){
+    if(!value || value.name === "GST"){
+      setFieldValue("identity_proof","")
+      setDisabledFields({...disabledFields,identity_proof : false})
+      
+    }else{
+      useridentityData.forEach(item=>{
+        if(item.id_type.toLowerCase() === value.name.toLowerCase()){
+
+          setFieldValue("identity_proof", item.id_number)
+          setFieldValue("GSTDoc", [])
+          setDisabledFields({...disabledFields,identity_proof : true})
+          setIsGSTExisted(true)
+        }
+        
+      })
+    }
+  // }else{
+  //   setFieldValue("identity_proof","")
+  //   setDisabledFields({...disabledFields,identity_proof : false})
+  // }
+
+}
+const checkGSTNumber =async (e,value)=>{
+  console.log(e.target.value, value)
+  try {
+    if(e.target.value){
+      await Services.checkGSTNumber(e.target.value)
+      setIsGSTExisted(true)
+    }
+  } catch (error) {
+    if(error.response.status === 404){
+      // user should upload the GST document if not existed in db
+      setIsGSTExisted(false)
+    }
+  }
+}
 
   return (
-    <Formik
-    enableReinitialize
+        <Formik
+        enableReinitialize
             initialValues={ { insideMall : "no",...initialValues}}
             validationSchema={Yup.object().shape({
               email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -597,6 +682,7 @@ const getMallsData = async (zipcode)=>{
               "Please enter valid number",
               checkValidNumber
               ),
+              identityType : Yup.string().nullable().required("Please select identity proof type"),
               storeName: Yup.string().required('Store name is required'),
               insideMall: Yup.string().required('Please select is it inside mall or not'),
               mall_name: Yup.string().when("insideMall",{is:(val)=>val ==="yes",then: Yup.string().required("Mall name is required"),
@@ -606,6 +692,11 @@ const getMallsData = async (zipcode)=>{
               city:Yup.string().max(200).required('City is required'),
               state:Yup.string().max(200).required('State is required'),
               country:Yup.string().max(200).required('Country is required'),
+              GSTDoc : Yup
+              .array()
+              .when("identityType",{is:(val)=> ( !isGSTExisted),then:Yup.array().required("please upload the GST document"),
+              otherwise: Yup.array().notRequired()})
+             
             })}
             onSubmit={(values, { setSubmitting }) => SaveStore(values,  setSubmitting )}
           >
@@ -872,13 +963,14 @@ const getMallsData = async (zipcode)=>{
               xs={12}
               
             >
-              <FormControl className={classes.formControl}>
+              <FormControl fullWidth>
               <InputLabel id="demo-mutiple-chip-label">Store Type</InputLabel>
         <Select
           error={Boolean(touched.selectedStoreType && errors.selectedStoreType)}
           labelId="demo-mutiple-chip-label"
           id="demo-mutiple-chip"
           multiple
+          className = {classes.mt}
           label="Store type"
           name = "storeType"
           value={selectedStoreType}
@@ -924,8 +1016,25 @@ const getMallsData = async (zipcode)=>{
               />
             </Grid>
             <Grid
+            item
+            md={6}
+            xs={12}
+        >
+        <Autocomplete
+           
+            id="identity_type"
+            options={identityTypeData}
+            value={values.identityType || ''}
+            name="identityType"
+            getOptionLabel={(option) =>typeof option === 'string' ? option : option.name}
+            onChange={( e,value) => {setFieldValue('identityType', value); setIdentityValue(value,setFieldValue)}}
+            renderInput={(params) => <TextField {...params} label="Select ID Proof" variant="outlined" />}
+            />
+          <FormHelperText  className={`${classes.mgLeft} ${errors.identityType}?  Mui-error Mui-required: ''`}>{errors.identityType}</FormHelperText>
+          </Grid>
+            <Grid
               item
-              md={12}
+              md={6}
               xs={12}
             >  
              <TextField
@@ -934,15 +1043,16 @@ const getMallsData = async (zipcode)=>{
                 fullWidth
                 label="Enter PAN / Aadhar / GST Number"
                 name="identity_proof"
+                disabled={disabledFields.identity_proof}
                 onChange={(e)=>{handleChange(e);updateStore(e,values,setValues)}}
-               // onBlur={(e)=>{handleBlur(e);validateIDProof(e,values,setValues)}}
+                onBlur={(e,value)=>{handleBlur(e);checkGSTNumber(e,setFieldValue)}}
                 value={values.identity_proof|| ''}
                 variant="outlined"
               />
             </Grid>
             <Grid
               item
-              md={12}
+              md={6}
               xs={12}
             >  
             <FormControl  className= "MuiFormControl-fullWidth" component="fieldset">
@@ -956,7 +1066,7 @@ const getMallsData = async (zipcode)=>{
             {values.insideMall === 'yes' && (
             <Grid
               item
-              md={12}
+              md={6}
               xs={12}
             >  
             <Autocomplete
@@ -1035,7 +1145,37 @@ const getMallsData = async (zipcode)=>{
             className={classes.avatar}
             src={thumbnailImg}
           />
+          {!isGSTExisted && 
+            <>
+       <Grid direction="row" container>
+            <Box
+            display="flex"
+            justifyContent="flex-end"
             
+            p={4}
+            >
+            <input
+            accept="image/*"
+            className={classes.input}
+            style={{ display: 'none' }}
+            id="raised-button-gst"
+            type="file"
+            onChange={(e) =>handleGSTCapture(e,setFieldValue)}
+            name="GSTDoc"
+            />
+            <label htmlFor="raised-button-gst">
+              <Button  component="span" >
+                Upload GST Document
+              </Button>
+              
+            </label> 
+            <FormHelperText  className={`${classes.errorCenter}  ${errors.GSTDoc} ?  Mui-error Mui-required: ''`}>{errors.GSTDoc}</FormHelperText>
+            <Typography className={classes.GSTDocStyle}>{values.GSTDoc && values.GSTDoc.length>0 ? values.GSTDoc[0].name : ""}</Typography>
+          </Box> 
+          </Grid> 
+
+          </>
+			 }
       </Grid>
         </CardContent>
         <br/>

@@ -17,11 +17,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 const App = () => {
    const classes = useStyles();
-   const {getAccessToken} = useContext(GlobalContext);
+   const {getAccessToken,getIDProofVerified} = useContext(GlobalContext);
    const accessToken =  getAccessToken()
-console.log("accesstoken--------------------",accessToken)
-//const accessToken = window.sessionStorage.getItem('token')
-  const routing = useRoutes(routes(accessToken));
+   const isIDProofVerified = getIDProofVerified()
+   console.log("accesstoken--------------------",accessToken)
+   //const accessToken = window.sessionStorage.getItem('token')
+   const routing = useRoutes(routes(accessToken,isIDProofVerified));
 
   return (
     <ThemeProvider theme={theme}>

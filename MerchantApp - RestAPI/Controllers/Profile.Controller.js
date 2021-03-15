@@ -59,9 +59,25 @@ class ProfileContorller {
             const idProofNumber = req.params.idProofNumber
             const result = await ProfileModel.findOne({identityProofs: {$elemMatch:{id_number:idProofNumber}}})
             console.log(result)
-            if(result) throw createError.NotAcceptable("PAN is existed")
+            if(result) throw createError.NotAcceptable("Given id is existed")
 
             res.send({})
+
+
+        } catch (error) {
+            next(error)
+            
+        }
+
+    }
+    async checkGSTNumber (req, res, next){
+        try {
+            const GSTNumber = req.params.GSTNumber
+            const ownerID = req.payload.aud
+            const result = await Store.findOne({identity_proof: GSTNumber,owner : ownerID})
+            if(!result) throw createError.NotFound("GST Not existed")
+
+            res.send()
 
 
         } catch (error) {

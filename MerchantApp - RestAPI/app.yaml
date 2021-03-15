@@ -19,6 +19,14 @@ env_variables :
   EMAIL_CLIENT_SECRET : "DwbtFZbgHRNkehAkPhtopJhV"
   EMAIL_CLIENT_ACCESSTOKEN : "ya29.A0AfH6SMBQWk6crIHEVjr4AZ5fCrbWjFqH5bLkRabhUoheWRGs1vL6eZ8-H93CKbc0eteAk-xS17AC95_7L9-EJfBYi-rxDwb4KZiwHTfUfjsb4MXoh3DaLvdiNTuPycHvmCyliJsu8Gx6H5QVy3BS6ZfDUmtV"
   EMAIL_CLIENT_REFRESHTOKEN : "1//04LdaynLgv0ZFCgYIARAAGAQSNwF-L9IrWs2WsKV_dPmiZuzldXloOUIeXaBXi8GqAcX6kwlNXl-JI0H-GzRwNupxuZxXnW0Hels"
+  PAYTM_MID : "ExPUrQ97239134980627"
+  PAYTM_WEBSITE : "WEBSTAGING"
+  PAYTM_CHANNEL_ID : "WEB"
+  PAYTM_INDUSTRY_TYPE_ID : "Retail"
+  PAYTM_CALLBACK_URL : "https://api-dot-api-project-908088024896.uc.r.appspot.com/rest/v1/payment/callback"
+  PAYTM_MERCHANT_KEY : "GEv_twPdBvnhtB9Y"
+  MERCHANT_APP_URI : "https://api-project-908088024896.uc.r.appspot.com"
+
 
 manual_scaling:
   instances: 1

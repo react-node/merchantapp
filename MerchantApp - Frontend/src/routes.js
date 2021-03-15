@@ -25,28 +25,28 @@ import AddOffersView from 'src/views/offer/NewOffers';
 import EditOffersView from 'src/views/offer/EditOffers';
 import SlotBookingStatusView from 'src/views/slotBooking/slotStatus';
 
-const routes = (accessToken)=> [
+const routes = (accessToken,isIDProofVerified)=> [
   {
     path: 'app',
     element: !accessToken ? <Navigate to="/" /> : <DashboardLayout />,
     children: [
       { path: 'Profile', element: <AccountView /> },
      // { path: 'customers', element: <CustomerListView /> },
-      { path: 'dashboard', element: <DashboardView /> },
-      { path: 'stores', element: <StoreListView /> },
-      { path: 'stores/addstore', element: <AddStoreView /> },
-      { path: 'store/details', element: <StoreDetailView /> },
-      { path: 'store/edit', element: <StoreEditView /> },
-      { path: 'offers', element: <OffersListView /> },
-      { path: 'offers/addoffer', element: <AddOffersView /> },
-      { path: 'offers/offerdetail', element: <OfferDetailsView /> },
-      { path: 'offer/editoffer', element: <EditOffersView /> },
-      { path: 'banner_images', element: <BannerImageView /> },
-      { path: 'banner_slot_booking/:type', element: <SlotBookingView /> },
-      { path: 'offer_slot_booking/:type', element: <OfferSlotBookingView /> },
-      { path: 'slot_booking/next', element: <SlotBookingFinalView /> },
-      { path: 'slot_history', element: <SlotHistoryView /> },
-      { path: 'slot-booking-status/:type/:orderID', element: <SlotBookingStatusView /> },
+      { path: 'dashboard', element: isIDProofVerified ? <DashboardView /> : <Navigate to="/app/Profile" /> },
+      { path: 'stores', element: isIDProofVerified ? <StoreListView /> : <Navigate to="/app/Profile" />},
+      { path: 'stores/addstore', element: isIDProofVerified ? <AddStoreView /> : <Navigate to="/app/Profile" />},
+      { path: 'store/details', element: isIDProofVerified ? <StoreDetailView /> : <Navigate to="/app/Profile" />},
+      { path: 'store/edit', element: isIDProofVerified ? <StoreEditView /> : <Navigate to="/app/Profile" />},
+      { path: 'offers', element: isIDProofVerified ? <OffersListView /> : <Navigate to="/app/Profile" />},
+      { path: 'offers/addoffer', element: isIDProofVerified ? <AddOffersView /> : <Navigate to="/app/Profile" />},
+      { path: 'offers/offerdetail', element: isIDProofVerified ? <OfferDetailsView /> : <Navigate to="/app/Profile" />},
+      { path: 'offer/editoffer', element: isIDProofVerified ? <EditOffersView /> : <Navigate to="/app/Profile" />},
+      { path: 'banner_images', element: isIDProofVerified ? <BannerImageView /> : <Navigate to="/app/Profile" />},
+      { path: 'banner_slot_booking/:type', element: isIDProofVerified ? <SlotBookingView /> : <Navigate to="/app/Profile" />},
+      { path: 'offer_slot_booking/:type', element: isIDProofVerified ? <OfferSlotBookingView /> : <Navigate to="/app/Profile" />},
+      { path: 'slot_booking/next', element: isIDProofVerified ? <SlotBookingFinalView /> : <Navigate to="/app/Profile" />},
+      { path: 'slot_history', element: isIDProofVerified ? <SlotHistoryView /> : <Navigate to="/app/Profile" />},
+      { path: 'slot-booking-status/:type/:orderID', element: isIDProofVerified ? <SlotBookingStatusView /> : <Navigate to="/app/Profile" />},
       // { path: 'settings', element: <SettingsView /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

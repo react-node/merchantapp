@@ -22,6 +22,7 @@ export const FORGOT_PASSWORD = `/auth/user/forgotpassword`
 export const RESET_PASSWORD = `/auth/user/updatepassword`
 export const DASHBOARD = `/rest/v1/profile/dashboard`
 export const PROFILE = `/rest/v1/profile/me`
+export const CHECK_GST = `/rest/v1/profile/me/checkGST`
 export const BANNER_API = `/rest/v1/imageupload/banner`
 export const BANNER_SLOT_API = `/rest/v1/slotbooking/banner`
 export const OFFER_SLOT_API = `/rest/v1/slotbooking/offer`

@@ -37,6 +37,10 @@ const storeSchema = new mongoose.Schema({
         type : Boolean,
         default : false
     },
+    identityType:{
+        type : String,
+        default : null
+    },
     isDeleted:{
         type : Boolean,
         default : false
@@ -74,7 +78,8 @@ const storeSchema = new mongoose.Schema({
     store_google_id : {type:String,default:null},
    // hasMainBranch : {type : Boolean,default : false},
     //mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null},
-    website: {type:String,default:null}
+    website: {type:String,default:null},
+    identity_type: {type:String,default:null},
     }, {
         timestamps: true
     })

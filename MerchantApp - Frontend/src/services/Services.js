@@ -132,6 +132,7 @@ const dashboard = async ()=>{
 const getProfileData = async ()=>{
     const headers = GenerateHeaders()
     const responseData = await axios.get(`${config.API_URI}${config.PROFILE}`,headers)
+    
     return responseData
 }
 const getStoreTypes = async ()=>{
@@ -238,7 +239,12 @@ const getOrderDetails = async (type,orderID)=>{
     const response = await axios.get(config.API_URI+config.GET_ORDER_DETAILS+`/${type}/${orderID}`,headers);
     return response
 }
-
+const checkGSTNumber = async (GST)=>{
+    const headers = GenerateHeaders()
+    
+    const response = await axios.get(config.API_URI+config.CHECK_GST+`/${GST}`,headers);
+    return response
+}
 
 export default {
     getStore,
@@ -277,5 +283,7 @@ export default {
     getBannerHistory,
     logout,
     getPaymentInit,
-    getOrderDetails
+    getOrderDetails,
+    checkGSTNumber
+    
 }

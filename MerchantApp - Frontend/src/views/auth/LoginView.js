@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 const LoginView = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const {setLoading,setAccessToken,setRefreshToken} = useContext(GlobalContext);
+  const {setLoading,setAccessToken,setRefreshToken,setIDProofVerified} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
 
@@ -44,11 +44,17 @@ const LoginView = () => {
       if(responseData.status===200){
         setAccessToken(responseData.data.accessToken)
         setRefreshToken(responseData.data.refreshToken)
+        setIDProofVerified(responseData.data.isIDProofVerified)
+        if(!responseData.data.isIDProofVerified){
+          navigate('/app/profile');
+        }else{
+          navigate('/app/dashboard');
+        }
       }
       setLoading(false)
       // .then((responseData)=>{
       //   console.log(responseData);
-        navigate('/app/dashboard');
+       
       // }).catch((err)=>{
       //   setSubmitting(false);
       //   console.log(err);

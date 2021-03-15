@@ -20,7 +20,8 @@ const initialState = {
   selectedSlotsData : [],
   slotsAvailability:[],
   historyData :[],
-  refreshToken : null
+  refreshToken : null,
+  isIDProofVerified : false
 };
 
 export const GlobalContext = createContext(initialState);
@@ -107,6 +108,12 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
+  function setIDProofVerified(data) {
+    dispatch({
+      type: "SET_IS_ID_VERIFIED",
+      payload: data
+    });
+  }
   function setSlotsAvailability(data) {
     dispatch({
       type: "SET_SLOT_AVAILABILITY",
@@ -120,6 +127,10 @@ export const GlobalProvider = ({ children }) => {
   function getRefreshToken() {
     const refreshToken = window.sessionStorage.getItem("refreshToken")
     return refreshToken
+  }
+  function getIDProofVerified() {
+    const isIDProofVerified = window.sessionStorage.getItem("isIDProofVerified")
+    return  JSON.parse(isIDProofVerified)
   }
   return (
     <GlobalContext.Provider
@@ -151,7 +162,9 @@ export const GlobalProvider = ({ children }) => {
         setHistoryData,
         setRefreshToken,
         getRefreshToken,
-        refreshToken : state.refreshToken
+        refreshToken : state.refreshToken,
+        setIDProofVerified,
+        getIDProofVerified
       }}
     >
       {children}

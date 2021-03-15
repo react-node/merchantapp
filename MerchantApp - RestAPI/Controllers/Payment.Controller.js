@@ -1,5 +1,5 @@
 const createError = require('http-errors')
-var PaytmChecksum = require("PaytmChecksum");
+var PaytmChecksum = require("../PaytmConfig/PaytmChecksum");
 const formidable=require('formidable')
 
 const {v4:uuidv4}=require('uuid')
@@ -155,7 +155,7 @@ class PaymentController{
                                 txn_bank_id : responseData.BANKTXNID,
                             }
                             const isSavedDB = await SlotBookingController.updateBookingTXNID(updateData,slotType)
-                            res.redirect(`http://localhost:3000/app/slot-booking-status/${slotType}/${responseData.ORDERID}`)
+                            res.redirect(`${process.env.MERCHANT_APP_URI}/app/slot-booking-status/${slotType}/${responseData.ORDERID}`)
 
 
                            // res.json(response)

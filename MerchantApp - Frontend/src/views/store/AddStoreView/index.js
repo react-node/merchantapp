@@ -2,7 +2,6 @@ import React from 'react';
 import {
   
   Container,
-  Grid,
   makeStyles
 } from '@material-ui/core';
 import Page from 'src/components/Page';
@@ -26,7 +25,7 @@ const AddStoreView = () => {
       title="Add Store"
     >
     <Container maxWidth="lg">
-        <Grid
+        {/* <Grid
           container
           spacing={3}
         >
@@ -36,10 +35,10 @@ const AddStoreView = () => {
             lg={8}
             md={6}
             xs={12}
-          >
+          > */}
             <AddStore />
-          </Grid>
-        </Grid>
+          {/* </Grid>
+        </Grid> */}
       </Container>
     </Page>
   );

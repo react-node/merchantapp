@@ -71,6 +71,13 @@ export default (state, action) => {
           refreshToken : action.payload
           
         };
+      case "SET_IS_ID_VERIFIED":
+        window.sessionStorage.setItem("isIDProofVerified",action.payload)
+        return {
+          ...state,
+          isIDProofVerified : action.payload
+          
+        };
       case "GET_TOKEN":
         const token = window.sessionStorage.getItem("token")
         return {

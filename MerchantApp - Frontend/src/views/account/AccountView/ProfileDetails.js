@@ -35,7 +35,7 @@ const ProfileDetails = ({ className, ...rest }) => {
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate()
-  const {setLoading} = useContext(GlobalContext)
+  const {setLoading,getIDProofVerified,setAccessToken,setIDProofVerified} = useContext(GlobalContext)
   // const handleChange = (event) => {
   //   setValues({
   //     ...values,
@@ -47,6 +47,11 @@ const ProfileDetails = ({ className, ...rest }) => {
       setLoading(true)
       const profileData = await Services.getProfileData()
       if(profileData.status === 200){
+        if(!getIDProofVerified() && profileData.data.identityProofs.length===0){
+          enqueueSnackbar('Please update your profile details...!',   { variant: "info","anchorOrigin" : alertPosition } );
+        }else if(!getIDProofVerified() && profileData.data.identityProofs.length>0){
+          enqueueSnackbar('Please wait untill your details will be verified by our team...!',   { variant: "info","anchorOrigin" : alertPosition } );
+        }
         setProfileData(profileData.data)
         var initialvalues = {
           firstName : profileData.data.firstName,
@@ -61,6 +66,7 @@ const ProfileDetails = ({ className, ...rest }) => {
         }
      // setUserID(profileData.data._id)
       setValues(initialvalues)
+     
       }
       setLoading(false)
     }catch(err){
@@ -68,7 +74,7 @@ const ProfileDetails = ({ className, ...rest }) => {
       setLoading(false)
       if(err.response){
          if(err.response.status ===401){
-          //setAccesstoken
+          setAccessToken('')
           navigate("/")
         }else{
           enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
@@ -108,22 +114,23 @@ const ProfileDetails = ({ className, ...rest }) => {
         if(promissArray.length >0){
           Promise.all(promissArray).then(async (result)=>{
             
-            saveProfileData(values)
+            await saveProfileData(values,setSubmitting)
+           
           }).catch(e=>{
+            setSubmitting(false)
+            setLoading(false)
+            
             enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
   
           })
         }else{
-          await saveProfileData(values)
+          await saveProfileData(values,setSubmitting)
 
         }
         
 
       }
-      setSubmitting(false)
-      setLoading(false)
-      enqueueSnackbar('Data updated successfully...!',  { variant: "success" ,"anchorOrigin" : alertPosition} );
-
+     
     }catch(e){
       console.log(e)
       setSubmitting(false)
@@ -134,7 +141,7 @@ const ProfileDetails = ({ className, ...rest }) => {
     
 
   }
-  const saveProfileData= async (values)=>{
+  const saveProfileData= async (values,setSubmitting)=>{
     const requestPayload = {...values,
       identityProofs:[{
         id_type: "PAN",
@@ -146,11 +153,26 @@ const ProfileDetails = ({ className, ...rest }) => {
         upload_path : values.uploadAadhaar.length>0 ? IDENTITY_PROOF_PATH+"/"+values.uploadAadhaar[0].name : ''
       }]
     }
-    if(values.PAN === profileData.identityProofs[0].id_number){
+    if(profileData.identityProofs.length > 0 && values.PAN === profileData.identityProofs[0].id_number){
       delete requestPayload.identityProofs[0].upload_path
       delete requestPayload.identityProofs[1].upload_path
     }
-    await Services.updateProfile(requestPayload)
+    try{
+      await Services.updateProfile(requestPayload)
+      setSubmitting(false)
+      setLoading(false)
+      enqueueSnackbar('Data updated successfully...!',  { variant: "success" ,"anchorOrigin" : alertPosition} );
+
+    }catch(error){
+      setSubmitting(false)
+      setLoading(false)
+      if(error.response.status === 406){
+      enqueueSnackbar('Phone number existed, Please try again with other phone number...!',   { variant: "error","anchorOrigin" : alertPosition } );
+
+      }else{
+        enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
+      }
+    }
   }
   const handleCapturePAN = ({ target },setFieldValue) => {
     console.log(target.files)
@@ -247,7 +269,7 @@ const ProfileDetails = ({ className, ...rest }) => {
             validationSchema={Yup.object().shape({
               firstName : Yup.string().required("First name is required"),
               lastName :  Yup.string().required("Last name is required"),
-              phoneNumber :  Yup.string().required('Phone number is required').min(10).max(10),
+              phoneNumber :  Yup.string().nullable().required('Phone number is required').min(10).max(10),
               PAN : Yup.string().required("Enter PAN number")
               .test("validate-pan",
               "Please enter valid PAN number",
