@@ -24,46 +24,67 @@ import OfferDetailsView from 'src/views/offer/OfferDetailsView';
 import AddOffersView from 'src/views/offer/NewOffers';
 import EditOffersView from 'src/views/offer/EditOffers';
 import SlotBookingStatusView from 'src/views/slotBooking/slotStatus';
+import AdminDashboardView from 'src/views/admin/dashboard';
+import AdminUserManagementView from 'src/views/admin/userManagement';
+import CreateAdminUserView from 'src/views/admin/userManagement/newUser';
+import EditAdminUserView from 'src/views/admin/userManagement/newUser';
 
-const routes = (accessToken,isIDProofVerified)=> [
-  {
-    path: 'app',
-    element: !accessToken ? <Navigate to="/" /> : <DashboardLayout />,
-    children: [
-      { path: 'Profile', element: <AccountView /> },
-     // { path: 'customers', element: <CustomerListView /> },
-      { path: 'dashboard', element: isIDProofVerified ? <DashboardView /> : <Navigate to="/app/Profile" /> },
-      { path: 'stores', element: isIDProofVerified ? <StoreListView /> : <Navigate to="/app/Profile" />},
-      { path: 'stores/addstore', element: isIDProofVerified ? <AddStoreView /> : <Navigate to="/app/Profile" />},
-      { path: 'store/details', element: isIDProofVerified ? <StoreDetailView /> : <Navigate to="/app/Profile" />},
-      { path: 'store/edit', element: isIDProofVerified ? <StoreEditView /> : <Navigate to="/app/Profile" />},
-      { path: 'offers', element: isIDProofVerified ? <OffersListView /> : <Navigate to="/app/Profile" />},
-      { path: 'offers/addoffer', element: isIDProofVerified ? <AddOffersView /> : <Navigate to="/app/Profile" />},
-      { path: 'offers/offerdetail', element: isIDProofVerified ? <OfferDetailsView /> : <Navigate to="/app/Profile" />},
-      { path: 'offer/editoffer', element: isIDProofVerified ? <EditOffersView /> : <Navigate to="/app/Profile" />},
-      { path: 'banner_images', element: isIDProofVerified ? <BannerImageView /> : <Navigate to="/app/Profile" />},
-      { path: 'banner_slot_booking/:type', element: isIDProofVerified ? <SlotBookingView /> : <Navigate to="/app/Profile" />},
-      { path: 'offer_slot_booking/:type', element: isIDProofVerified ? <OfferSlotBookingView /> : <Navigate to="/app/Profile" />},
-      { path: 'slot_booking/next', element: isIDProofVerified ? <SlotBookingFinalView /> : <Navigate to="/app/Profile" />},
-      { path: 'slot_history', element: isIDProofVerified ? <SlotHistoryView /> : <Navigate to="/app/Profile" />},
-      { path: 'slot-booking-status/:type/:orderID', element: isIDProofVerified ? <SlotBookingStatusView /> : <Navigate to="/app/Profile" />},
-      // { path: 'settings', element: <SettingsView /> },
-      { path: '*', element: <Navigate to="/404" /> }
-    ]
-  },
-  {
-    path: '/',
-    element: accessToken ? <Navigate to="/app/dashboard" /> :  <MainLayout />,
-    children: [
-      { path: '/', element: <LoginView /> },
-      { path: 'register', element: <RegisterView /> },
-      { path: 'forgotPassword', element: <ForgotPasswordView /> },
-      { path: 'user/verify/:token/:userid', element: <VerificationView /> },
-      { path: 'user/updatepassword/:token/:email', element: <UpdatePasswordView /> },
-      { path: '404', element: <NotFoundView /> },
-      { path: '*', element: <Navigate to="/404" /> }
-    ]
-  }
-];
+const RedirectProfile = <Navigate to="/app/Profile" />
+const RedirectAdmin = <Navigate to="/app/admin/dashboard" />
+
+const routes = (accessToken,isIDProofVerified,userType)=> {
+  const children =  [
+    { path: 'Profile', element:  <AccountView />  },
+   // { path: 'customers', element: <CustomerListView /> },
+    { path: 'dashboard', element: userType===3 ? (isIDProofVerified ? <DashboardView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'stores', element:  userType===3 ? (isIDProofVerified ? <StoreListView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'stores/addstore', element:  userType===3 ? (isIDProofVerified ? <AddStoreView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'store/details', element: userType===3 ? ( isIDProofVerified ? <StoreDetailView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'store/edit', element:  userType===3 ? (isIDProofVerified ? <StoreEditView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'offers', element:  userType===3 ? (isIDProofVerified ? <OffersListView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'offers/addoffer', element:  userType===3 ? (isIDProofVerified ? <AddOffersView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'offers/offerdetail', element:  userType===3 ? (isIDProofVerified ? <OfferDetailsView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'offer/editoffer', element:  userType===3 ? (isIDProofVerified ? <EditOffersView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'banner_images', element:  userType===3 ? (isIDProofVerified ? <BannerImageView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'banner_slot_booking/:type', element:  userType===3 ? (isIDProofVerified ? <SlotBookingView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'offer_slot_booking/:type', element:  userType===3 ? (isIDProofVerified ? <OfferSlotBookingView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'slot_booking/next', element:  userType===3 ? (isIDProofVerified ? <SlotBookingFinalView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'slot_history', element:  userType===3 ? (isIDProofVerified ? <SlotHistoryView /> : RedirectProfile) : RedirectAdmin},
+    { path: 'slot-booking-status/:type/:orderID', element:  userType===3 ? (isIDProofVerified ? <SlotBookingStatusView /> : RedirectProfile) : RedirectAdmin},
+    // { path: 'settings', element: <SettingsView /> },
+    { path: '*', element: <Navigate to="/404" /> }
+  ]
+  const adminChildren =  [
+    
+    { path: 'admin/dashboard', element: <AdminDashboardView /> },
+    { path: 'admin/users', element: <AdminUserManagementView /> },
+    { path: 'admin/users/create', element: <CreateAdminUserView /> },
+    { path: 'admin/users/edit/:id', element: <EditAdminUserView /> },
+    { path: '*', element: <Navigate to="/404" /> }
+  ]
+
+  const route = [
+    {
+      path: 'app',
+      element: !accessToken  ? <Navigate to="/" /> : <DashboardLayout />,
+      children: userType===3 ? children : adminChildren,
+    },
+    {
+      path: '/',
+      element: accessToken ? ( userType ===3 ? <Navigate to="/app/dashboard" /> : <Navigate to="/app/admin/dashboard" /> ) :  <MainLayout />,
+      children: [
+        { path: '/', element: <LoginView /> },
+        { path: 'register', element: <RegisterView /> },
+        { path: 'forgotPassword', element: <ForgotPasswordView /> },
+        { path: 'user/verify/:token/:userid', element: <VerificationView /> },
+        { path: 'user/updatepassword/:token/:email', element: <UpdatePasswordView /> },
+        { path: '404', element: <NotFoundView /> },
+        { path: '*', element: <Navigate to="/404" /> }
+      ]
+    }
+  ];
+  return route
+}
+
 
 export default routes;

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {
@@ -22,67 +22,11 @@ import CollectionsBookmarkIcon from '@material-ui/icons/CollectionsBookmark';
 import ViewDayIcon from '@material-ui/icons/ViewDay';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import ReceiptIcon from '@material-ui/icons/Receipt';
+import { GlobalContext } from "../../../context/GlobalState";
 
-const items = [
-  {
-    href: '/app/dashboard',
-    icon: DashboardIcon,
-    title: 'Dashboard'
-  },
-  {
-    href: '/app/stores',
-    icon: StorefrontIcon,
-    title: 'Stores'
-  },
-  {
-    href: '/app/profile',
-    icon: PersonIcon,
-    title: 'Profile'
-  },
-  {
-    href: '/app/offers',
-    icon: LocalOfferIcon,
-    title: 'Offers'
-  },
-  {
-    href: '/app/banner_images',
-    icon: ViewCarouselIcon,
-    title: 'Upload Banners'
-  },
-  {
-   
-    icon: LibraryBooksIcon,
-    title: 'Slots',
-    children : [{
-      href: '/app/banner_slot_booking/banner',
-      icon: ViewDayIcon,
-      title: 'Banner Slots',
-    },{
-      href: '/app/offer_slot_booking/offer',
-      icon: CollectionsBookmarkIcon,
-      title: 'Offer Slots',
-    }]
-  },
-  {
-    href: '/app/slot_history',
-    icon: ReceiptIcon,
-    title: 'Slot History'
-  },
-  // {
-   
-  //   icon: LibraryBooksIcon,
-  //   title: 'Report',
-  //   children : [{
-  //     href: '/app/slot_booking',
-  //     icon: ViewCarouselIcon,
-  //     title: 'Banner Slots',
-  //   },{
-  //     href: '/app/offer_slot_booking',
-  //     icon: LibraryBooksIcon,
-  //     title: 'Offer Slots',
-  //   }]
-  // }
-];
+
+
+
 
 const useStyles = makeStyles(() => ({
   mobileDrawer: {
@@ -103,7 +47,84 @@ const useStyles = makeStyles(() => ({
 const NavBar = ({ onMobileClose, openMobile }) => {
   const classes = useStyles();
   const location = useLocation();
-
+  const {getUserType} = useContext(GlobalContext);
+  const userType = getUserType() 
+  const menuItems = [
+    {
+      href: userType===3 ? '/app/dashboard' : '/app/admin/dashboard' ,
+      icon: DashboardIcon,
+      title: 'Dashboard',
+      userType :[1,2,3]
+    },
+    {
+      href: '/app/admin/users',
+      icon: PersonIcon,
+      title: 'Admin Users',
+      userType :[1]
+    },
+    {
+      href: userType===3 ? '/app/stores' : '/app/admin/stores',
+      icon: StorefrontIcon,
+      title: 'Stores',
+      userType :[1,2,3]
+    },
+    {
+      href: '/app/profile',
+      icon: PersonIcon,
+      title: 'Profile',
+      userType :[3]
+    },
+    {
+      href: '/app/offers',
+      icon: LocalOfferIcon,
+      title: 'Offers',
+      userType :[3]
+    },
+    {
+      href: '/app/banner_images',
+      icon: ViewCarouselIcon,
+      title: 'Upload Banners',
+      userType :[3]
+    },
+    {
+     
+      icon: LibraryBooksIcon,
+      title: 'Slots',
+      children : [{
+        href: '/app/banner_slot_booking/banner',
+        icon: ViewDayIcon,
+        title: 'Banner Slots',
+      },{
+        href: '/app/offer_slot_booking/offer',
+        icon: CollectionsBookmarkIcon,
+        title: 'Offer Slots',
+      }],
+      userType :[3]
+    },
+    {
+      href: '/app/slot_history',
+      icon: ReceiptIcon,
+      title: 'Slot History',
+      userType :[3]
+    },
+    
+    // {
+     
+    //   icon: LibraryBooksIcon,
+    //   title: 'Report',
+    //   children : [{
+    //     href: '/app/slot_booking',
+    //     icon: ViewCarouselIcon,
+    //     title: 'Banner Slots',
+    //   },{
+    //     href: '/app/offer_slot_booking',
+    //     icon: LibraryBooksIcon,
+    //     title: 'Offer Slots',
+    //   }]
+    // }
+  ];
+  const items = menuItems.filter(item=>item.userType.includes(userType))
+ 
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();

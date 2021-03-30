@@ -49,7 +49,16 @@ const UserSchema = new Schema({
   isIDProofVerified : {
     type:Boolean,
     default : false
+  },
+  userType : {
+    type:Number,
+    default:3  // 1-super admin  2-admin 3-merchant
+  },
+  isDeleted : {
+    type: Boolean,
+    default:false
   }
+
 
 },{
   timestamps: true

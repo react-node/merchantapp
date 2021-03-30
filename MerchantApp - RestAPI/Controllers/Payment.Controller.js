@@ -172,7 +172,7 @@ class PaymentController{
 
             })
         } catch (error) {
-            
+            console.log("payment failed....", error);
         }
     }
     async getOrderDetails (req,res,next){

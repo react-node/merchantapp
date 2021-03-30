@@ -221,7 +221,7 @@ const SlotHistoryForm = ({ className,type, ...rest }) => {
            
             id="Banners"
             options={bannersData}
-            value={values.banner || ''}
+            value={values.banner || null}
             name="banner"
             getOptionLabel={(option) =>typeof option === 'string' ? option : optionName(option.imagePath,option.createdAt,"banner")}
             onChange={( e,value) => setFieldValue('banner', value)}
@@ -244,7 +244,7 @@ const SlotHistoryForm = ({ className,type, ...rest }) => {
            
             id="offers"
             options={offersData}
-            value={values.offer || ''}
+            value={values.offer || null}
             name="offer"
             getOptionLabel={(option) =>typeof option === 'string' ? option : optionName(option.offerName,option.createdAt,"offer")}
             onChange={( e,value) => {setFieldValue('offer', value)}}

@@ -15,8 +15,6 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableSortLabel,
-  Tooltip,
   makeStyles
 } from '@material-ui/core';
 import ArrowRightIcon from '@material-ui/icons/ArrowRight';
@@ -93,31 +91,11 @@ const LatestOrders = ({ className, offersData,...rest }) => {
                 <TableCell>
                 Active status
                 </TableCell>
-                <TableCell sortDirection="desc">
-                  <Tooltip
-                    enterDelay={300}
-                    title="Sort"
-                  >
-                    <TableSortLabel
-                      active
-                      direction="desc"
-                    >
+                <TableCell >
                      From Date
-                    </TableSortLabel>
-                  </Tooltip>
                 </TableCell>
-                <TableCell sortDirection="desc">
-                  <Tooltip
-                    enterDelay={300}
-                    title="Sort"
-                  >
-                    <TableSortLabel
-                      active
-                      direction="desc"
-                    >
+                <TableCell>
                      Expire Date
-                    </TableSortLabel>
-                  </Tooltip>
                 </TableCell>
                 <TableCell>
                   status

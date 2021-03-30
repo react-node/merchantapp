@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import Axios from 'axios';
 import * as Yup from 'yup';
 import { Formik } from 'formik';
@@ -30,8 +30,8 @@ const useStyles = makeStyles((theme) => ({
 
 const LoginView = () => {
   const classes = useStyles();
-  const navigate = useNavigate();
-  const {setLoading,setAccessToken,setRefreshToken,setIDProofVerified} = useContext(GlobalContext);
+ // const navigate = useNavigate();
+  const {setLoading,setAccessToken,setRefreshToken,setIDProofVerified,setUserType} = useContext(GlobalContext);
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
 
@@ -42,14 +42,21 @@ const LoginView = () => {
 
       console.log(responseData);
       if(responseData.status===200){
-        setAccessToken(responseData.data.accessToken)
-        setRefreshToken(responseData.data.refreshToken)
-        setIDProofVerified(responseData.data.isIDProofVerified)
-        if(!responseData.data.isIDProofVerified){
-          navigate('/app/profile');
+          await setUserType(responseData.data.userType)
+          await setAccessToken(responseData.data.accessToken)
+          await setRefreshToken(responseData.data.refreshToken)
+        if(responseData.data.userType===1){
+         
+         // navigate('/app/admin/dashboard');
         }else{
-          navigate('/app/dashboard');
+          setIDProofVerified(responseData.data.isIDProofVerified)
+          // if(!responseData.data.isIDProofVerified){
+          //   navigate('/app/profile');
+          // }else{
+          //   navigate('/app/dashboard');
+          // }
         }
+        
       }
       setLoading(false)
       // .then((responseData)=>{

@@ -25,11 +25,10 @@ import DeleteIcon from '@material-ui/icons/Delete';
     },
     avatar: {
       height: 200,
-      width: 400
+      width: "100%"
     },
     paper: {
         padding: theme.spacing(2),
-        
         maxWidth: "100%",
       },
       image: {
@@ -85,7 +84,7 @@ const StoreInfo =({store})=>{
             <div className={classes.root}>
             <Paper className={classes.paper}>
                 <Grid container spacing={2}>
-                <Grid item>
+                <Grid item xs={12} md={6}>
                 <Avatar
                     alt={store.name}
                     src={GOOGLE_STORAGE_PUBLIC_URL+store.owner+"/"+store.profilepic}

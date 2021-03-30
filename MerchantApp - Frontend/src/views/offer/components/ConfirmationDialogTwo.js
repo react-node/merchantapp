@@ -6,19 +6,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { Box } from '@material-ui/core';
 export default function ConfirmationDialogTwo({handleSubmit,open,message,handleCancel}) {
 
-  //const [open, setOpen] = React.useState(open);
-//   const handleClickOpen = () => {
-//     setOpen(true);
-//   };
-
   const handleClose = () => {
     handleCancel();
   };
-//   const handleDeleteStore=()=>{
-//     handleSubmit()
-//     //setOpen(false);
-//   }
-
   return (
     <Box component={'span'}  >
       

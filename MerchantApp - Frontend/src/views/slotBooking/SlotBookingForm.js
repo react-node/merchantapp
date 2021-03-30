@@ -170,9 +170,9 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
                 toDate : Yup.date().required("To date is required"),
                 selectStore : Yup.string().required("Store is required"),
                 slotType : Yup.string(),
-                banner : Yup.string().when('slotType' ,{is:(val)=>(val ==="banner") ,then: Yup.string().required("banner is required"),
+                banner : Yup.string().nullable().when('slotType' ,{is:(val)=>(val ==="banner") ,then: Yup.string().required("Banner is required"),
                 otherwise: Yup.string().notRequired()}),
-                offer:Yup.string().when('slotType' ,{is:(val)=>(val ==="offer") ,then: Yup.string().required("offer is required"),
+                offer:Yup.string().nullable().when('slotType' ,{is:(val)=>(val ==="offer") ,then: Yup.string().required("Offer is required"),
                 otherwise: Yup.string().notRequired()})
             })}
             onSubmit={(values, { setSubmitting }) => SearchAvailability(values,  setSubmitting )}
@@ -199,7 +199,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
       <Card>
         <CardHeader
           subheader=""
-          title="Banner Slot Booking"
+          title="Slot Booking"
         />
         <Divider />
         <CardContent>
@@ -267,7 +267,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
            
             id="Banners"
             options={bannersData}
-            value={values.banner || ''}
+            value={values.banner || null}
             name="banner"
             getOptionLabel={(option) =>typeof option === 'string' ? option : optionName(option.imagePath,option.createdAt,"banner")}
             onChange={( e,value) => setFieldValue('banner', value)}
@@ -308,7 +308,7 @@ const SlotBookingForm = ({ className,type, ...rest }) => {
            
             id="Banners"
             options={offersData}
-            value={values.offer || ''}
+            value={values.offer || null}
             name="offer"
             getOptionLabel={(option) =>typeof option === 'string' ? option : optionName(option.offerName,option.createdAt,"offer")}
             onChange={( e,value) => {setFieldValue('offer', value);getStores(value,setFieldValue)}}

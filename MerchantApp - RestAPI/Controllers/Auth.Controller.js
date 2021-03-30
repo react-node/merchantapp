@@ -26,15 +26,16 @@ module.exports = {
       var savedUser = await user.save()
       console.log(savedUser._id)
       const encrypt_email =  cryptr.encrypt(savedUser._id);
-      const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
-      console.log(emailSend)
+      // const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
+      // console.log(emailSend)
 
-      if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
+      // if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
       // const accessToken = await signAccessToken(savedUser.id)
       // const refreshToken = await signRefreshToken(savedUser.id)
       const responseData = {
         status:200,
-        message : "Registered successfully"
+        message : "Registered successfully",
+        _id : savedUser._id
       }
       res.send(responseData)
     } catch (error) {
@@ -44,7 +45,6 @@ module.exports = {
       next(error)
     }
   },
-
   login: async (req, res, next) => {
     try {
       const result = await authSchema.validateAsync(req.body)
@@ -58,7 +58,8 @@ module.exports = {
       const accessToken = await signAccessToken(user.id)
       const refreshToken = await signRefreshToken(user.id)
       const isIDProofVerified = user.isIDProofVerified
-      res.send({ accessToken, refreshToken,isIDProofVerified })
+      const userType = user.userType
+      res.send({ accessToken, refreshToken,isIDProofVerified ,userType})
     } catch (error) {
       if (error.isJoi === true)
         return next(createError.BadRequest('Invalid Username/Password'))

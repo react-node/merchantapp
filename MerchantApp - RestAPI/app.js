@@ -15,6 +15,7 @@ const ImageuploadRoute = require('./Routes/Imageupload.route')
 const ProfileRoute = require('./Routes/Profile.route')
 const SlotsRoute = require('./Routes/Slots.route')
 const PaymentRoute = require('./Routes/Payment.route')
+const User = require('./Models/User.model')
 
 const app = express()
 const multerMid = multer({
@@ -31,7 +32,9 @@ app.use(multerMid.single('file'))
 
 app.get('/',  async (req, res, next) => {
   console.log(req.body)
-  res.redirect("http://localhost:3000/app/dashboard")
+  const user = await User.find({createdAt : {$gte : "2021-02-25",$lte:'2021-02-27'}})
+  res.send(user)
+ // res.redirect("http://localhost:3000/app/dashboard")
 })
 
 app.use('/auth', AuthRoute)

@@ -35,7 +35,7 @@ const ProfileDetails = ({ className, ...rest }) => {
   const { enqueueSnackbar } = useSnackbar();
   const alertPosition = { horizontal: "right", vertical: "top" }
   const navigate = useNavigate()
-  const {setLoading,getIDProofVerified,setAccessToken,setIDProofVerified} = useContext(GlobalContext)
+  const {setLoading,getIDProofVerified,setAccessToken} = useContext(GlobalContext)
   // const handleChange = (event) => {
   //   setValues({
   //     ...values,

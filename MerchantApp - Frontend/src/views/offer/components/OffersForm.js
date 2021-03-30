@@ -9,8 +9,7 @@ import {GlobalContext} from "../../../context/GlobalState"
 import DeleteIcon from '@material-ui/icons/Delete';
 import { GOOGLE_STORAGE_PUBLIC_URL, OFFERS_PATH} from 'src/utils/config';
 import ConfirmDialog from '../../store/StoreDetailView/ConfirmDialog'
-
-
+ 
 import {
   Box,
   Button,
@@ -92,6 +91,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 const OffersForm=({isEdit=false})=>{
   
+
     const classes = useStyles();
     const navigate = useNavigate();
     const {setLoading,selectedOffer} = useContext(GlobalContext);

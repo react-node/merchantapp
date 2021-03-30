@@ -628,7 +628,7 @@ const getMallsData = async (zipcode)=>{
     
   }
 }
-const setIdentityValue=(value, setFieldValue)=>{
+const setIdentityValue=  (value, setFieldValue)=>{
   console.log(value)
   //if(value){
     if(!value || value.name === "GST"){
@@ -636,13 +636,14 @@ const setIdentityValue=(value, setFieldValue)=>{
       setDisabledFields({...disabledFields,identity_proof : false})
       
     }else{
-      useridentityData.forEach(item=>{
+      useridentityData.forEach(async (item)=>{
         if(item.id_type.toLowerCase() === value.name.toLowerCase()){
 
-          setFieldValue("identity_proof", item.id_number)
+          await setFieldValue("identity_proof", item.id_number)
           setFieldValue("GSTDoc", [])
           setDisabledFields({...disabledFields,identity_proof : true})
           setIsGSTExisted(true)
+          return false;
         }
         
       })
@@ -654,7 +655,7 @@ const setIdentityValue=(value, setFieldValue)=>{
 
 }
 const checkGSTNumber =async (e,value)=>{
-  console.log(e.target.value, value)
+  
   try {
     if(e.target.value){
       await Services.checkGSTNumber(e.target.value)
@@ -757,8 +758,7 @@ const checkGSTNumber =async (e,value)=>{
                 
                 <TextField
                 fullWidth
-                error={Boolean(touched.storeName && errors.StoreName)}
-                helperText={touched.storeName && errors.storeName}
+               
                 //helperText="Please specify the store name"
                 label="Store Name"
                 name="storeName"
@@ -770,6 +770,7 @@ const checkGSTNumber =async (e,value)=>{
                 id="place_changed"
                 placeholder=""
               />
+          <FormHelperText  className={`${classes.mgLeft} ${errors.storeName}?  Mui-error Mui-required: ''`}>{errors.storeName}</FormHelperText>
               
               
             </Grid>
@@ -1024,8 +1025,9 @@ const checkGSTNumber =async (e,value)=>{
            
             id="identity_type"
             options={identityTypeData}
-            value={values.identityType || ''}
+            value={values.identityType || null}
             name="identityType"
+            getOptionSelected={(option, value) => option.name === value.name}
             getOptionLabel={(option) =>typeof option === 'string' ? option : option.name}
             onChange={( e,value) => {setFieldValue('identityType', value); setIdentityValue(value,setFieldValue)}}
             renderInput={(params) => <TextField {...params} label="Select ID Proof" variant="outlined" />}

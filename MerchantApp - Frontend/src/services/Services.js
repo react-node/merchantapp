@@ -246,6 +246,7 @@ const checkGSTNumber = async (GST)=>{
     return response
 }
 
+
 export default {
     getStore,
     getAllStore,
@@ -284,6 +285,7 @@ export default {
     logout,
     getPaymentInit,
     getOrderDetails,
-    checkGSTNumber
+    checkGSTNumber,
+    
     
 }

@@ -21,7 +21,8 @@ const initialState = {
   slotsAvailability:[],
   historyData :[],
   refreshToken : null,
-  isIDProofVerified : false
+  isIDProofVerified : false,
+  userType : null
 };
 
 export const GlobalContext = createContext(initialState);
@@ -108,6 +109,12 @@ export const GlobalProvider = ({ children }) => {
       payload: data
     });
   }
+  function setUserType(data) {
+    dispatch({
+      type: "SET_USERT_TYPE",
+      payload: data
+    });
+  }
   function setIDProofVerified(data) {
     dispatch({
       type: "SET_IS_ID_VERIFIED",
@@ -131,6 +138,10 @@ export const GlobalProvider = ({ children }) => {
   function getIDProofVerified() {
     const isIDProofVerified = window.sessionStorage.getItem("isIDProofVerified")
     return  JSON.parse(isIDProofVerified)
+  }
+  function getUserType() {
+    const userType = window.sessionStorage.getItem("userType")
+    return  JSON.parse(userType)
   }
   return (
     <GlobalContext.Provider
@@ -164,7 +175,9 @@ export const GlobalProvider = ({ children }) => {
         getRefreshToken,
         refreshToken : state.refreshToken,
         setIDProofVerified,
-        getIDProofVerified
+        getIDProofVerified,
+        setUserType,
+        getUserType
       }}
     >
       {children}

@@ -24,7 +24,8 @@ class Map extends Component{
 			markerPosition: {
 				lat: "",
 				lng: ""
-			}
+			},
+			errorMessage  : null
 		}
 		
 	}
@@ -67,6 +68,15 @@ class Map extends Component{
 					console.error( error );
 				}
 			);
+			},error=>{
+				console.log(error)
+				this.setState({
+					...this.state,
+					errorMessage: error.message
+				})
+				
+			},{
+				enableHighAccuracy:true
 			}
 		  )
 		} else {
@@ -253,7 +263,7 @@ console.log("info window closed")
 				/>
 			</div>
 		} else {
-			map = <div style={{height: this.props.height}} />
+			map = <div style={{height: this.props.height}} >{this.state.errorMessage}</div>
 		}
 		return( map )
 	}

@@ -1,12 +1,12 @@
 {
-  "name": "MyProduct-Merchant-App",
+  "name": "myproduct-merchant-app",
   "author": "Dileep",
   "licence": "InfyOrigin",
   "version": "1.0.0",
   "description": "My Product merchant app",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js"
+    "start": "nodemon app.js"
   },
   "keywords": [],
   "dependencies": {

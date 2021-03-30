@@ -2,7 +2,7 @@ const createError = require('http-errors')
 const Offers = require('../Models/Offers.model')
 const Store = require('../Models/Store.model')
 const ProfileModel = require('../Models/User.model')
-
+const AssignedCities = require('../Models/AssignedCities.model')
 
 class ProfileContorller {
     async getProfileDetails(req, res, next){
@@ -15,13 +15,70 @@ class ProfileContorller {
             next(error)
         }
     }
+    async getUsers(req, res, next){
+        try {
+            const userType = parseInt(req.query.userType) || 0
+            const page = parseInt(req.query.page) || 1
+            const PAGE_SIZE = parseInt(req.query.pagesize) || 5;                   
+            const ORDERBY = req.query.orderBy || "_id";                  
+            const searchField = req.query.field || null;                  
+            const searchVal = req.query.val || null;                  
+            const ORDER = req.query.order === "asc" ? 1 : -1;                   
+            const skip = (page - 1) * PAGE_SIZE; 
+            let query = {}
+            //let query = {userType,isDeleted : false}
+            
+            if(searchField === "phoneNumber"){
+                const queryString = parseInt(searchVal)
+                 const regex = new RegExp(queryString)
+                 query.phoneNumber =  queryString
+              }else if(searchField === "email"){
+                const queryString = `${searchVal}`
+                const regex = new RegExp(queryString,'i')
+                query.email = {$regex: regex}
+              }
+            const count = await ProfileModel.countDocuments(query)
+
+            const users = await ProfileModel.find(query).select("_id firstName lastName email phoneNumber isVerified ").sort({ [ORDERBY]: ORDER }).skip(skip).limit(PAGE_SIZE)
+            res.send({users,count})
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
+    async getUser(req, res, next){
+        try {
+            const _id = req.params.id
+            const type = req.params.type
+            const user = await AssignedCities.findOne({assignedTo : _id}).populate("assignedTo","_id firstName lastName email phoneNumber isVerified")
+            res.send(user) 
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
+    async deleteUsers(req, res, next){
+        try {
+            await ProfileModel.updateMany({_id:{'$in':req.body}},{isDeleted : true})
+            const responseData = {
+                status : 200,
+                message : "ok"
+            }
+            res.send(responseData) 
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
     async updateProfileDetails(req, res, next){
         try {
             const requestPayload = req.body
+            const id= requestPayload.editId || req.payload.aud
+            delete requestPayload.editId
             const isPhoneFound = await ProfileModel.findOne({phoneNumber: requestPayload.phoneNumber})
             if(isPhoneFound && isPhoneFound.email !== requestPayload.email) throw createError.NotAcceptable("Phone number existed")
-            await ProfileModel.findByIdAndUpdate(req.payload.aud,requestPayload,{new:true})
-            res.send({"status": "ok","message" : "Updated successfully"})
+            const result = await ProfileModel.findByIdAndUpdate(id,requestPayload,{new:true})
+            res.send(result)
         } catch (error) {
             if (error.isJoi === true) error.status = 422
             next(error)

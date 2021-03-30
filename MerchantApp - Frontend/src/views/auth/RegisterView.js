@@ -153,6 +153,7 @@ const RegisterView = () => {
                   label="Password"
                   margin="normal"
                   name="password"
+                  autoComplete="new-password"
                   onBlur={handleBlur}
                   onChange={handleChange}
                   type="password"

@@ -71,6 +71,13 @@ export default (state, action) => {
           refreshToken : action.payload
           
         };
+      case "SET_USERT_TYPE":
+        window.sessionStorage.setItem("userType",action.payload)
+        return {
+          ...state,
+          userType : action.payload
+          
+        };
       case "SET_IS_ID_VERIFIED":
         window.sessionStorage.setItem("isIDProofVerified",action.payload)
         return {
