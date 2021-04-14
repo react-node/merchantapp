@@ -28,11 +28,19 @@ import AdminDashboardView from 'src/views/admin/dashboard';
 import AdminUserManagementView from 'src/views/admin/userManagement';
 import CreateAdminUserView from 'src/views/admin/userManagement/newUser';
 import EditAdminUserView from 'src/views/admin/userManagement/newUser';
+import MerchantUsersView from 'src/views/admin/merchantUsers/list';
+import MerchantStoresView from 'src/views/admin/merchantStores/list';
+import MerchantBannersView from 'src/views/admin/merchantBanners/list';
+import MerchantStoresBannerInfoView from 'src/views/admin/merchantBanners/info';
+import MerchantUsersInfoView from 'src/views/admin/merchantUsers/info';
+import MerchantStoresInfoView from 'src/views/admin/merchantStores/info';
+import MerchantStoresImageView from 'src/views/admin/merchantStores/images';
 
 const RedirectProfile = <Navigate to="/app/Profile" />
 const RedirectAdmin = <Navigate to="/app/admin/dashboard" />
 
 const routes = (accessToken,isIDProofVerified,userType)=> {
+  console.log("userType=======",userType)
   const children =  [
     { path: 'Profile', element:  <AccountView />  },
    // { path: 'customers', element: <CustomerListView /> },
@@ -60,6 +68,14 @@ const routes = (accessToken,isIDProofVerified,userType)=> {
     { path: 'admin/users', element: <AdminUserManagementView /> },
     { path: 'admin/users/create', element: <CreateAdminUserView /> },
     { path: 'admin/users/edit/:id', element: <EditAdminUserView /> },
+    { path: 'admin/merchant/users', element: <MerchantUsersView /> },
+    { path: 'admin/merchant/users/info/:id', element: <MerchantUsersInfoView /> },
+    { path: 'admin/merchant/stores', element: <MerchantStoresView type="stores" key="stores" /> },
+    { path: 'admin/merchant/storeImages', element: <MerchantStoresView type="storeImages"  key="storeImages"/> },
+    { path: 'admin/merchant/storeBanners', element: <MerchantBannersView type="storeBanners"  key="storeBanners"/> },
+    { path: 'admin/merchant/stores/info/:storeID', element: <MerchantStoresInfoView /> },
+    { path: 'admin/merchant/storeImages/:storeID', element: <MerchantStoresImageView /> },
+    { path: 'admin/merchant/storeBanners/:bannerID', element: <MerchantStoresBannerInfoView /> },
     { path: '*', element: <Navigate to="/404" /> }
   ]
 

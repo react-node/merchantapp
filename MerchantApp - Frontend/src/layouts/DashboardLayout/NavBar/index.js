@@ -19,9 +19,11 @@ import ViewCarouselIcon from '@material-ui/icons/ViewCarousel';
 import PersonIcon from '@material-ui/icons/Person';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CollectionsBookmarkIcon from '@material-ui/icons/CollectionsBookmark';
+import PeopleAltIcon from '@material-ui/icons/PeopleAlt';
 import ViewDayIcon from '@material-ui/icons/ViewDay';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import ReceiptIcon from '@material-ui/icons/Receipt';
+import ImageIcon from '@material-ui/icons/Image';
 import { GlobalContext } from "../../../context/GlobalState";
 
 
@@ -66,7 +68,7 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       href: userType===3 ? '/app/stores' : '/app/admin/stores',
       icon: StorefrontIcon,
       title: 'Stores',
-      userType :[1,2,3]
+      userType :[3]
     },
     {
       href: '/app/profile',
@@ -106,6 +108,30 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       icon: ReceiptIcon,
       title: 'Slot History',
       userType :[3]
+    },
+    {
+      href: '/app/admin/merchant/users',
+      icon: PeopleAltIcon,
+      title: 'Merchant Users',
+      userType :[1,2]
+    },
+    {
+      href: '/app/admin/merchant/stores',
+      icon: StorefrontIcon,
+      title: 'Merchant Stores',
+      userType :[1,2]
+    },
+    {
+      href: '/app/admin/merchant/storeImages',
+      icon: ImageIcon,
+      title: 'Merchant Store Images',
+      userType :[1,2]
+    },
+    {
+      href: '/app/admin/merchant/storeBanners',
+      icon: ViewCarouselIcon,
+      title: 'Merchant Store Banners',
+      userType :[1,2]
     },
     
     // {

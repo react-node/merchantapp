@@ -5,7 +5,6 @@ export default (state, action) => {
           ...state,
           tableSortingDetails : action.payload
         };
-      
       default:
         return state;
     }

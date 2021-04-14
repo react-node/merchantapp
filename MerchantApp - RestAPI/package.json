@@ -6,7 +6,7 @@
   "description": "My Product merchant app",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon app.js --config nodemon.json"
   },
   "keywords": [],
   "dependencies": {

@@ -15,6 +15,14 @@ const storeImagesSchema = new mongoose.Schema({
     isApproved : {
         type: Boolean,
         default : false
+    },
+    status:{
+        type : Number,
+        default : 1 // 1- submitted 2- approved 3- rejected
+    },
+    rejectedMessage:{
+        type: String,
+        default:null
     },   
     image:  String
     

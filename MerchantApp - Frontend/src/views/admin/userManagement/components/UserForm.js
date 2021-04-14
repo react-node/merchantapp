@@ -53,6 +53,7 @@ const UserForm = ({ className,initialValues,...rest }) => {
       console.log(values)
       values.policy = false
       values.userType = 2
+      values.status = 2
       // values.city.forEach((cityData)=>{
       //   const selectedZipcodes = cityData.zipcodes.filter((item)=> values.zipcode.includes(item))
       //   cityData.zipcodes = selectedZipcodes

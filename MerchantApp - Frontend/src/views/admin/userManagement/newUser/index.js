@@ -6,7 +6,6 @@ import {
 import Page from 'src/components/Page';
 import UserForm from '../components/UserForm'
 import { useParams } from 'react-router-dom';
-import Services from 'src/services/Services';
 import AdminServices from 'src/services/AdminServices';
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,6 +39,7 @@ const CreateUserView = () =>{
     }else{
       setInitialValues(intVal)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[])
   
   const getUserData =async (id)=>{

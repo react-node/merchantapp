@@ -26,10 +26,10 @@ module.exports = {
       var savedUser = await user.save()
       console.log(savedUser._id)
       const encrypt_email =  cryptr.encrypt(savedUser._id);
-      // const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
-      // console.log(emailSend)
+      const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
+      console.log(emailSend)
 
-      // if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
+      if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
       // const accessToken = await signAccessToken(savedUser.id)
       // const refreshToken = await signRefreshToken(savedUser.id)
       const responseData = {

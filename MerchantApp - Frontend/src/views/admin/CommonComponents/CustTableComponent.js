@@ -18,6 +18,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ConfirmationDialogTwo from "src/views/offer/components/ConfirmationDialogTwo"
 // function descendingComparator(a, b, orderBy) {
@@ -126,7 +127,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected,selectedRow,editHandling,deleteHandling ,Title} = props;
+  const { numSelected,selectedRow,editHandling,deleteHandling ,Title,tableToolbarOptions,viewHandling} = props;
   const [dialogDeleteOpen,setDialogDeleteOpen] = useState(false)
   
   const handleDialogDeleteClose =()=>{
@@ -142,6 +143,10 @@ const EnhancedTableToolbar = (props) => {
       console.log(selectedRow)
       editHandling(selectedRow)
 
+  }
+  const viewRow = ()=>{
+    console.log("record details",selectedRow)
+    viewHandling(selectedRow)
   }
   return (
     <Toolbar
@@ -159,18 +164,30 @@ const EnhancedTableToolbar = (props) => {
         </Typography>
       )}
 
-      {(numSelected > 0 && selectedRow[0]) && (
+      {(numSelected > 0 && tableToolbarOptions.includes("delete")) && (
         <Tooltip title="Delete">
           <IconButton aria-label="delete" onClick={deleteSelectedRow}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       )}
-      {(numSelected ===1 && selectedRow[0]) && (
+      {(numSelected ===1 && tableToolbarOptions.includes("edit")) && (
         <Tooltip title="Edit Row">
         <IconButton aria-label="edit-row" onClick={editRow}>
         <EditIcon
             className={classes.editIcon}
+            color="action"
+            
+        />
+        
+        </IconButton>
+      </Tooltip>
+      )}
+      {(numSelected ===1 && tableToolbarOptions.includes("view")) && (
+        <Tooltip title="Details">
+        <IconButton aria-label="view-row" onClick={viewRow}>
+        <VisibilityIcon
+            className={classes.viewIcon}
             color="action"
             
         />
@@ -216,7 +233,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({rows,pageCount,getRows,editHandling,deleteHandling,Headers,Title}) {
+export default function EnhancedTable({rows,pageCount,getRows,editHandling,deleteHandling,Headers,Title,tableToolbarOptions,viewHandling}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('desc');
   const [tableData, setTabledata] = React.useState([]);
@@ -227,7 +244,7 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   useEffect(()=>{
     if(rows.length===0){
-      rows.push({error:-1, message : "Records not found..."})
+      rows.push({error:-2, message : "",isLoading:true})
     }
     setTabledata(rows)
     console.log(rows)
@@ -235,6 +252,7 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
   useEffect(()=>{
     console.log("Changed order or orderby....")
     getRows(page+1,rowsPerPage,order,orderBy)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[order,orderBy])
 
   const handleRequestSort = (event, property) => {
@@ -298,7 +316,9 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
         selectedRow={selected}
         editHandling={editHandling}
         deleteHandling ={deleteHandling}
+        viewHandling = {viewHandling}
         Title={Title}
+        tableToolbarOptions = {tableToolbarOptions}
          />
         <TableContainer>
           <Table
@@ -319,17 +339,19 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
             />
            
             <TableBody>
-            {tableData.length ===0 &&
-            (<TableRow>
-                <TableCell colSpan={Headers.length+1} align="center">
-                    <CircularProgress align="center"/>
-                    </TableCell>
-                </TableRow>)
-            }
-           
               {tableData.map((row, index) => {
                   const isItemSelected = isSelected(row._id);
                   const labelId = `enhanced-table-checkbox-${index}`;
+                  if(row.isLoading ){
+                    return (<TableRow
+                      key={row.error}>
+                      <TableCell colSpan={Headers.length+1} align="center">
+                          <CircularProgress align="center"/>
+                          </TableCell>
+                      </TableRow>
+                      
+                      )
+                  }
                 if(row.error === -1){
                   return (<TableRow
                     hover

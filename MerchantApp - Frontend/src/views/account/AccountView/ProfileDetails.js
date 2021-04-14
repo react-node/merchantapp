@@ -153,9 +153,11 @@ const ProfileDetails = ({ className, ...rest }) => {
         upload_path : values.uploadAadhaar.length>0 ? IDENTITY_PROOF_PATH+"/"+values.uploadAadhaar[0].name : ''
       }]
     }
-    if(profileData.identityProofs.length > 0 && values.PAN === profileData.identityProofs[0].id_number){
-      delete requestPayload.identityProofs[0].upload_path
-      delete requestPayload.identityProofs[1].upload_path
+    if( requestPayload.identityProofs[0].upload_path === ""){
+       requestPayload.identityProofs[0].upload_path = profileData.identityProofs[0].upload_path
+    }
+    if( requestPayload.identityProofs[1].upload_path === ""){
+       requestPayload.identityProofs[1].upload_path = profileData.identityProofs[1].upload_path
     }
     try{
       await Services.updateProfile(requestPayload)

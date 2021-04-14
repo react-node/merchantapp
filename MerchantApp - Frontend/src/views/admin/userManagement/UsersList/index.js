@@ -1,5 +1,5 @@
 import { useSnackbar } from 'notistack';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import AdminServices from 'src/services/AdminServices';
 import Toolbar from '../components/Toolbar';
 import { GlobalContext } from "src/context/GlobalState";
@@ -13,11 +13,13 @@ const UserListView = () =>{
     const [count,setCount] = useState(0)
     const { enqueueSnackbar } = useSnackbar();
     const navigate = useNavigate()
+    const [filterData,setFilterData] = useState({})
     const {setLoading} = useContext(GlobalContext);
 
     const {updateSearchCriteria,state} = useContext(UserManagemantContext)
     const {tableSortingDetails} = state
     const alertPosition = { horizontal: "right", vertical: "top" }
+
     const Headers = [
       { id: 'firstName', numeric: false, disablePadding: true, label: 'First Name', key : "firstName", type : "text",sort : false },
       { id: 'LastName', numeric: false, disablePadding: false, label: 'Last Name', key : "lastName" , type : "text",sort : false},
@@ -38,7 +40,7 @@ const UserListView = () =>{
               searchString : parseInt(searchString),
               type : "phoneNumber"
             }
-            
+            setFilterData(filter)
             getAdminUsers(page,pageSize,order,orderBy,filter)
           }else{
             console.log("search string contains letter")
@@ -46,6 +48,7 @@ const UserListView = () =>{
               searchString : searchString,
               type : "email"
             }
+            setFilterData(filter)
             getAdminUsers(page,pageSize,order,orderBy,filter)
       
           }
@@ -74,11 +77,17 @@ const UserListView = () =>{
     const getAdminUsers = async (page=1,pageSize=5,order="desc",orderBy = "_id",filter={})=>{
       try{
           setRows([])
-         
+          if(Object.keys(filterData).length > 0 ){
+            filter = filterData
+          }          
           //setTimeout(async () => {
             updateSearchCriteria({page,pageSize,order,orderBy})
             const offerdata = await AdminServices.getUsers(page,pageSize,order,orderBy,2,filter)
-            setRows(offerdata.data.users)
+            let resultData = offerdata.data.users
+            if(offerdata.data.count === 0){
+              resultData = [{error:-1, message : "Records not found..."}]
+            }
+            setRows(resultData)
             setCount(offerdata.data.count)
          // }, 2000);
          
@@ -88,7 +97,7 @@ const UserListView = () =>{
           console.log(error)
           enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
   
-          setRows([])
+          setRows([{error:-1, message : "Something went wrong, Please try again...!"}])
           setCount(0)
       }
     }
@@ -107,6 +116,7 @@ const UserListView = () =>{
                     getRows = {getAdminUsers}
                     editHandling={edithandling}
                     deleteHandling= {deletehandling}
+                    tableToolbarOptions = {['edit','delete']}
                     Title = {tableTitle}
                 />
        

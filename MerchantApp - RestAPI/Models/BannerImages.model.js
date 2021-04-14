@@ -8,18 +8,26 @@ const bannerImagesSchema = new mongoose.Schema({
         ref: 'User'
     }, 
     isApproved : {
-        type: Number,
-        default : 1
+        type: Boolean,
+        default : false
     },   
     isDeleted : {
         type: Boolean,
         default : false
-    },   
+    },
+    status:{
+        type : Number,
+        default : 1 // 1- submitted 2- approved 3- rejected
+    },
+    rejectedMessage:{
+        type: String,
+        default:null
+    },
     imagePath:  String
     
 }, {
     timestamps: true
 })
-const Offers = mongoose.model('BannerImages', bannerImagesSchema)
+const bannerImages = mongoose.model('BannerImages', bannerImagesSchema)
 
-module.exports = Offers
+module.exports = bannerImages

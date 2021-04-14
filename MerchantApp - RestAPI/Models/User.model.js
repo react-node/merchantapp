@@ -54,6 +54,14 @@ const UserSchema = new Schema({
     type:Number,
     default:3  // 1-super admin  2-admin 3-merchant
   },
+  status:{
+    type : Number,
+    default : 1 // 1- submitted 2- approved 3- rejected
+  },
+  rejectedMessage:{
+    type: String,
+    default:null
+  },
   isDeleted : {
     type: Boolean,
     default:false

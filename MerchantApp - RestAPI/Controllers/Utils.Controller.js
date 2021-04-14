@@ -44,8 +44,12 @@ const UtilsContorller = {
     },
     async getCityZipcodes(req, res, next){
         try {
-           
-            const resultData = await CityZipcodes.find({}).select('_id city zipcodes')
+            const cities = req.query.cities ? req.query.cities.split(",") : null
+            let query ={}
+            if(cities){
+                query.city = {$in : cities}
+            }
+            const resultData = await CityZipcodes.find(query).select('_id city zipcodes')
            // const mallModelData =  mallModel()
             res.send(resultData)
         } catch (error) {

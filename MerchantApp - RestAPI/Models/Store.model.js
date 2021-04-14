@@ -80,6 +80,14 @@ const storeSchema = new mongoose.Schema({
     //mainBranchID : {type:mongoose.Schema.Types.ObjectId,default: null},
     website: {type:String,default:null},
     identity_type: {type:String,default:null},
+    status:{
+        type : Number,
+        default : 1 // 1- submitted 2- approved 3- rejected
+    },
+    rejectedMessage:{
+    type: String,
+    default:null
+    }
     }, {
         timestamps: true
     })

@@ -1,6 +1,7 @@
 const uploadImage = require('../helpers/gcs_helper')
 const StoreImagesModel = require('../Models/StoreImages.model')
 const BannerImageModel = require('../Models/BannerImages.model')
+const Store = require('../Models/Store.model')
 
 class ImageuploadController{
 
@@ -21,6 +22,25 @@ class ImageuploadController{
             console.log(error)
             next(error)
           }
+    }
+    async updateStoreImages (req,res,next){
+      try{
+       
+        let requestBody = req.body
+        let ids = requestBody.selectedIds
+        delete requestBody.selectedIds
+        console.log(ids)
+        console.log(requestBody)
+        const storeID = req.params.storeID
+
+        const query ={_id :{$in : ids}, storeID }
+       const UpdateResult = await StoreImagesModel.updateMany(query,requestBody,{new:true})
+        //const storeImageData = await storeImage.insertMany()
+        res.send(UpdateResult)
+      }catch(error){
+        next(error)
+
+      }
     }
     async saveStoreImage (req,res,next){
       try{
@@ -56,15 +76,20 @@ class ImageuploadController{
     async getStoreImage(req,res,next){
       try{
         const page = req.query.page || 1
-        const PAGE_SIZE = 6;                   // Similar to 'limit'
+        const userType = req.query.type || 3
+        const status = parseInt(req.query.status) || 0
+        const PAGE_SIZE = 7;                   // Similar to 'limit'
         const skip = (page - 1) * PAGE_SIZE; 
         const ownerID = req.payload.aud
         const storeID = req.params.storeID
-      //  setTimeout(async () => {
-        const storeImages = await StoreImagesModel.find({storeID: storeID,ownerID : ownerID}).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
+        let query = {storeID}
+        if(status) query.status = status
+        if(userType === 3)  query.ownerID = ownerID 
+        setTimeout(async () => {
+        const storeImages = await StoreImagesModel.find(query).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
         res.send(storeImages)
           
-      //  }, 3000);
+        }, 3000);
        
       }catch(error){
         next(error)
@@ -75,19 +100,80 @@ class ImageuploadController{
       try{
         const page = req.query.page || 1
         const ownerID = req.payload.aud
+        const userType = parseInt(req.query.userType) || 3
+        let query = {isDeleted:false}
+        if(userType === 3 ){
+          query.ownerID = ownerID
+        }
         let bannerImages = []
         if(page === "all"){
-          bannerImages = await BannerImageModel.find({ownerID,isDeleted:false}).sort({ _id: -1 })
+          bannerImages = await BannerImageModel.find(query).sort({ _id: -1 })
         }else{
           const PAGE_SIZE = 6;                   // Similar to 'limit'
           const skip = (page - 1) * PAGE_SIZE; 
         //  const ownerID = req.payload.aud
         //  const storeID = req.params.storeID
         //  setTimeout(async () => {
-          bannerImages = await BannerImageModel.find({ownerID,isDeleted:false}).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
+          bannerImages = await BannerImageModel.find(query).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
         }
         
         res.send(bannerImages)
+          
+      //  }, 3000);
+       
+      }catch(error){
+        next(error)
+
+      }
+    }
+    async getBannerImageByZipcodes(req,res,next){
+      try{
+        const page = req.query.page || 1
+        const filter = req.query.searchstring || null
+        const userType = parseInt(req.query.userType) || 3
+        const filterType = req.query.type || null
+        const zipcodes = req.query.zipcodes || null
+        const ORDERBY = req.query.orderBy || "_id";
+        const ORDER = req.query.order === "asc" ? 1 : -1;
+        const status = parseInt(req.query.status);
+        const PAGE_SIZE = parseInt(req.query.pagesize) || 5;                   // Similar to 'limit'
+        const skip = (page - 1) * PAGE_SIZE; 
+        const fromDate = req.query.fromDate;
+        const toDate = req.query.toDate;
+       
+        let query = { isDeleted:false}
+        if(userType === 3) query.owner = req.payload.aud
+        if(userType === 2) {
+          let zipcodesArray = []
+          if(zipcodes){
+            zipcodesArray = zipcodes.split(",")
+            const ownersList = await Store.distinct('owner',{ isDeleted: false,zipcode: { '$in': zipcodesArray}})
+            // console.log(ownersList)
+            // let ownerIds = ownersList.map(({owner})=>{
+            //   return owner
+            //   // if(!ownerIds.includes(owner)){
+            //   //   ownerIds.push(owner)
+            //   //  }
+            //   })
+            console.log(ownersList)
+
+            query.ownerID = {$in : ownersList}
+          }
+          
+          //query.zipcode = {$in : zipcodesArray}
+        }
+        if(fromDate && toDate){
+          query.createdAt = { $gte: fromDate, $lte: toDate + "T23:59:59" }
+        }else if(fromDate) {
+          query.createdAt = { $gte: fromDate }
+        }else if(toDate) {
+          query.createdAt = { $lte: toDate + "T23:59:59"  }
+        }
+        if(status) query.status = status
+        const count = await BannerImageModel.countDocuments(query)
+        const bannerImages = await BannerImageModel.find(query).sort({[ORDERBY]: ORDER }).skip(skip).limit(PAGE_SIZE)
+        
+        res.send({bannerImages,count})
           
       //  }, 3000);
        
@@ -101,6 +187,31 @@ class ImageuploadController{
         const ownerID = req.payload.aud
         const BannerImages = await BannerImageModel.updateMany({_id:{'$in':req.body},ownerID},{isDeleted : true})
         res.send(BannerImages)
+      
+       
+      }catch(error){
+        next(error)
+
+      }
+    }
+    async getBannerInfo(req,res,next){
+      try{
+        const id = req.params.bannerID
+        const BannerImages = await BannerImageModel.findById(id)
+        res.send(BannerImages)
+      
+       
+      }catch(error){
+        next(error)
+
+      }
+    }
+    async updatebannerInfo(req,res,next){
+      try{
+        const id = req.params.bannerID
+        const requestBody = req.body
+        const BannerImage = await BannerImageModel.findByIdAndUpdate(id,requestBody,{new : true} )
+        res.send(BannerImage)
       
        
       }catch(error){

@@ -1,10 +1,10 @@
-import React, { createContext, useReducer } from "react";
 import createDataContext from '../../CommonComponents/createDataContext';
 
 import UserReducer from "./UserReducer";
 const initialState = {
-  tableSortingDetails :{}
+  tableSortingDetails :{},
 }
+console.log("context initial data-----",initialState)
 const addBlogPost = (dispatch) => {
   return (title, content, callback) => {
     dispatch({ type: 'add_blogpost', payload: { title, content } });
@@ -19,6 +19,7 @@ const updateSearchCriteria = (dispatch) => {
    
   };
 };
+
 const deleteBlogPost = (dispatch) => {
   return (id) => {
     dispatch({ type: 'delete_blogpost', payload: id });
