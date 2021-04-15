@@ -11,7 +11,10 @@ import {useSnackbar} from "notistack"
 // }))
 
 const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeValue,touched,errors,type=null})=>{
-   // const classes = useStyles();
+  console.log("zipcodeValue---------------->",zipcodeValue)
+  console.log("city value---------------->",value)
+   
+  // const classes = useStyles();
    // const [cities,setCities] = useState([])
     const [cityAndZipcodes,setcityAndZipcodes] = useState([])
     const [assignedCityAndZipcodes,setAssignedCityAndZipcodes] = useState([])
@@ -84,16 +87,19 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
         
        
         setZipcodes(newzipcodes)
-        zipcodeValue.forEach((zip)=>{
-            //console.log("in each.....")
+        if(newzipcodes.length > 0){
+          zipcodeValue.forEach((zip)=>{
+            console.log("in each.....",newzipcodes)
             if(!newzipcodes.includes(zip)){
                 //zipcodeValue.splice(zip,1)
                 zipcodeValue = zipcodeValue.filter(i=>i!==zip)
 
             } 
          })
-        // console.log("after each.....",zipcodeValue)
+         console.log("after each.....",zipcodeValue)
          onHandleZipcodeChange(zipcodeValue)
+        }
+       
         
     }
   

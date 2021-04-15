@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 
 import FilterToolbar from '../../CommonComponents/FilterToolbar'  
 import CustomTable from '../../CommonComponents/CustTableComponent'
@@ -25,7 +25,6 @@ const BannersListView = ({type}) =>{
       navigate(`/app/admin/merchant/storeBanners/${selectedRow[0]}`)
       
   }
-  
   return (
         <>
             <FilterToolbar 

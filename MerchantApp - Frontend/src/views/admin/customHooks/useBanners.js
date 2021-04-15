@@ -19,7 +19,9 @@ const useBanners = () =>{
             setRows([])
             
             if(Object.keys(filterOptions).length === 0){
-                filterOptions = filterData
+              //  filterOptions = filterData
+                filterOptions = JSON.parse(localStorage.getItem("contextFilterData") || JSON.stringify(filterData) )
+
             }else{
                 setFilterData(filterOptions)
             }

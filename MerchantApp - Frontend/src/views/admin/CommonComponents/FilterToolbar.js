@@ -48,13 +48,13 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
         await handleFetchData(page,pageSize,order,orderBy,{},values)
         setSubmitting(false)
     }
-    useEffect(()=>{
-      const featchData = async() =>{
-        const {page,pageSize,order,orderBy} = tableSortingDetails
-        await handleFetchData(page,pageSize,order,orderBy,{},values)
-      }
-      featchData()
-    },[values])
+    // useEffect(()=>{
+    //   const featchData = async() =>{
+    //     const {page,pageSize,order,orderBy} = tableSortingDetails
+    //     await handleFetchData(page,pageSize,order,orderBy,{},values)
+    //   }
+    //   featchData()
+    // },[values])
     return (<div
         className={clsx(classes.root, className)}
         {...rest}
@@ -163,7 +163,7 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
                             <Autocomplete
                                 id="status"
                                 options={statusArray}
-                                value={values.status}
+                                value={values.status || null}
                                 name="status"
                                 getOptionLabel={(option) =>typeof option === 'string' ? option : option.toString()}
                                 onChange={(e,value)=>setFieldValue("status",value)}
