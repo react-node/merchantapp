@@ -147,7 +147,14 @@ class ImageuploadController{
           let zipcodesArray = []
           if(zipcodes){
             zipcodesArray = zipcodes.split(",")
-            const ownersList = await Store.distinct('owner',{ isDeleted: false,zipcode: { '$in': zipcodesArray}})
+            let storeQuery = { isDeleted: false,zipcode: { '$in': zipcodesArray}}
+            if(filterType === "string"){
+              let regex = new RegExp(filter,'i')
+              storeQuery.name = regex
+
+            }
+            console.log(storeQuery)
+            const ownersList = await Store.distinct('owner',storeQuery)
             // console.log(ownersList)
             // let ownerIds = ownersList.map(({owner})=>{
             //   return owner

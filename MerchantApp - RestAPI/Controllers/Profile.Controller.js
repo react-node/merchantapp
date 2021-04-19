@@ -37,7 +37,7 @@ class ProfileContorller {
             if (searchField === "phoneNumber") {
                 const queryString = parseInt(searchVal)
                 const regex = new RegExp(queryString)
-                query.phoneNumber = queryString
+                query.phoneNumber = parseInt(searchVal)
             } else if (searchField === "email") {
                 const queryString = `${searchVal}`
                 const regex = new RegExp(queryString, 'i')
@@ -45,7 +45,7 @@ class ProfileContorller {
             }
             const count = await ProfileModel.countDocuments(query)
 
-            const users = await ProfileModel.find(query).select("_id firstName lastName email phoneNumber isVerified ").sort({ [ORDERBY]: ORDER }).skip(skip).limit(PAGE_SIZE)
+            const users = await ProfileModel.find(query).select("_id firstName lastName email phoneNumber isVerified status").sort({ [ORDERBY]: ORDER }).skip(skip).limit(PAGE_SIZE)
             res.send({ users, count })
         } catch (error) {
             console.log(error)

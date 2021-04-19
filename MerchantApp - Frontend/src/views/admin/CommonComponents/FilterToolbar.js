@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useState } from "react"
 
 import { Box, Button, Card, CardContent, Grid, makeStyles, TextField } from "@material-ui/core";
 import clsx from "clsx";
@@ -13,7 +13,6 @@ import CityAndZipcodes from '../userManagement/components/CityAndZipcodes'
 import { Autocomplete } from "@material-ui/lab";
 import { Context as UserManagemantContext } from 'src/views/admin/userManagement/Context/userManagementContext';
 
-
 const useStyles = makeStyles((theme) => ({
     root: {},
     importButton: {
@@ -27,9 +26,10 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
     const classes = useStyles();
     console.log(localStorage.getItem("contextFilterData"))
     const initVal = JSON.parse(localStorage.getItem("contextFilterData")  || JSON.stringify(initialValues))
-    const [values] = useState(initVal);
+    const [values,setFilterData] = useState(initVal);
     const {state} = useContext(UserManagemantContext)
     const {tableSortingDetails} = state
+    const {page,pageSize,order,orderBy} = tableSortingDetails
     const handleCityChange = (newValue,setFieldValue) =>{
         setFieldValue("city",newValue)
     }
@@ -44,9 +44,21 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
     }
     const searchData = async (values,setSubmitting)=>{
       localStorage.setItem("contextFilterData",JSON.stringify(values))
-        const {page,pageSize,order,orderBy} = tableSortingDetails
+        
         await handleFetchData(page,pageSize,order,orderBy,{},values)
         setSubmitting(false)
+    }
+    const resetFilter =  async (resetForm)=>{
+      localStorage.removeItem("contextFilterData")
+      setFilterData( {
+        fromDate :null,
+        toDate :null,
+        city : [],
+        zipcode : [],
+        status: 0
+    })
+    resetForm()
+     await handleFetchData(page,pageSize,order,orderBy,{},initialValues)
     }
     // useEffect(()=>{
     //   const featchData = async() =>{
@@ -83,19 +95,17 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
                     touched,
                     values,
                     setValues,
-                    setFieldValue
+                    setFieldValue,
+                    resetForm
                     }) => (
                     <form
-                    
                     name = "createAdminUser"
                     noValidate
                     onSubmit={handleSubmit} 
                     className={clsx(classes.root, className)}
                     {...rest}
                     >
-                     
                     <Grid
-                    
                     container
                     spacing={3}
                     >
@@ -111,7 +121,6 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
                         />)
                         }
                         <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                            
                             <Grid
                                 item
                                 md={3}
@@ -173,10 +182,7 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
                                 />}
                                 />    
                         </Grid>
-                                                                
-                      
                         <Box
-                            
                             alignSelf="center"
                             p={2}
                             >
@@ -188,9 +194,16 @@ const FilterToolbar =({ className,initialValues,statusArray,cityZipRequired,hand
                         >
                             Search
                         </Button>
+                        &nbsp;
+                        <Button
+                            color="secondary"
+                            variant="contained"
+                            onClick={()=>resetFilter(resetForm)}
+                        >
+                            Clear All
+                        </Button>
                         </Box> 
                         </Grid>
-                       
                     </form> )}
                 </Formik>
               </Box>

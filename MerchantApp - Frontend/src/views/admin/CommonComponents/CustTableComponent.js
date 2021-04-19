@@ -21,6 +21,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import ConfirmationDialogTwo from "src/views/offer/components/ConfirmationDialogTwo"
+import { InputAdornment, SvgIcon, TextField } from '@material-ui/core';
+import { Search as SearchIcon } from 'react-feather';
+
 // function descendingComparator(a, b, orderBy) {
 //   if (b[orderBy] < a[orderBy]) {
 //     return -1;
@@ -69,7 +72,7 @@ function EnhancedTableHead(props) {
         {Headers.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}
+            align={headCell.key === "status" ? "center" : headCell.numeric ? 'right' : 'left'}
             padding={headCell.disablePadding ? 'none' : 'default'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -123,11 +126,18 @@ const useToolbarStyles = makeStyles((theme) => ({
   title: {
     flex: '1 1 100%',
   },
+  searchRoot : {
+    paddingLeft:7,
+    '& $positionStart' :{marginRight:5},
+
+  },
+  positionStart :{marginRight:5},
+  custPadd:{ padding:10,paddingLeft:0}
 }));
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected,selectedRow,editHandling,deleteHandling ,Title,tableToolbarOptions,viewHandling} = props;
+  const { numSelected,selectedRow,deleteHandling ,Title,tableToolbarOptions,searchHandler,searchPlaceHolder,searchError} = props;
   const [dialogDeleteOpen,setDialogDeleteOpen] = useState(false)
   
   const handleDialogDeleteClose =()=>{
@@ -138,16 +148,21 @@ const EnhancedTableToolbar = (props) => {
       console.log(selectedRow)
       setDialogDeleteOpen(true)
   }
-  const editRow = ()=>{
-      console.log("edit record")
-      console.log(selectedRow)
-      editHandling(selectedRow)
+  // const editRow = ()=>{
+  //     console.log("edit record")
+  //     console.log(selectedRow)
+  //     editHandling(selectedRow)
+
+  // }
+  // const viewRow = ()=>{
+  //   console.log("record details",selectedRow)
+  //   viewHandling(selectedRow)
+  // }
+  const onChangeHandler = (e)=>{
+    searchHandler(e.target.value)
 
   }
-  const viewRow = ()=>{
-    console.log("record details",selectedRow)
-    viewHandling(selectedRow)
-  }
+
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -163,15 +178,37 @@ const EnhancedTableToolbar = (props) => {
           {Title}
         </Typography>
       )}
-
-      {(numSelected > 0 && tableToolbarOptions.includes("delete")) && (
-        <Tooltip title="Delete">
+        <TextField
+            fullWidth
+            error= {!searchError? false : true}
+            helperText= {searchError? searchError : ''}
+            style={searchError ? {top:5}:{}}
+            InputProps={{
+              classes: {root : classes.searchRoot,inputAdornedStart: classes.custPadd},
+              startAdornment: (
+                <InputAdornment classes={{root:classes.positionStart}} position="start" >
+                  <SvgIcon
+                    fontSize="small"
+                    color="action"
+                  >
+                    <SearchIcon />
+                  </SvgIcon>
+                </InputAdornment>
+              )
+            }}
+            
+            placeholder={searchPlaceHolder || ''}
+            variant="outlined"
+            onChange = {onChangeHandler}
+          />
+       {(numSelected > 0 && tableToolbarOptions.includes("delete")) && (
+        <Tooltip title="Delete selected rows">
           <IconButton aria-label="delete" onClick={deleteSelectedRow}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
       )}
-      {(numSelected ===1 && tableToolbarOptions.includes("edit")) && (
+      {/* {(numSelected ===1 && tableToolbarOptions.includes("edit")) && (
         <Tooltip title="Edit Row">
         <IconButton aria-label="edit-row" onClick={editRow}>
         <EditIcon
@@ -182,8 +219,8 @@ const EnhancedTableToolbar = (props) => {
         
         </IconButton>
       </Tooltip>
-      )}
-      {(numSelected ===1 && tableToolbarOptions.includes("view")) && (
+      )} */}
+      {/* {(numSelected ===1 && tableToolbarOptions.includes("view")) && (
         <Tooltip title="Details">
         <IconButton aria-label="view-row" onClick={viewRow}>
         <VisibilityIcon
@@ -194,7 +231,7 @@ const EnhancedTableToolbar = (props) => {
         
         </IconButton>
       </Tooltip>
-      )}
+      )} */}
       <ConfirmationDialogTwo
                     open={dialogDeleteOpen}
                     handleSubmit = {()=>{setDialogDeleteOpen(false);deleteHandling(selectedRow)}}
@@ -231,9 +268,34 @@ const useStyles = makeStyles((theme) => ({
     top: 20,
     width: 1,
   },
+  statusBadge:{
+    marginLeft: 10,
+    borderRadius: 10,
+    padding: 3,
+    paddingLeft:15,
+    paddingRight:15
+  },
+  approved:{
+    color: "#0e9413",
+    backgroundColor: "rgb(76 175 80 / 42%)",
+   
+  },
+  submitted:{
+    color: "#3645f4",
+    backgroundColor: "rgb(54 95 244 / 42%)",
+   
+  },
+  rejected:{
+    color: "#f44336",
+    backgroundColor: "rgba(244, 67, 54, 42%)",
+  },
+  rowPadding : {
+    paddingTop:5,
+    paddingBottom : 5
+  }
 }));
 
-export default function EnhancedTable({rows,pageCount,getRows,editHandling,deleteHandling,Headers,Title,tableToolbarOptions,viewHandling}) {
+export default function EnhancedTable({rows,pageCount,getRows,editHandling,deleteHandling,Headers,Title,tableToolbarOptions,viewHandling,searchHandler,searchPlaceHolder,searchError}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('desc');
   const [tableData, setTabledata] = React.useState([]);
@@ -242,6 +304,7 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
   const [page, setPage] = React.useState(0);
   //const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
   useEffect(()=>{
     if(rows.length===0){
       rows.push({error:-2, message : "",isLoading:true})
@@ -254,7 +317,17 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
     getRows(page+1,rowsPerPage,order,orderBy)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[order,orderBy])
+  
+  const editRow = (id)=>{
+    console.log("edit record")
+    console.log(id)
+    editHandling(id)
 
+}
+const viewRow = (id)=>{
+  console.log("record details",id)
+  viewHandling(id)
+}
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -307,7 +380,58 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   //const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
-
+  const generateRow =(rowData,key,numeric,type,actionTypes,index)=>{
+    let row = ''
+    switch(type){
+      case "text":
+          row = rowData[key]
+         break
+      case "action" :
+        row = actionTypes.map((t)=>{
+          let x;
+          if(t === "view") x=  <Tooltip key={t} title="Details">
+          <IconButton aria-label="view-row" onClick={()=>viewRow(rowData._id)}>
+          <VisibilityIcon
+              className={classes.viewIcon}
+              color="action"
+          />
+          </IconButton>
+        </Tooltip>
+           if(t === "edit") x= <Tooltip key={t} title="Edit Row">
+           <IconButton aria-label="edit-row" onClick={()=>editRow(rowData._id)}>
+           <EditIcon
+               className={classes.editIcon}
+               color="action"
+           />
+           </IconButton>
+         </Tooltip>
+        //    if(t === "delete") return <Tooltip key={t} title="Delete">
+        //    <IconButton aria-label="delete" onClick={deleteSelectedRow}>
+        //      <DeleteIcon />
+        //    </IconButton>
+        //  </Tooltip>
+        return x
+        })
+        break
+      case "active" :
+          row = rowData[key] === 1 ? 
+          <span className={`${classes.submitted} ${classes.statusBadge}`}>Submitted  </span> 
+          : rowData[key] === 2 ? 
+          <span className={`${classes.approved} ${classes.statusBadge}`}>Approved  </span>
+          : <span className={`${classes.rejected} ${classes.statusBadge}`}>Rejected  </span>
+          break
+      default : 
+          break;    
+    }
+    if(index ===0 ){
+      return (<TableCell key={key} component="th"  scope="row" align={numeric ? 'right' : 'left'} padding='none'>
+           {row}
+         </TableCell>)
+    }
+    return ( <TableCell classes = {{root : classes.rowPadding}} key={key} align={numeric ? 'right' : 'left'} >
+            {row}
+      </TableCell>)
+  }
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
@@ -319,6 +443,9 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
         viewHandling = {viewHandling}
         Title={Title}
         tableToolbarOptions = {tableToolbarOptions}
+        searchHandler ={searchHandler}
+        searchPlaceHolder = {searchPlaceHolder}
+        searchError = {searchError}
          />
         <TableContainer>
           <Table
@@ -337,7 +464,6 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
               rowCount={tableData.length}
               Headers = {Headers}
             />
-           
             <TableBody>
               {tableData.map((row, index) => {
                   const isItemSelected = isSelected(row._id);
@@ -349,7 +475,6 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
                           <CircularProgress align="center"/>
                           </TableCell>
                       </TableRow>
-                      
                       )
                   }
                 if(row.error === -1){
@@ -362,7 +487,6 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
                     {row.message}
                       </TableCell>
                       </TableRow>
-                    
                     )
                 }
                   return (
@@ -382,25 +506,27 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
                         />
                       </TableCell>
                       {
-                          Headers.map(({key,numeric,type},index) => {
-                              if(index === 0 ){
-                                return <TableCell key={key} component="th" id={labelId} scope="row" align={numeric ? 'right' : 'left'} padding="none">
-                                {row[key]}
-                              </TableCell>
-                              }else{
-                                return <TableCell key={key} align={numeric ? 'right' : 'left'} >
-                                {type ==="active" ? (row[key] ? "Active" : "Not Activated") : row[key]}
-                              </TableCell>
-                              }
-                          })
+                          Headers.map(({key,numeric,type,actionTypes},index) => 
+                            //   if(index === 0 ){
+                            //     return <TableCell key={key} component="th" id={labelId} scope="row" align={numeric ? 'right' : 'left'} >
+                            //     {row[key]}
+                            //   </TableCell>
+                            //   }else{
+                            //     return <TableCell key={key} align={numeric ? 'right' : 'left'} >
+                            //     {type ==="active" ? (row[key] ? "Active" : "Not Activated") : 
+                            //     type==="action" ?  <VisibilityIcon
+                            //     className={classes.viewIcon}
+                            //     color="action"
+                                
+                            // /> : row[key]}
+                            //   </TableCell>
+                            //   }
+                            generateRow(row,key,numeric,type,actionTypes,index)
+                          )
                       }
-                     
-                     
-                     
                     </TableRow>
                   );
                 })}
-            
             </TableBody>
           </Table>
         </TableContainer>
@@ -414,7 +540,6 @@ export default function EnhancedTable({rows,pageCount,getRows,editHandling,delet
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      
     </div>
   );
 }

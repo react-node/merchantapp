@@ -44,6 +44,7 @@ const TopBar = ({
       const refreshToken =getRefreshToken()
       await Services.logout({refreshToken})
       setAccessToken('')
+      localStorage.removeItem("contextFilterData")
       navigate('/', { replace: true });
     } catch (error) {
       console.log(error)

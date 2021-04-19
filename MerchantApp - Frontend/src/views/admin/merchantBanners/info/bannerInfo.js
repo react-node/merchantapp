@@ -4,7 +4,6 @@ import {  Avatar,
   Grid,
   GridList,
   GridListTile,
-  GridListTileBar,
   makeStyles,
   Paper,
   Typography} from '@material-ui/core';
@@ -68,18 +67,13 @@ const useStyles = makeStyles((theme) => ({
 const StoresBannerInfoView =()=>{
    const classes = useStyles()
     const [bannerData,updateBannerStatus] = useGetStoreBannerInfo()
-  
-   // console.log("bannerData....",bannerData)
     const approveUser =()=>{
       updateBannerStatus(bannerData._id,2,"")
     }
     const rejectUser =(rejectedMessage)=>{
       console.log(rejectedMessage)
       updateBannerStatus(bannerData._id,3,rejectedMessage)
-
     }
-    
-
     return ( <div className={classes.root}>
       <Paper className={classes.paper}>
           <Grid container spacing={2}>
@@ -91,9 +85,7 @@ const StoresBannerInfoView =()=>{
                   {bannerData.imagePath}
                   </Typography>
               </Grid>
-             
               <Grid item container direction="row" spacing={2}>
-                  
                   <Grid item    xs={12}   md={4}  lg={4}>
                       <Typography variant="body2" >
                         Created Date : {bannerData.createdAt.slice(0, 10)}
@@ -115,12 +107,10 @@ const StoresBannerInfoView =()=>{
                       </Typography>
                     </Grid>
                   }
-                  
               </Grid>
               <br />
               <Grid >
               <GridList  className={classes.gridList} cols={3} component={"span"}>
-                 
                     <a  href={GOOGLE_STORAGE_PUBLIC_URL+bannerData.ownerID+"/banner/"+bannerData.imagePath} target="_blank" rel="noopener noreferrer">
                       <GridListTile  cols={1} component={"span"} >
                       <Avatar
@@ -130,29 +120,21 @@ const StoresBannerInfoView =()=>{
                       variant="square"
                       className={classes.avatar}
                       />
-                      
                       </GridListTile>
                     </a>
-                  
-                
- 
               </GridList>
               <br/>
-                
                 <Typography variant="body2" style={{textAlign:"center" }}>
                  <ApprovedButton onButtonClick={approveUser}/>
                  &nbsp; 
                  <RejectedButton onButtonClick={rejectUser}/>
                  </Typography>
-                
               </Grid>
               </Grid>
-              
           </Grid>
           }
          </Grid>
       </Paper>
-      
       </div>)
 }
 

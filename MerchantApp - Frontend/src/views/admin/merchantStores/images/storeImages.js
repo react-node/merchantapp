@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import {  Avatar,
-    CircularProgress,
   colors,
   Grid,
   GridList,
@@ -10,16 +9,14 @@ import {  Avatar,
   makeStyles,
   Paper,
   TextField,
-  Typography} from '@material-ui/core';
+  } from '@material-ui/core';
 import ApprovedButton from '../../CommonComponents/ApprovedButton'
 import RejectedButton from '../../CommonComponents/RejectedButton'
 import useGetStoreImages from '../../customHooks/useGetStoreImages'
 import { GOOGLE_STORAGE_PUBLIC_URL } from 'src/utils/config'
-import ImageListView from "../../../store/StoreDetailView/ImagesListView"
 import DoneIcon from '@material-ui/icons/Done';
 import { Autocomplete } from '@material-ui/lab';
 import {GlobalContext} from 'src/context/GlobalState'
-import { useNavigate, useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -74,22 +71,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 const StoresInfoView =({statusArray})=>{
     const classes = useStyles()
-    const {storeID} = useParams()
-
     const [storeImages,updateStoreImageStatus,getStoreImagesInfo] = useGetStoreImages()
-    const [isLoading, setIsLoading]  = useState(false)
     const [isStatusChange, setIsStatusChange]  = useState(false)
     const [imagesData,setImagesdata] = useState([])
     const [statusFilter,setStatusFilter] = useState("")
     const {setLoading} = useContext(GlobalContext)
     const [selectedImages,setSelectedImages]=useState([])
-    const navigate = useNavigate()
     const [page, setPage] = useState(0);
-
      // add loader refrence 
-  const loader = useRef(null);
- 
-  useEffect(() => {
+    const loader = useRef(null);
+    useEffect(() => {
        var options = {
           root: null,
           rootMargin: "20px",
@@ -106,88 +97,77 @@ const StoresInfoView =({statusArray})=>{
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     useEffect(()=>{
-        setImagesdata(storeImages)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        },[storeImages])
+      setImagesdata(storeImages)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[storeImages])
     const handleObserver = (entities) => {
-    
-        const target = entities[0];
-        if (target.isIntersecting) {   
-            setPage((page) => page + 1)
-        }
+      const target = entities[0];
+      if (target.isIntersecting) {   
+          setPage((page) => page + 1)
       }
-      useEffect(() => {
-        // here we simulate adding new posts to List
-        if(page){
-          getMoreData(page,statusFilter,isStatusChange)
-          setIsStatusChange(false)
-          console.log("call function to get new records",page)
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        }, [page,statusFilter])
+    }
+    useEffect(() => {
+      // here we simulate adding new posts to List
+      if(page){
+        getMoreData(page,statusFilter,isStatusChange)
+        setIsStatusChange(false)
+        console.log("call function to get new records",page)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page,statusFilter])
     const getMoreData = async (page,filterStatus,isStatusChange)=>{
-        try {
-            setLoading(true)
-           // setIsLoading(true)
-            await getStoreImagesInfo(page,filterStatus,isStatusChange)
-           // setIsLoading(false)
-            setLoading(false)
-        } catch (error) {
-           // setIsLoading(false)
-            setLoading(false)
-            
-        }
-       
+      try {
+          setLoading(true)
+          // setIsLoading(true)
+          await getStoreImagesInfo(page,filterStatus,isStatusChange)
+          // setIsLoading(false)
+          setLoading(false)
+      } catch (error) {
+          // setIsLoading(false)
+          setLoading(false)
+      }
     }
     const selectImage=(id)=>{
-        //let image= selectedImages
-        console.log(imagesData)
-        let isNew = !selectedImages.includes(id)
-        if(isNew){
-          setSelectedImages([...selectedImages,id])
-    
-        }else{
-          //selectedImages.splice(id,1)
-          const filteredItems = selectedImages.filter(function(item) {
-            return item !== id
-          })
-          setSelectedImages(filteredItems)
-        }
-       const modifiedArray = imagesData.map((item)=>{ 
-          if(item._id === id){
-            item.isSelect = !item.isSelect
-          }
-          return item
+      //let image= selectedImages
+      console.log(imagesData)
+      let isNew = !selectedImages.includes(id)
+      if(isNew){
+        setSelectedImages([...selectedImages,id])
+      }else{
+        //selectedImages.splice(id,1)
+        const filteredItems = selectedImages.filter(function(item) {
+          return item !== id
         })
-        setImagesdata(modifiedArray)
+        setSelectedImages(filteredItems)
       }
-    const ChangeFilter=async (e,value)=>{
-        if(value !== statusFilter){
-            setIsStatusChange(true)
-            await setPage(0)
+      const modifiedArray = imagesData.map((item)=>{ 
+        if(item._id === id){
+          item.isSelect = !item.isSelect
         }
-        setStatusFilter(value)
-        // navigate("/app/admin/merchant/storeImages/"+storeID+"?status="+value,{replace:true})
-        // console.log(value)
-        
-        setPage(1)
-       
+        return item
+      })
+      setImagesdata(modifiedArray)
     }
-      
+    const ChangeFilter=async (e,value)=>{
+      if(value !== statusFilter){
+          setIsStatusChange(true)
+          await setPage(0)
+      }
+      setStatusFilter(value)
+      // navigate("/app/admin/merchant/storeImages/"+storeID+"?status="+value,{replace:true})
+      // console.log(value)
+      setPage(1)
+    }
     const approveUser =()=>{
         updateStoreImageStatus(selectedImages,2,"")
     }
     const rejectUser =(rejectedMessage)=>{
       console.log(rejectedMessage)
       updateStoreImageStatus(selectedImages,3,rejectedMessage)
-
     }
-    
-
     return ( <div className={classes.root}>
       <Paper className={classes.paper}>
       <Grid
-        
         container
         spacing={3}
         >
@@ -213,17 +193,14 @@ const StoresInfoView =({statusArray})=>{
         <Autocomplete
             id="status"
             options={statusArray}
-            
             name="status"
             getOptionLabel={(option) =>typeof option === 'string' ? option : option.toString()}
             onChange={ChangeFilter}
             renderInput={(params) =>
                 <TextField {...params} label="Select Status" variant="outlined" 
-                
             />}
             /> 
             </Grid>
-           
         </Grid>
       <br/>
       <GridList  className={classes.gridList} cols={3} component={"span"}>
@@ -248,17 +225,13 @@ const StoresInfoView =({statusArray})=>{
                   {item.isSelect && <DoneIcon style={{color:'rgb(255,247,0)'}} fontSize='large' /> }
                 </IconButton>
               }
-             
             />
           </GridListTile>
         ))}
-       
       </GridList>
       <div  className={classes.loading} ref={loader}>
-         
       </div>
       </Paper>
-      
       </div>)
 }
 StoresInfoView.defaultProps = {

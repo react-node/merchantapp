@@ -85,7 +85,7 @@ const StoreContorller = {
               
               const regex = new RegExp(queryString, 'i')
               console.log(queryString)
-              query.name = {$regex: regex}
+              query.$or =[ {name : regex},{area :   regex} ]
             }
 
             console.log(query)

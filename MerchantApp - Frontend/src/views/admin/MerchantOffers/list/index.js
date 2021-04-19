@@ -6,7 +6,7 @@ import {
   import Page from 'src/components/Page';
 
 import { Provider as UserManagementProvider } from '../../userManagement/Context/userManagementContext';
-import BannersListView from './BannersListView'
+import OffersListView from './OffersListView'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
  
-const MerchantBannersListView = () =>{
+const MerchantOffersListView = () =>{
   const classes = useStyles();
   
   
@@ -31,7 +31,7 @@ const MerchantBannersListView = () =>{
     title="Stores List"
     >
         <Container maxWidth={false}>
-            <BannersListView />
+            <OffersListView />
         </Container>
     </Page>
     </UserManagementProvider>
@@ -39,4 +39,4 @@ const MerchantBannersListView = () =>{
 }
 
 
-export default MerchantBannersListView
+export default MerchantOffersListView

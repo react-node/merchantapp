@@ -17,6 +17,7 @@ export const STORE_IMAGE_DB  = `${REST_V}/imageupload/storeimages`
 export const OFFERS  = `${REST_V}/offers`
 export const GET_STORES_BY_ID = `${OFFERS}/storesbyoffer`
 export const GET_ALL_OFFERS = `${OFFERS}/getAllOffers`
+export const GET_OFFERS_BY_ZIPCODES = `${OFFERS}/getOfferByZipcodes`
 export const USER_VERIFY = `/auth/user/verify`
 export const FORGOT_PASSWORD = `/auth/user/forgotpassword`
 export const RESET_PASSWORD = `/auth/user/updatepassword`

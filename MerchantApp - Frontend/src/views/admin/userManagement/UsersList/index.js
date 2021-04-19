@@ -1,5 +1,5 @@
 import { useSnackbar } from 'notistack';
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import AdminServices from 'src/services/AdminServices';
 import Toolbar from '../components/Toolbar';
 import { GlobalContext } from "src/context/GlobalState";
@@ -15,23 +15,20 @@ const UserListView = () =>{
     const navigate = useNavigate()
     const [filterData,setFilterData] = useState({})
     const {setLoading} = useContext(GlobalContext);
-
     const {updateSearchCriteria,state} = useContext(UserManagemantContext)
     const {tableSortingDetails} = state
     const alertPosition = { horizontal: "right", vertical: "top" }
-
     const Headers = [
-      { id: 'firstName', numeric: false, disablePadding: true, label: 'First Name', key : "firstName", type : "text",sort : false },
+      { id: 'firstName', numeric: false, disablePadding: false, label: 'First Name', key : "firstName", type : "text",sort : false },
       { id: 'LastName', numeric: false, disablePadding: false, label: 'Last Name', key : "lastName" , type : "text",sort : false},
       { id: 'email', numeric: false, disablePadding: false, label: 'Email' , key : "email", type : "text",sort : true},
       { id: 'phoneNumber', numeric: false, disablePadding: false, label: 'Phone Number', key : "phoneNumber", type : "text" ,sort : false},
       { id: 'isVerified', numeric: false, disablePadding: false, label: 'Status' , key : "isVerified", type : "active",sort : true},
-      
+      { id: 'Action', numeric: false, disablePadding: false, label: 'Action' , key : "action", type : "action",sort : false,actionTypes:["edit"]}
     ]
     const tableTitle ="Admin Users"
-    const searchUsers = (searchString)=>{
-        console.log(tableSortingDetails)
-        const {page,pageSize,order,orderBy} = tableSortingDetails
+    const searchUsers = async (searchString)=>{
+        console.log(searchString)
         var filter = {}
         if(searchString){
           if(!isNaN(searchString)){
@@ -41,7 +38,7 @@ const UserListView = () =>{
               type : "phoneNumber"
             }
             setFilterData(filter)
-            getAdminUsers(page,pageSize,order,orderBy,filter)
+           // getAdminUsers(page,pageSize,order,orderBy,filter)
           }else{
             console.log("search string contains letter")
             filter = {
@@ -49,17 +46,22 @@ const UserListView = () =>{
               type : "email"
             }
             setFilterData(filter)
-            getAdminUsers(page,pageSize,order,orderBy,filter)
-      
+           // getAdminUsers(page,pageSize,order,orderBy,filter)
           }
+        }else{
+          setFilterData(filter)
+         // getAdminUsers(page,pageSize,order,orderBy,{})
         }
-        
     }
+    useEffect(()=>{
+      const {page,pageSize,order,orderBy} = tableSortingDetails
+      getAdminUsers(page,pageSize,order,orderBy,filterData)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[filterData])
     const edithandling = (selectedUser)=>{
         // const selectedObj = rows.find((item)=> item._id===selectedUser[0])
         // console.log(selectedObj)
-        navigate(`/app/admin/users/edit/${selectedUser[0]}`)
-  
+        navigate(`/app/admin/users/edit/${selectedUser}`)
     }
     const deletehandling = async (selectedUsers)=>{
       console.log(selectedUsers)
@@ -73,7 +75,6 @@ const UserListView = () =>{
         setLoading(false)
       }
     }
-  
     const getAdminUsers = async (page=1,pageSize=5,order="desc",orderBy = "_id",filter={})=>{
       try{
           setRows([])
@@ -90,9 +91,6 @@ const UserListView = () =>{
             setRows(resultData)
             setCount(offerdata.data.count)
          // }, 2000);
-         
-         
-          
       }catch(error){
           console.log(error)
           enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
@@ -101,13 +99,12 @@ const UserListView = () =>{
           setCount(0)
       }
     }
-    
   // useEffect(()=>{
   //   getAdminUsers()
   // },[])
     return (
         <Container maxWidth={false}>
-          <Toolbar searchHandler={searchUsers}/>
+          <Toolbar />
           <br/>
          <CustomTable 
                     rows={rows}
@@ -118,12 +115,11 @@ const UserListView = () =>{
                     deleteHandling= {deletehandling}
                     tableToolbarOptions = {['edit','delete']}
                     Title = {tableTitle}
+                    searchHandler={searchUsers}
+                    searchPlaceHolder = "Enter Email/Phone"
                 />
-       
         </Container>
     )
 }
-
-
 export default UserListView
 

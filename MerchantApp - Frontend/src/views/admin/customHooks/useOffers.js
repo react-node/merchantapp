@@ -4,7 +4,7 @@ import { Context as UserManagemantContext } from '../userManagement/Context/user
 import * as config from '../../../utils/config'
 import useServices from './useServices'
 import moment from 'moment';
-const useBanners = () =>{
+const useOffers = () =>{
     const [rows,setRows] = useState([])
     const [filterData,setFilterData] = useState({})
     const [searchData,setSearchData] = useState({})
@@ -14,8 +14,8 @@ const useBanners = () =>{
     const { enqueueSnackbar } = useSnackbar();
     const alertPosition = { horizontal: "right", vertical: "top" }
     const {updateSearchCriteria} = useContext(UserManagemantContext)
-    console.log("custom hook get all banners data.....")
-    const getBanners = async (page=1,pageSize=5,order="desc",orderBy = "_id",searchCriteria={},filterOptions={},userType=0,isItSearch=false)=>{
+    console.log("custom hook get all offers data.....")
+    const getOffers = async (page=1,pageSize=5,order="desc",orderBy = "_id",searchCriteria={},filterOptions={},userType=0,isItSearch=false)=>{
         try{
             setRows([])
             if(Object.keys(filterOptions).length === 0){
@@ -34,7 +34,6 @@ const useBanners = () =>{
                 return false
             }
             updateSearchCriteria({page,pageSize,order,orderBy})
-              
             let filter =`?pagesize=${pageSize}&page=${page}&orderBy=${orderBy}&order=${order}&userType=${userType}`
             if(Object.keys(searchCriteria).length >0 )
                 filter += `&type=${searchCriteria.type}&searchstring=${searchCriteria.searchString}`
@@ -47,17 +46,14 @@ const useBanners = () =>{
                     const toDate = moment(filterOptions.toDate).format('YYYY-MM-DD')
                     filter += `&toDate=${toDate}`
                 }
-                
                 if(filterOptions.status) {
                     var status=0
                     if(filterOptions.status === "Submitted"){
                         status=1
                     }else if(filterOptions.status === "Approved"){
                         status=2
-
                     }else if(filterOptions.status === "Rejected"){
                         status=3
-
                     }
                     filter += `&status=${status}`
                 }
@@ -65,11 +61,10 @@ const useBanners = () =>{
                     filter += `&zipcodes=${filterOptions.zipcode.toString()}`
                 }
             }
-            const URL = config.API_URI+config.BANNER__BY_ZIPCODE+filter
+            const URL = config.API_URI+config.GET_OFFERS_BY_ZIPCODES+filter
             //const offerdata = await AdminServices.getUsers(page,pageSize,order,orderBy,userType,searchCriteria,filter)
             const response = await get(URL)
-            let resultData = response.data.bannerImages
-            resultData.map(item=>item.imagePath = item.imagePath.split("/")[1])
+            let resultData = response.data.offersData
             if(response.data.count === 0){
               resultData = [{error:-1, message : "Records not found..."}]
             }
@@ -82,7 +77,7 @@ const useBanners = () =>{
             setCount(0)
         }
       }
-      const getMerchantBannersBySearch = async (searchString)=>{
+      const getMerchantOffersBySearch = async (searchString)=>{
         console.log(searchString)
         const userType = window.sessionStorage.getItem("userType")
         var searchCriteria = {}
@@ -93,8 +88,11 @@ const useBanners = () =>{
               searchString : parseInt(searchString),
               type : "number"
             }
+
             setSearchData(searchCriteria)
+           
             setErrorMessage("Please enter valid store name")
+    
            // getAdminUsers(page,pageSize,order,orderBy,filter)
           }else{
             setErrorMessage("")
@@ -104,15 +102,16 @@ const useBanners = () =>{
               type : "string"
             }
             setSearchData(searchCriteria)
-            getBanners(1,5,"desc","_id",searchCriteria,{},userType,true)
+            getOffers(1,5,"desc","_id",searchCriteria,{},userType,true)
           }
         }else{
           setErrorMessage("")
           setSearchData(searchCriteria)
-          getBanners(1,5,"desc","_id",searchCriteria,{},userType,true)
+          getOffers(1,5,"desc","_id",searchCriteria,{},userType,true)
         }
+    
       }
-      return [rows,count,getBanners,getMerchantBannersBySearch,errorMessage]
+      return [rows,count,getOffers,getMerchantOffersBySearch,errorMessage]
 }
 
-export default useBanners
+export default useOffers

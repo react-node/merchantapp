@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import {useParams} from 'react-router-dom'
 import useServices from './useServices'
 import * as config from '../../../utils/config';
@@ -24,18 +24,15 @@ const userReducer = (state,action) =>{
         return {...state,isResponseEmpty:action.payload}
         default:
             return state
-
     }
 }
 const useGetStoreImages = ()=>{
-    const {storeID,status} = useParams()
+    const {storeID} = useParams()
     const { enqueueSnackbar } = useSnackbar();
     const alertPosition = { horizontal: "right", vertical: "top" }
     console.log("custom hook to get the data...",storeID)
     const [isResponseEmpty, setisResponseEmpty]  = useAsyncState(true)
-
     const [state,dispatch] = useReducer(userReducer,initialState)
-
     const {get,put} = useServices()
     const navigate = useNavigate()
     const getStatusCode = (filterStatus)=>{
@@ -54,7 +51,6 @@ const useGetStoreImages = ()=>{
                     console.log("in callback=======",isResponseEmpty)
                     await getStoreImagesData(page,filterStatus,isStatusChange,isResponseEmpty)
                 })
-               
                 // await dispatch({
                 //     type:"SET_IS_RESPONSE_EMPTY",
                 //     payload : true

@@ -4,14 +4,13 @@ import {  Avatar,
   Grid,
   GridList,
   GridListTile,
-  GridListTileBar,
   makeStyles,
   Paper,
   Typography} from '@material-ui/core';
 import ApprovedButton from '../../CommonComponents/ApprovedButton'
 import RejectedButton from '../../CommonComponents/RejectedButton'
-import useGetUserInfo from '../../customHooks/useGetUserInfo';
-import { GOOGLE_STORAGE_PUBLIC_URL } from 'src/utils/config';
+import useGetOffersInfo from '../../customHooks/useGetOfferInfo'
+import { GOOGLE_STORAGE_PUBLIC_URL,OFFERS_PATH } from 'src/utils/config'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -65,126 +64,109 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "rgba(244, 67, 54, 0.08)",
     }
 }));
-const UsersInfoView =()=>{
-  const classes = useStyles()
-    const [userData,updateUserStatus] = useGetUserInfo()
-    
-    console.log("userData....",userData)
+const OffersInfoView =()=>{
+   const classes = useStyles()
+    const [offerData,updateOfferStatus] = useGetOffersInfo()
     const approveUser =()=>{
-      updateUserStatus(userData._id,2,"")
+      updateOfferStatus(offerData._id,2,"")
     }
     const rejectUser =(rejectedMessage)=>{
       console.log(rejectedMessage)
-      updateUserStatus(userData._id,3,rejectedMessage)
-
+      updateOfferStatus(offerData._id,3,rejectedMessage)
     }
-    
-
     return ( <div className={classes.root}>
       <Paper className={classes.paper}>
           <Grid container spacing={2}>
-          {Object.keys(userData).length >0 && 
+          {Object.keys(offerData).length >0 && 
           <Grid item xs={12} sm container>
               <Grid item xs={11} md={11} container direction="column" spacing={2}>
               <Grid item xs>
                   <Typography gutterBottom variant="h4" >
-                  {userData.firstName} {userData.lastName}
+                  {offerData.offerName} - {offerData.offerDescription}
                   </Typography>
               </Grid>
               <Grid item container direction="row" spacing={2}>
                   <Grid item  xs={12} md={4} lg={4} >
                       <Typography variant="body2" >
-                          Email : {userData.email}
+                        Discount Type : {offerData.discountType}
                       </Typography>
                   </Grid>
                   <Grid item    xs={12}   md={4}  lg={4}>
                       <Typography variant="body2" >
-                          Phone : {userData.phoneNumber}
+                          Discount : {offerData.discount}
                       </Typography>
                   </Grid>
               </Grid>
               <Grid item container direction="row" spacing={2}>
                   <Grid item  xs={12} md={4} lg={4} >
                       <Typography variant="body2" >
-                          Aadhaar : {userData.identityProofs.length > 0 ? userData.identityProofs[1].id_number : ""}
+                          Start Date : {offerData.fromDate.slice(0, 10)}
                       </Typography>
                   </Grid>
                   <Grid item    xs={12}   md={4}  lg={4}>
                       <Typography variant="body2" >
-                          PAN : {userData.identityProofs.length > 0 ? userData.identityProofs[0].id_number : ''}
+                          End Date : {offerData.expireDate.slice(0, 10)}
                       </Typography>
                   </Grid>
                   <Grid item  xs={12} md={4} lg={4} >
                       <Typography variant="body2" >
-                          Created Date : {userData.createdAt.slice(0, 10)}
+                          Offer Status : {offerData.isActive ? "Active" : "Deactive"}
                       </Typography>
                   </Grid>
               </Grid>
               <Grid item container direction="row" spacing={2}>
-                  
                   <Grid item    xs={12}   md={4}  lg={4}>
                       <Typography variant="body2" >
-                          ID Proof Verified : {userData.isIDProofVerified ? "Yes" : "No"}
+                        Created Date : {offerData.createdAt.slice(0, 10)}
                       </Typography>
                   </Grid>
                   <Grid item    xs={12}   md={4}  lg={4}>
                       <Typography variant="body2" >
                           Status : 
-                          {userData.status ===1 ? 
+                          {offerData.status ===1 ? 
                           <span className={`${classes.submitted} ${classes.statusBadge}`}>Submitted  </span>
-                            : (userData.status ===2 ? <span className={`${classes.approved} ${classes.statusBadge}`}>Approved  </span> 
+                            : (offerData.status ===2 ? <span className={`${classes.approved} ${classes.statusBadge}`}>Approved  </span> 
                              : <span className={`${classes.rejected} ${classes.statusBadge}`}>Rejected  </span>)} 
                       </Typography>
                   </Grid>
-                  {userData.rejectedMessage && 
+                  {offerData.rejectedMessage && 
                     <Grid item  xs={12} md={4} lg={4} >
                       <Typography variant="body2" >
-                        Rejected Message : {userData.rejectedMessage}
+                        Rejected Message : {offerData.rejectedMessage}
                       </Typography>
                     </Grid>
                   }
-                  
               </Grid>
               <br />
               <Grid >
-              <GridList  className={classes.gridList} cols={3} component={"span"}>
-                  {userData.identityProofs.map((item) => (
-                    <a key={item._id} href={GOOGLE_STORAGE_PUBLIC_URL+userData._id+item.upload_path} target="_blank" rel="noopener noreferrer">
-                      <GridListTile  cols={item.cols || 1} component={"span"} >
-                      <Avatar
-                      component={"span"}
-                      alt={item.upload_path}
-                      src={GOOGLE_STORAGE_PUBLIC_URL+userData._id+item.upload_path}
-                      variant="square"
-                      className={classes.avatar}
-                      />
-                       <GridListTileBar
-                        title={item.id_type}
-                        />
-                  
-                      </GridListTile>
-                    </a>
-                  
-                  ))}
- 
-              </GridList>
-              <br/>
-                
+              <GridList className={classes.gridList} cols={3} component={"span"}>
+                        {offerData.images.map((item) => (
+                          <a key={item._id} href={GOOGLE_STORAGE_PUBLIC_URL+offerData.ownerID+OFFERS_PATH+item.imagePath} target="_blank" rel="noopener noreferrer">
+                            <GridListTile  cols={item.cols || 1} component={"span"} >
+                                <Avatar
+                                component={"span"}
+                                alt={item.imagePath}
+                                src={GOOGLE_STORAGE_PUBLIC_URL+offerData.ownerID+OFFERS_PATH+item.imagePath}
+                                variant="square"
+                                className={classes.avatar}
+                            />
+                            </GridListTile>
+                          </a>
+                        ))}
+                    </GridList>
+                <br/>
                 <Typography variant="body2" style={{textAlign:"center" }}>
                  <ApprovedButton onButtonClick={approveUser}/>
                  &nbsp; 
                  <RejectedButton onButtonClick={rejectUser}/>
                  </Typography>
-                
               </Grid>
               </Grid>
-              
           </Grid>
           }
          </Grid>
       </Paper>
-      
       </div>)
 }
 
-export default UsersInfoView
+export default OffersInfoView

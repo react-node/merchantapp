@@ -133,6 +133,12 @@ const NavBar = ({ onMobileClose, openMobile }) => {
       title: 'Merchant Store Banners',
       userType :[1,2]
     },
+    {
+      href: '/app/admin/merchant/storeOffers',
+      icon: LocalOfferIcon,
+      title: 'Merchant Store Offers',
+      userType :[1,2]
+    },
     
     // {
      

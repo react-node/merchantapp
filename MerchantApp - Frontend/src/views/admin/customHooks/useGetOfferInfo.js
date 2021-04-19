@@ -5,33 +5,33 @@ import * as config from '../../../utils/config';
 import { useSnackbar } from 'notistack';
 import {useNavigate} from 'react-router-dom'
 
-const initialState = {userData:{}}
+const initialState = {offerData:{}}
 const userReducer = (state,action) =>{
     switch(action.type){
-        case "SET_USER_DATA" : 
-        return {...state,userData:action.payload}
+        case "SET_OFFERS_DATA" : 
+        return {...state,offerData:action.payload}
         default:
             return state
 
     }
 }
-const useGetUserInfo = ()=>{
-    const {id} = useParams()
+const useGetOfferInfo = ()=>{
+    const {offerID} = useParams()
     const { enqueueSnackbar } = useSnackbar();
     const alertPosition = { horizontal: "right", vertical: "top" }
-    console.log("custom hook to get the data...",id)
+    console.log("custom hook to get the data...",offerID)
     const [state,dispatch] = useReducer(userReducer,initialState)
     const {get,put} = useServices()
     const navigate = useNavigate()
 
-    const getUserInfo = async (id)=>{
+    const getOfferInfo = async (id)=>{
         try {
             console.log("custom hook get function...",id)
            // const response = await AdminServices.getUserByID(id,3)
-           const URL = config.API_URI+config.GET_USER+`/3/${id}`
+           const URL = config.API_URI+config.OFFERS+`/${id}`
             const response = await get(URL)
             dispatch({
-                type:"SET_USER_DATA",
+                type:"SET_OFFERS_DATA",
                 payload : response.data
             })
         } catch (error) {
@@ -39,20 +39,19 @@ const useGetUserInfo = ()=>{
         }
 
     }
-    const updateUserStatus = async (_id,status=0,rejectedMessage="") =>{
+    const updateOfferStatus = async (_id,status=0,rejectedMessage="") =>{
         try {
             console.log("custom hook update status function...",status,rejectedMessage)
             //const response = await AdminServices.getUserByID()
-            const URL = `${config.API_URI}${config.PROFILE}`
+            const URL = `${config.API_URI}${config.OFFERS}/${_id}`
             const requestBody = {
-                editId : _id,
                 status,
-                isIDProofVerified : status===2 ? true : false,
+                isActive : status===2 ? true : false,
                 rejectedMessage
             }
             await put(URL,requestBody)
             enqueueSnackbar('Updated Successfully',   { variant: "success","anchorOrigin" : alertPosition } );
-            navigate('/app/admin/merchant/users')
+            navigate('/app/admin/merchant/storeOffers')
           
         } catch (error) {
             console.log(error)
@@ -62,13 +61,13 @@ const useGetUserInfo = ()=>{
     }
 
     useEffect(()=>{
-        getUserInfo(id)
+        getOfferInfo(offerID)
     // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
 
-    return [state.userData,updateUserStatus]
+    return [state.offerData,updateOfferStatus]
 
 
 
 }
-export default useGetUserInfo
+export default useGetOfferInfo

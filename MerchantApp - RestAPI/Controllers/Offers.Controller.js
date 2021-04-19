@@ -214,6 +214,94 @@ class OffersContorller {
         }
 
     }
+    async getOfferByZipcodes(req, res, next){
+        try{
+            const page = req.query.page || 1
+            const filter = req.query.searchstring || null
+            const userType = parseInt(req.query.userType) || 3
+            const filterType = req.query.type || null
+            const zipcodes = req.query.zipcodes || null
+            const ORDERBY = req.query.orderBy || "_id";
+            const ORDER = req.query.order === "asc" ? 1 : -1;
+            const status = parseInt(req.query.status);
+            const PAGE_SIZE = parseInt(req.query.pagesize) || 5;                   // Similar to 'limit'
+            const skip = (page - 1) * PAGE_SIZE; 
+            const fromDate = req.query.fromDate;
+            const toDate = req.query.toDate;
+           
+            let query = { isDeleted:false}
+            if(userType === 3) query.owner = req.payload.aud
+            if(userType === 2) {
+              let zipcodesArray = []
+              if(zipcodes){
+                zipcodesArray = zipcodes.split(",")
+                let storeQuery = { isDeleted: false,zipcode: { '$in': zipcodesArray}}
+                if(filterType === "string"){
+                let regex = new RegExp(filter,'i')
+                storeQuery.name = regex
+
+                }
+                const ownersList = await Store.distinct('owner',storeQuery)
+                // console.log(ownersList)
+                // let ownerIds = ownersList.map(({owner})=>{
+                //   return owner
+                //   // if(!ownerIds.includes(owner)){
+                //   //   ownerIds.push(owner)
+                //   //  }
+                //   })
+                console.log(ownersList)
+    
+                query.ownerID = {$in : ownersList}
+              }
+              
+              //query.zipcode = {$in : zipcodesArray}
+            }
+            if(fromDate && toDate){
+              query.createdAt = { $gte: fromDate, $lte: toDate + "T23:59:59" }
+            }else if(fromDate) {
+              query.createdAt = { $gte: fromDate }
+            }else if(toDate) {
+              query.createdAt = { $lte: toDate + "T23:59:59"  }
+            }
+            if(status) query.status = status
+            const count = await OffersModel.countDocuments(query)
+            const offersData = await OffersModel.find(query).sort({[ORDERBY]: ORDER }).skip(skip).limit(PAGE_SIZE)
+            
+            res.send({offersData,count})
+              
+          //  }, 3000);
+           
+          }catch(error){
+            next(error)
+    
+          }
+    }
+    async getOfferBYID(req, res, next){
+        try {
+            const offerID = req.params.offerID
+            const result  = await OffersModel.findById(offerID)
+            if(!result){
+                return next(createError.NotFound)
+            }
+            res.send(result)
+        } catch (error) {
+            next(error)
+        }
+
+    }
+    async updateOffersInfo(req,res,next){
+        try{
+          const id = req.params.offerID
+          const requestBody = req.body
+          const offerData = await OffersModel.findByIdAndUpdate(id,requestBody,{new : true} )
+          res.send(offerData)
+        
+         
+        }catch(error){
+          next(error)
+  
+        }
+      }
     
 }
 

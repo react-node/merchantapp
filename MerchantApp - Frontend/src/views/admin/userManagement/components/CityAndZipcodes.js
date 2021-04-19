@@ -11,10 +11,7 @@ import {useSnackbar} from "notistack"
 // }))
 
 const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeValue,touched,errors,type=null})=>{
-  console.log("zipcodeValue---------------->",zipcodeValue)
-  console.log("city value---------------->",value)
-   
-  // const classes = useStyles();
+   // const classes = useStyles();
    // const [cities,setCities] = useState([])
     const [cityAndZipcodes,setcityAndZipcodes] = useState([])
     const [assignedCityAndZipcodes,setAssignedCityAndZipcodes] = useState([])
@@ -25,13 +22,11 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
 
     const getAssignedCitiesAndZipcodes= async ()=>{
       try {
-        const userType = window.sessionStorage.getItem("userType")
         const result = await AdminServices.getUserByID(0,2) //this will return for both admin and super admin
         console.log("assigned data===",result)
         if(result.data){
           setCities(result.data.assignedData.city)
           setAssignedCityAndZipcodes(result.data.assignedData)
-         
         }
       } catch (error) {
         console.log(error)
@@ -41,18 +36,14 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
       try {
         console.log("adsfsdfdf")
         const resultData = await AdminServices.getCityAndZipcodes()
-
         setcityAndZipcodes(resultData.data)
         let c=[]
         resultData.data.forEach((i)=>{
-
           c.push(i.city)
-
         })
         setCities(c)
-          
       } catch (error) {
-        
+        console.log(error)
       }
     }
     const filterZipcodes = async (selectedCity) =>{
@@ -71,21 +62,15 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
                 newzipcodes.push(item)
               })
             }
-            
           })
-
         }else{
-          cityAndZipcodes.forEach(({city,zipcodes})=> {
-            if(selectedCity.includes(city)){
-                newzipcodes = [...newzipcodes,...zipcodes]
-               
-            }
-
-            }
-          )
+          if(selectedCity.length === 0) zipcodeValue=[]
+            cityAndZipcodes.forEach(({city,zipcodes})=> {
+              if(selectedCity.includes(city)){
+                  newzipcodes = [...newzipcodes,...zipcodes]
+              }
+            })
         }
-        
-       
         setZipcodes(newzipcodes)
         if(newzipcodes.length > 0){
           zipcodeValue.forEach((zip)=>{
@@ -93,16 +78,12 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
             if(!newzipcodes.includes(zip)){
                 //zipcodeValue.splice(zip,1)
                 zipcodeValue = zipcodeValue.filter(i=>i!==zip)
-
             } 
          })
-         console.log("after each.....",zipcodeValue)
-         onHandleZipcodeChange(zipcodeValue)
         }
-       
-        
+        console.log("after each.....",zipcodeValue)
+        onHandleZipcodeChange(zipcodeValue)
     }
-  
     useEffect(()=>{
       if(type === "assignedCities"){
         getAssignedCitiesAndZipcodes()
@@ -123,7 +104,7 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
         //    })
            filterZipcodes(value) 
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       },[value,assignedCityAndZipcodes])
     return (
         <>
@@ -146,7 +127,6 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
                 helperText={touched.city && errors.city}
                 />}
         />
-
           </Grid>
           <Grid
             item
@@ -165,10 +145,8 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
             onChange={( e,value) => {
               if(value.length >3 ){
                 enqueueSnackbar('you cant able to select more than 3 values',   { variant: "error","anchorOrigin" : alertPosition } );
-
               }else{
                 onHandleZipcodeChange(value)
-
               }
             }}
             renderInput={(params) =>
@@ -177,7 +155,6 @@ const CityAndZipcodes =({value,onHandleCityChange,onHandleZipcodeChange,zipcodeV
                 helperText={touched.zipcode && errors.zipcode}
             />}
             />
-
           </Grid>
         </>
     )

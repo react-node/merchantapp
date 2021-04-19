@@ -5,14 +5,8 @@ import clsx from 'clsx';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  TextField,
-  InputAdornment,
-  SvgIcon,
   makeStyles
 } from '@material-ui/core';
-import { Search as SearchIcon } from 'react-feather';
 const useStyles = makeStyles((theme) => ({
   root: {},
   importButton: {
@@ -22,9 +16,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(1)
   }
 }));
-
-
-const Toolbar = ({ className,searchHandler, ...rest }) => {
+const Toolbar = ({ className, ...rest }) => {
   const classes = useStyles();
  // const {state} = useContext(UserManagementContext)
   const navigate = useNavigate();
@@ -32,11 +24,10 @@ const Toolbar = ({ className,searchHandler, ...rest }) => {
   const createUser=()=>{
     navigate("/app/admin/users/create")
   }
-
-  const changeHandler = (event)=>{
-    searchHandler(event.target.value)
-   // console.log(searchString) 
-  }
+  // const changeHandler = (event)=>{
+  //   searchHandler(event.target.value)
+  //  // console.log(searchString) 
+  // }
   return (
     <div
       className={clsx(classes.root, className)}
@@ -46,7 +37,6 @@ const Toolbar = ({ className,searchHandler, ...rest }) => {
         display="flex"
         justifyContent="flex-end"
       >
-       
         <Button
           color="primary"
           variant="contained"
@@ -56,32 +46,7 @@ const Toolbar = ({ className,searchHandler, ...rest }) => {
           Create User
         </Button>
       </Box>
-      <Box mt={3}>
-        <Card>
-          <CardContent>
-            <Box maxWidth={500}>
-              <TextField
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SvgIcon
-                        fontSize="small"
-                        color="action"
-                      >
-                        <SearchIcon />
-                      </SvgIcon>
-                    </InputAdornment>
-                  )
-                }}
-                placeholder="Enter email / name"
-                variant="outlined"
-                onChange = {changeHandler}
-              />
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
+     
     </div>
   );
 };

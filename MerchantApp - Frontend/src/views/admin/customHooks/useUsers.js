@@ -14,12 +14,19 @@ const useUsers = () =>{
     const getUsers = async (page=1,pageSize=5,order="desc",orderBy = "_id",searchCriteria={},filter={},userType=0)=>{
         try{
             setRows([])
-            
+            console.log(searchCriteria)
+            console.log(filter)
             if(Object.keys(filter).length === 0){
-                filter = filterData
+                //filter = filterData
+                filter = JSON.parse(localStorage.getItem("contextFilterData") || JSON.stringify(filterData) )
             }else{
                 setFilterData(filter)
             }
+            // if(Object.keys(searchCriteria).length === 0){
+            //     searchCriteria = searchData
+            // }else{
+            //     setSearchData(searchCriteria)
+            // }
             
               updateSearchCriteria({page,pageSize,order,orderBy})
               const offerdata = await AdminServices.getUsers(page,pageSize,order,orderBy,userType,searchCriteria,filter)

@@ -12,7 +12,11 @@ import { GlobalContext } from "../src/context/GlobalState";
 
 const useStyles = makeStyles((theme) => ({
   snack: {
-    top:65
+    top:65,
+    position:'absolute'
+  },
+  snackbarContainer:{
+    height:0
   }
 }));
 const App = () => {
@@ -31,6 +35,7 @@ const App = () => {
        maxSnack={3}
         classes={{ 
           root: classes.snack,
+          containerRoot: classes.snackbarContainer
         }}
         >
       <GlobalStyles />
