@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useSnackbar } from 'notistack'
 import { Context as UserManagemantContext } from '../userManagement/Context/userManagementContext';
 import * as config from '../../../utils/config'
@@ -15,6 +15,11 @@ const useStores = () =>{
     const { enqueueSnackbar } = useSnackbar();
     const alertPosition = { horizontal: "right", vertical: "top" }
     const {updateSearchCriteria} = useContext(UserManagemantContext)
+    const unmounted = useRef(false);
+    //perfect fix to memory leak when unmount the component.
+    useEffect(() => {
+      return () => { unmounted.current = true }
+    }, []);
     console.log("custom hook get all stores data.....")
     const getStores = async (page=1,pageSize=5,order="desc",orderBy = "_id",searchCriteria={},filterOptions={},userType=0,isItSearch=false)=>{
         try{
@@ -66,13 +71,19 @@ const useStores = () =>{
             if(offerdata.data.count === 0){
               resultData = [{error:-1, message : "Records not found..."}]
             }
-            setRows(resultData)
-            setCount(offerdata.data.count)
+            if(!unmounted.current){
+              setRows(resultData)
+              setCount(offerdata.data.count)
+            }
         }catch(error){
             console.log(error)
-            setRows([{error:-1, message : "Something went wrong, Please try again...!"}])
+            if(!unmounted.current){
+              setRows([{error:-1, message : "Something went wrong, Please try again...!"}])
+              setCount(0)
+            }
             enqueueSnackbar('Something went wrong, Please try again...!',   { variant: "error","anchorOrigin" : alertPosition } );
-            setCount(0)
+
+           
         }
       }
       const getMerchantStoresBySearch = async (searchString)=>{

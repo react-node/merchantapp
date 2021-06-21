@@ -149,12 +149,12 @@ const StoresInfoView =()=>{
               <Grid >
               <GridList  className={classes.gridList} cols={3} component={"span"}>
                  
-                    <a  href={GOOGLE_STORAGE_PUBLIC_URL+storeData._id+"/"+storeData.profilepic} target="_blank" rel="noopener noreferrer">
+                    <a  href={GOOGLE_STORAGE_PUBLIC_URL+storeData.owner+"/"+storeData.profilepic} target="_blank" rel="noopener noreferrer">
                       <GridListTile  cols={1} component={"span"} >
                       <Avatar
                       component={"span"}
                       alt={storeData.profilepic}
-                      src={GOOGLE_STORAGE_PUBLIC_URL+storeData._id+storeData.profilepic}
+                      src={GOOGLE_STORAGE_PUBLIC_URL+storeData.owner+"/"+storeData.profilepic}
                       variant="square"
                       className={classes.avatar}
                       />

@@ -23,7 +23,7 @@ const UserListView = () =>{
       { id: 'LastName', numeric: false, disablePadding: false, label: 'Last Name', key : "lastName" , type : "text",sort : false},
       { id: 'email', numeric: false, disablePadding: false, label: 'Email' , key : "email", type : "text",sort : true},
       { id: 'phoneNumber', numeric: false, disablePadding: false, label: 'Phone Number', key : "phoneNumber", type : "text" ,sort : false},
-      { id: 'isVerified', numeric: false, disablePadding: false, label: 'Status' , key : "isVerified", type : "active",sort : true},
+      { id: 'isVerified', numeric: false, disablePadding: false, label: 'Status' , key : "status", type : "active",sort : true},
       { id: 'Action', numeric: false, disablePadding: false, label: 'Action' , key : "action", type : "action",sort : false,actionTypes:["edit"]}
     ]
     const tableTitle ="Admin Users"

@@ -7,6 +7,7 @@ import {useNavigate} from 'react-router-dom'
  
 const StoresListView = ({type}) =>{
   const [rows,count,getStores,getMerchantStoresBySearch,errorMessage] = useStores()
+
   const navigate = useNavigate()
   const tableTitle ="Merchant Stores"
   const Headers = [
