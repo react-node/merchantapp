@@ -53,6 +53,21 @@ class ProfileContorller {
         }
         //}, 2000);
     }
+    async getCityzipcodesTest (req, res, next){
+        try {
+        //     const userID= req.payload.aud
+        //     console.log(userID)
+       
+        //    const result =await AssignedCities.find({assignedTo:userID})
+        //    res.send(result)
+            let _id =  req.payload.aud 
+            const user = await AssignedCities.findOne({ assignedTo: _id })
+            res.send(user)
+        } catch (error) {
+            console.log(error)
+            next(error)
+        }
+    }
     async getUser(req, res, next) {
         try {
             // const log = {message:"calling getuser endpoint...."}

@@ -92,13 +92,17 @@ const storeSchema = new mongoose.Schema({
         timestamps: true
     })
 
+
+
+storeSchema.index({location: '2dsphere'}) //Index not creating. need to check other option or manually create index
 storeSchema.virtual('offers', {
     ref: 'Offers',
     localField: '_id',
-    foreignField: 'storeID'
+    foreignField: 'storeID',
+   
 })
+storeSchema.set('toJSON', { virtuals: true });
 
-storeSchema.index({location: '2dsphere'}) //Index not creating. need to check other option or manually create index
 const Store = mongoose.model('Store', storeSchema)
 
 module.exports = Store

@@ -156,8 +156,6 @@ class PaymentController{
                             }
                             const isSavedDB = await SlotBookingController.updateBookingTXNID(updateData,slotType)
                             res.redirect(`${process.env.MERCHANT_APP_URI}/app/slot-booking-status/${slotType}/${responseData.ORDERID}`)
-
-
                            // res.json(response)
                         });
                     });

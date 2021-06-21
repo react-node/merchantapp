@@ -13,6 +13,7 @@ router.get('/banner/:bannerID', imageuploadController.getBannerInfo )
 router.put('/banner/:bannerID', imageuploadController.updatebannerInfo )
 router.get('/bannerByzipcodes', imageuploadController.getBannerImageByZipcodes )
 router.delete('/banner', imageuploadController.deleteBannerImage )
+router.post('/updateDefaultBannerInfo/:bannerID', imageuploadController.updateDefaultBannerInfo )
 
 
 

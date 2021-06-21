@@ -9,5 +9,7 @@ router.post('/offerHistory', SlotBookingController.getOffersHistory)
 router.post('/bannerHistory', SlotBookingController.getBannerHistory)
 router.post('/searchbanneravailability', SlotBookingController.searchBannerSlots)
 router.post('/searchofferavailability', SlotBookingController.searchOfferSlots)
+router.get('/getBanners', SlotBookingController.getBanners)
+
 
 module.exports = router

@@ -1,6 +1,6 @@
 const createError = require('http-errors')
 const User = require('../Models/User.model')
-const { authSchema } = require('../helpers/validation_schema')
+const { authSchema ,endUserAuthSchema} = require('../helpers/validation_schema')
 const {
   signAccessToken,
   signRefreshToken,
@@ -16,6 +16,44 @@ module.exports = {
       // const { email, password } = req.body
       // if (!email || !password) throw createError.BadRequest()
       const result = await authSchema.validateAsync(req.body)
+
+      const doesExist = await User.findOne({ email: result.email })
+      if (doesExist)
+        throw createError.Conflict(`${result.email} is already been registered`)
+      const randomString = Math.random().toString(36).slice(2)
+      result.activationKey = randomString
+      const user = new User(result)
+      var savedUser = await user.save()
+      console.log(savedUser._id)
+      const encrypt_email =  cryptr.encrypt(savedUser._id);
+      const emailSend = await sendEmail(randomString,encrypt_email,result.firstName,result.email)
+      console.log(emailSend)
+
+      if(!emailSend.messageId ) throw createError.InternalServerError("email not sent")
+      // const accessToken = await signAccessToken(savedUser.id)
+      // const refreshToken = await signRefreshToken(savedUser.id)
+      const responseData = {
+        status:200,
+        message : "Registered successfully",
+        _id : savedUser._id
+      }
+      res.send(responseData)
+    } catch (error) {
+      if (error.isJoi === true) error.status = 422
+      if(error.status === 500)
+      var deleteUser = await User.findByIdAndDelete(savedUser._id)
+      next(error)
+    }
+  },
+  
+  // End user login or signup.
+  // If email existed login directly or else create and login
+
+  LoginORSignup: async (req, res, next) => {
+    try {
+      // const { email, password } = req.body
+      // if (!email || !password) throw createError.BadRequest()
+      const result = await endUserAuthSchema.validateAsync(req.body)
 
       const doesExist = await User.findOne({ email: result.email })
       if (doesExist)

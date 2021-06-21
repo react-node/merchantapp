@@ -16,9 +16,13 @@ const cityZipcodesSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User' 
-    }
-
-    
+    },
+    popularAreas:[{
+            type: String,
+            required: true
+           
+        }]
+        
 }, {
     timestamps: true
 })

@@ -8,6 +8,11 @@ const authSchema = Joi.object({
   policy:Joi.boolean()
 }).unknown(true)
 
+const endUserAuthSchema = Joi.object({
+  email: Joi.string().email().lowercase().required(),
+  password: Joi.string().min(2).required(),
+}).unknown(true)
+
 const StoreValidation = Joi.object({
   name : Joi.string(),
   address :Joi.string(),
@@ -39,5 +44,6 @@ const OffersModelValidation = Joi.array().items(Joi.object({
 module.exports = {
   authSchema,
   StoreValidation,
-  OffersModelValidation
+  OffersModelValidation,
+  endUserAuthSchema
 }

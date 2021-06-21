@@ -1,6 +1,7 @@
 const uploadImage = require('../helpers/gcs_helper')
 const StoreImagesModel = require('../Models/StoreImages.model')
 const BannerImageModel = require('../Models/BannerImages.model')
+const DefaultBanners = require('../Models/DefaultBannerImages.model')
 const Store = require('../Models/Store.model')
 
 class ImageuploadController{
@@ -85,11 +86,11 @@ class ImageuploadController{
         let query = {storeID}
         if(status) query.status = status
         if(userType === 3)  query.ownerID = ownerID 
-        setTimeout(async () => {
+        //setTimeout(async () => {
         const storeImages = await StoreImagesModel.find(query).sort({ _id: -1 }).skip(skip).limit(PAGE_SIZE)
         res.send(storeImages)
           
-        }, 3000);
+       // }, 3000);
        
       }catch(error){
         next(error)
@@ -224,6 +225,27 @@ class ImageuploadController{
       }catch(error){
         next(error)
 
+      }
+    }
+    async updateDefaultBannerInfo(req,res,next){
+      try{
+        const id = req.params.bannerID
+        if(id > 5){
+          throw new Error("ID value should be less than 6")
+        }
+        const ownerID = req.payload.aud
+        const requestBody = {ownerID,...req.body}
+        console.log(requestBody)
+        const BannerImage = await DefaultBanners.findOneAndUpdate({id},requestBody,{new : true} )
+        if(!BannerImage){
+          const model = new DefaultBanners({...requestBody,id})
+          const result = await model.save()
+          res.send(result)
+          return 
+        }
+        res.send(BannerImage)
+      }catch(error){
+        next(error)
       }
     }
 }

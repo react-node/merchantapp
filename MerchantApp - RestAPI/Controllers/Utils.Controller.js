@@ -49,7 +49,7 @@ const UtilsContorller = {
             if(cities){
                 query.city = {$in : cities}
             }
-            const resultData = await CityZipcodes.find(query).select('_id city zipcodes')
+            const resultData = await CityZipcodes.find(query).select('_id city zipcodes popularAreas')
            // const mallModelData =  mallModel()
             res.send(resultData)
         } catch (error) {
@@ -85,10 +85,12 @@ const UtilsContorller = {
             next(error)
         }
     },
+    
     //get store type and categories.
     async getStoreTypes(req,res,next){
         try {
-            const storeTypeData = await StoreType.find()
+            const query = req.query.id ? {_id : req.query.id } : {}
+            const storeTypeData = await StoreType.find(query)
             res.send(storeTypeData)
           } catch (error) {
            

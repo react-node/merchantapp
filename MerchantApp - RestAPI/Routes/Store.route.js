@@ -8,7 +8,7 @@ router.put('/', StoreController.updateStore)
 router.get('/', StoreController.getStores)
 router.delete('/:storeID', StoreController.deleteStore)
 router.get('/:storeID', StoreController.getStoreByID)
-router.get('/getAllStores', StoreController.getAllStores)
+router.get('/getallstores/stores', StoreController.getAllStores)
 
 
 module.exports = router

@@ -4,6 +4,8 @@ const { StoreValidation } = require('../helpers/validation_schema')
 const { validateStore } = require('../helpers/storeDuplicateCheck')
 const { getAssignedZipcodes } = require('../helpers/utils')
 const createError = require('http-errors')
+const { Mongoose } = require('mongoose')
+const Malls = require('../Models/Malls.model')
 const StoreContorller = {
     async addStore(req, res, next){
         try {
@@ -97,19 +99,30 @@ const StoreContorller = {
             next(error)
           }
     },
-    async getAllStores(req,res,next){
-      try {
-         
-          let query = {owner : req.payload.aud, isDeleted:false}
-         
-          const storesData = await Store.find(query).sort({ _id: -1 })
-          const responseStore = storesData.map(({_id,name,address,zipcode})=>{return {_id,name,address,zipcode}})
-          res.send(responseStore)
-        } catch (error) {
-          if (error.isJoi === true) error.status = 422
-          next(error)
-        }
-  },
+  async getStoreDetails(req,res,next){
+    try {
+        const searchString = req.params.searchString
+        const regex = new RegExp(searchString, 'i')
+        const query = {name : regex, isActive : true, isDeleted:false}
+        const storesData = await Store.find(query).select('_id name area').limit(10)
+        res.send(storesData)
+      
+    } catch (error) {
+      next(error)
+    }
+  },  
+  async searchMalls(req,res,next){
+    try {
+        const searchString = req.params.searchString
+        const regex = new RegExp(searchString, 'i')
+        const query = {mallName : regex}
+        const storesData = await Malls.find(query).select('_id mallName area').limit(10)
+        res.send(storesData)
+      
+    } catch (error) {
+      next(error)
+    }
+  },  
   async updateStore(req,res,next){
     try {
       const requestPayload = req.body
@@ -145,6 +158,18 @@ const StoreContorller = {
     } catch (error) {
         next(error)
     }
+  },
+  async getAllStores(req,res,next){
+    try {
+        let query = {owner : req.payload.aud, isDeleted:false}
+        console.log(query)
+       const storesData = await Store.find(query).sort({ _id: -1 })
+       const responseStore = storesData.map(({_id,name,address,zipcode})=>{return {_id,name,address,zipcode}})
+        res.send(responseStore)
+      } catch (error) {
+        if (error.isJoi === true) error.status = 422
+        next(error)
+      }
   },
   async getStoreByID(req,res,next){
     try {

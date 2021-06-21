@@ -34,7 +34,8 @@ module.exports = {
         return next(createError.Unauthorized(message))
       }
       req.payload = payload
-      client.get(payload.aud,(error,redisToken)=>{
+      const user_id = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud
+      client.get(user_id,(error,redisToken)=>{
         console.log("redis token is checking in verify accesstoken function, id is---", payload.aud)
         if(error || !redisToken)   return next(createError.Unauthorized('Unauthorized'))
         next()
@@ -76,7 +77,7 @@ module.exports = {
         process.env.REFRESH_TOKEN_SECRET,
         (err, payload) => {
           if (err) return reject(createError.Unauthorized())
-          const userId = payload.aud
+          const userId = Array.isArray(payload.aud) ? payload.aud[0] : payload.aud
           client.GET(userId, (err, result) => {
             if (err) {
               console.log(err.message)
