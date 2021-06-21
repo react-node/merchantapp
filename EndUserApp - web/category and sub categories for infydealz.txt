@@ -1,0 +1,48 @@
+[
+{
+"name":iphone
+"categoryName" : "Mobile",
+"regExp" : [i]([phone])
+"category":"Cell_Phones@0"
+"storeTypeID" : "5ff30073014868212cc5ab77"
+ 
+},
+{
+"name":xperia
+"categoryName" : "Mobile",
+"regExp" : [x]([peria])
+"category":"Cell_Phones@0"
+"storeTypeID" : "5ff30073014868212cc5ab77"
+ 
+}
+{
+"name":iwatch
+"categoryName" : "Mobile",
+"regExp" : [i]([watch])
+"category":"Watches@1"
+"storeTypeID" : "5ff30073014868212cc5ab77"
+ 
+},
+{
+"name":android
+"categoryName" : "Mobile",
+"regExp" : [a]([ndroid])
+"category":"Cell_Phones@0"
+"storeTypeID" : "5ff30073014868212cc5ab77"
+ 
+}
+]
+
+Request payload for api to insert in both storetypes and products collection
+
+[
+{
+type : "Electronics",
+categories : [
+{"name" : "cell phone",subCategories :[{company:"apple","productName":"iphone"},{company:"sony","productName":"xperia"}]},
+{"name":"TV & Video",subCategories :[{company:"sony","productName":"BRAVIA"}]}]
+
+}
+]
+
+ 
