@@ -38,9 +38,9 @@ const OffersListByCategory = () => {
   const [handleClickOpen] = useLogin()
   const {getAccessToken} = useContext(GlobalContext)
    const accessToken = getAccessToken()
-  const {getNearByOffers} = useDashboard()
+  const {getNearByOffers,updateOfferMetaData} = useDashboard()
   const [nearByStores, setNearByStores] = useState([])
-  
+
   const [isResponseEmpty, setIsResponseEmpty] = useState(false)
   const {type,category} = useParams()
   //const [categoryID,setCategoryID] = useState(category)
@@ -119,7 +119,37 @@ const OffersListByCategory = () => {
     
     
   },[category])
+  const offerMetaData=async (type,offerID)=>{
+    try {
+      if(accessToken){
 
+        const resp = await updateOfferMetaData(type,offerID)
+        const existingData =  nearByStores.map(item => {
+           if(item.offers.length===0) return item
+
+           item.offers.forEach((x,index)=>{
+            if(x._id === resp._id){
+             const newObj = {...x,[type]:resp[type]}
+             item.offers[index] = newObj
+              
+            }
+            
+          })
+          return {...item}
+         
+        })
+        console.log(existingData)
+        setNearByStores(existingData)
+        
+      }else{
+        handleClickOpen(true)
+      }
+    } catch (error) {
+      
+    }
+    
+    
+  }
   const goToDetails=(storeID,offerID=null)=>{
     if(accessToken){
       if(offerID){
@@ -155,7 +185,7 @@ const OffersListByCategory = () => {
                 md={6}
                 xs={12}
               >
-              {item.offers.length > 0 && <OfferCard goToDetails={goToDetails} offer={item.offers[0]} storeName = {item.name} storeID={item._id} />}  
+              {item.offers.length > 0 && <OfferCard goToDetails={goToDetails} offer={item.offers[0]} storeName = {item.name} storeID={item._id}  offerMetaData={offerMetaData}/>}  
               {item.offers.length === 0 && <StoreCard  goToDetails={goToDetails}  store={item}/>}  
               
             </Grid>

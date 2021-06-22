@@ -13,6 +13,7 @@ import StoreCard from 'src/components/Offers/StoreCard';
 import useLogin from 'src/hooks/useLogin';
 import { Context as GlobalContext } from '../../globalContext/globalContext'
 import useSearchFilter from 'src/hooks/useSearchFilter';
+import useDashboard from 'src/hooks/useDashboard';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,6 +35,8 @@ const SearchStore = () => {
   const classes = useStyles();
   const [stores,setStore] = useState([])
   const [page, setPage] = useState(0);
+  const {updateOfferMetaData} = useDashboard()
+
   const [isResponseEmpty, setIsResponseEmpty] = useState(false)
   const {storeID} = useParams()
   let { search } = useLocation();
@@ -115,7 +118,37 @@ const SearchStore = () => {
     if(page!==0  && !isResponseEmpty)
     getData()
   },[page])
+  const offerMetaData=async (type,offerID)=>{
+    try {
+      if(accessToken){
 
+        const resp = await updateOfferMetaData(type,offerID)
+        const existingData =  stores.map(item => {
+           if(item.offers.length===0) return item
+
+           item.offers.forEach((x,index)=>{
+            if(x._id === resp._id){
+             const newObj = {...x,[type]:resp[type]}
+             item.offers[index] = newObj
+              
+            }
+            
+          })
+          return {...item}
+         
+        })
+        console.log(existingData)
+        setStore(existingData)
+        
+      }else{
+        handleClickOpen(true)
+      }
+    } catch (error) {
+      
+    }
+    
+    
+  }
   useEffect(()=>{
     // setStore([])
     // setIsResponseEmpty(false)
@@ -153,7 +186,7 @@ const SearchStore = () => {
                 md={6}
                 xs={12}
               >
-                    <OfferCard key={data._id} goToDetails={goToDetails} offer={data} storeName = {item.name} storeID={item._id} />
+                    <OfferCard key={data._id} goToDetails={goToDetails} offer={data} storeName = {item.name} storeID={item._id} offerMetaData={offerMetaData} />
                 </Grid>
                 ))
               
